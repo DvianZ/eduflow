@@ -1,56 +1,35 @@
-# Welcome to your Expo app 👋
+# EduFlow
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern learning flow management app built for students and lifelong learners, offering an immersive, gamified, and seamless educational experience on iOS, Android, and the Web.
 
-## Get started
+## Features
+- **Discovery**: Explore a vast catalog of courses across various topics (Spatial UI, Machine Learning, etc.).
+- **Progress Tracking**: Track your streak, earned points, and module-level progress.
+- **Mock Checkout**: Seamless, state-driven mock payment experience.
+- **Cross-Platform**: Runs beautifully on iOS, Android, and Web browsers.
+- **Dark & Light Mode**: Fluid dynamic theming out of the box.
 
-1. Install dependencies
+## Tech Stack
+- **React Native 0.86.3** + **Expo 57.0.25**
+- **Zustand** for global state management
+- **Expo Router** for file-based navigation
+- **AsyncStorage** for local persistence
 
-   ```bash
-   npm install
-   ```
+## Quick Start
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Run the development server: `npx expo start`
+4. Scan the QR code with Expo Go (iOS/Android) or press `w` to open in your web browser.
 
-2. Start the app
+## Project Structure
+Please see [ARCHITECTURE.md](./ARCHITECTURE.md) for a detailed overview of the folder structure and technical design.
 
-   ```bash
-   npx expo start
-   ```
+## Development
+- `npm run lint` - Run ESLint (when configured)
+- `npm run type-check` - Run TypeScript compiler check (use `npx tsc --noEmit`)
 
-In the output, you'll find options to open the app in a
+## Vision
+See [PROJECT_VISION.md](./PROJECT_VISION.md) for more info on the project goals and roadmap.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## License
+MIT
