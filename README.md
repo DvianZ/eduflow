@@ -25,7 +25,8 @@ A modern learning flow management app built for students and lifelong learners, 
 Please see [ARCHITECTURE.md](./ARCHITECTURE.md) for a detailed overview of the folder structure and technical design.
 
 ## Development
-- `npm run lint` - Run ESLint (when configured)
+- `npm run lint` - Run ESLint 9 (Flat Config setup) to check for code issues.
+- `npm run test` - Run Unit Tests with Jest & React Native Testing Library.
 - `npm run type-check` - Run TypeScript compiler check (use `npx tsc --noEmit`)
 
 ## Vision
