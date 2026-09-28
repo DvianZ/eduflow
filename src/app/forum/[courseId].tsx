@@ -11,7 +11,7 @@ export default function ForumScreen() {
   const { colors, typography, spacing, radii, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { courseId } = useLocalSearchParams<{ courseId: string }>();
+  // Removed courseId
   const { user } = useAppStore();
 
   const [activeFilter, setActiveFilter] = useState('All');

@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useTheme } from '@/hooks/use-theme';
 import { useAppStore } from '@/store/useAppStore';
@@ -51,7 +51,7 @@ export default function QuizScreen() {
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
-  const handleNext = useCallback(() => {
+  const handleNext = () => {
     if (!isAnswered) {
       // Submit answer
       setIsAnswered(true);
@@ -79,7 +79,7 @@ export default function QuizScreen() {
         setShowHint(false);
       }
     }
-  }, [isAnswered, selectedOption, currentQuestion, isLastQuestion, correctCount, quiz, completedQuizzes, markQuizComplete]);
+  };
 
   const finalScore = correctCount * quiz.pointsPerQuestion;
   const scorePercent = Math.round((correctCount / questions.length) * 100);

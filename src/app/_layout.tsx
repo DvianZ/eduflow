@@ -35,7 +35,7 @@ function RootNavigation() {
     } else if (hasOnboarded && inOnboardingGroup) {
       router.replace('/(tabs)');
     }
-  }, [hasOnboarded, segments]);
+  }, [hasOnboarded, segments, router]);
 
   return (
     <>
@@ -62,21 +62,13 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
-  const [appIsReady, setAppIsReady] = useState(false);
-
   useEffect(() => {
     if (fontsLoaded || fontError) {
-      setAppIsReady(true);
+      SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
 
-  useEffect(() => {
-    if (appIsReady) {
-      SplashScreen.hideAsync();
-    }
-  }, [appIsReady]);
-
-  if (!appIsReady) {
+  if (!fontsLoaded && !fontError) {
     return null;
   }
 

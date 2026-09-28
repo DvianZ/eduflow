@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
@@ -14,7 +14,7 @@ export default function MyLearningScreen() {
   const { colors, typography, spacing, radii, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { enrolledCourses, courseProgress, completedLessons, bookmarkedCourses } = useAppStore();
+  const { enrolledCourses, courseProgress, completedLessons } = useAppStore();
 
   const inProgressCount = enrolledCourses.length;
   const completedCount = completedLessons.length;
@@ -25,7 +25,7 @@ export default function MyLearningScreen() {
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
 
   const activeCourseId = enrolledCourses.length > 0 ? enrolledCourses[0] : '1';
-  const isEnrolledInCourse1 = enrolledCourses.includes(activeCourseId);
+  // Removed isEnrolledInCourse1
   const activeCourse = getCourseById(activeCourseId) || MOCK_COURSES[0];
   const currentProgress = courseProgress[activeCourseId] || 0;
   

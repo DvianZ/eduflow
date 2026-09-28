@@ -13,7 +13,7 @@ export default function CourseDetailsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { enrolledCourses, enrollInCourse } = useAppStore();
+  const { enrolledCourses } = useAppStore();
   
   const course = getCourseById(id || '1') || MOCK_COURSES[0];
   const isEnrolled = enrolledCourses.includes(course.id);

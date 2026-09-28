@@ -38,19 +38,17 @@ export default function LessonScreen() {
       interval = setInterval(() => {
         setCurrentTime(prev => {
           const next = prev + (1 * playbackSpeed);
-          return Math.min(next, totalTime);
+          if (next >= totalTime) {
+            setIsPlaying(false);
+            markLessonComplete(id); // use id instead of lessonId which isn't defined here
+            return totalTime;
+          }
+          return next;
         });
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, currentTime, playbackSpeed, totalTime]);
-
-  useEffect(() => {
-    if (currentTime >= totalTime) {
-      markLessonComplete(lessonId);
-      setIsPlaying(false);
-    }
-  }, [currentTime, totalTime, markLessonComplete, lessonId]);
+  }, [isPlaying, currentTime, playbackSpeed, totalTime, markLessonComplete, id]);
 
   const progressPercent = Math.min((currentTime / totalTime) * 100, 100);
   const formatTime = (secs: number) => {

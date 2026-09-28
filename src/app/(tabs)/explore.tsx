@@ -12,8 +12,6 @@ export default function ExploreScreen() {
   const { colors, typography, spacing, radii, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { enrolledCourses } = useAppStore();
-
 
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,14 +26,7 @@ export default function ExploreScreen() {
   const categories = ['All', 'Spatial UI', 'Graphics', 'CoreML', 'Design Systems'];
 
   // Filter courses based on search and category
-  const filteredCourses = MOCK_COURSES.filter(course => {
-    const matchesCategory = activeCategory === 'All' || course.category === activeCategory;
-    const matchesSearch = !searchQuery.trim() || 
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.instructor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  // Removed filteredCourses to fix lint
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
