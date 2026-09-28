@@ -54,7 +54,7 @@ export default function CheckoutScreen() {
           </TouchableOpacity>
           <View style={[styles.encryptBadge, { backgroundColor: colors.surface2 }]}>
             <Ionicons name="lock-closed" size={14} color={colors.success} />
-            <Text style={[typography.labelSm, { color: colors.onSurfaceVariant, marginLeft: 4 }]}>256-bit Encrypted</Text>
+            <Text style={[typography.labelSm, { color: colors.onSurfaceVariant, marginLeft: 4 }]}>Secure Checkout</Text>
           </View>
         </View>
 
