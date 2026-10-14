@@ -9,6 +9,7 @@ import {
   useColorScheme,
   Alert,
   Modal,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -48,8 +49,6 @@ export default function DashboardScreen() {
       !n.isRead &&
       (n.type === 'revision' || n.type === 'grade')
   );
-
-
 
   const userEnrollments = enrollments.filter((e) => e.userId === currentUser.id);
   const enrolledBatches = batches.filter((b) =>
@@ -159,614 +158,840 @@ export default function DashboardScreen() {
     Alert.alert('Berhasil! 🎉', 'Anda telah bergabung ke kelas baru. Silakan cek silabus.');
   };
 
+  // iOS Theme Tokens
+  const pageBg = isDark ? '#000000' : '#F2F2F7';
+  const cardBg = isDark ? '#1C1C1E' : '#FFFFFF';
+  const secondaryCardBg = isDark ? '#2C2C2E' : '#FFFFFF';
+  const cardBorder = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+  const textPrimary = isDark ? '#FFFFFF' : '#000000';
+  const textSecondary = isDark ? 'rgba(235, 235, 245, 0.65)' : 'rgba(60, 60, 67, 0.65)';
+  const inputBg = isDark ? '#2C2C2E' : '#F2F2F7';
+
   return (
-    <SafeAreaView
-      edges={['top']}
-      style={[
-        styles.safeArea,
-        { backgroundColor: isDark ? '#090D16' : '#F8FAFC' },
-      ]}>
+    <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: pageBg }]}>
       <DemoHeader />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {/* Active Batch Hero Card */}
-        <View
-          style={[
-            styles.batchCard,
-            {
-              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-              borderColor: isDark ? '#334155' : '#E2E8F0',
-            },
-          ]}>
-          <View style={styles.batchHeader}>
-            <View
-              style={[
-                styles.batchBadge,
-                {
-                  backgroundColor:
-                    activeBatch.id === 'batch-edf-402'
-                      ? '#DBEAFE'
-                      : activeBatch.status === 'completed'
-                      ? '#DCFCE7'
-                      : '#EDE9FE',
-                },
-              ]}>
-              <Text
-                style={[
-                  styles.batchBadgeText,
-                  {
-                    color:
-                      activeBatch.id === 'batch-edf-402'
-                        ? '#1E40AF'
-                        : activeBatch.status === 'completed'
-                        ? '#15803D'
-                        : '#7C3AED',
-                  },
-                ]}>
-                {activeBatch.id === 'batch-edf-402'
-                  ? '⚡ COHORT AKTIF'
-                  : activeBatch.status === 'completed'
-                  ? '🏆 LULUS & BERSERTIFIKAT'
-                  : 'KELAS AKTIF'}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => handleCopyCode(activeBatch.classCode)}
-              activeOpacity={0.8}
-              style={[
-                styles.codeBadge,
-                copiedCode === activeBatch.classCode && { backgroundColor: '#DCFCE7' },
-              ]}>
-              <Ionicons
-                name={copiedCode === activeBatch.classCode ? 'checkmark' : 'copy-outline'}
-                size={12}
-                color={copiedCode === activeBatch.classCode ? '#16A34A' : '#2563EB'}
-              />
-              <Text style={styles.codeBadgeLabel}>Kode:</Text>
-              <Text
-                style={[
-                  styles.codeBadgeValue,
-                  copiedCode === activeBatch.classCode && { color: '#16A34A' },
-                ]}>
-                {copiedCode === activeBatch.classCode ? 'Tersalin!' : activeBatch.classCode}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text
+        {/* iOS BENTO GRID CONTAINER */}
+        <View style={styles.bentoGrid}>
+          {/* ============================================================== */}
+          {/* CELL 1 (SPAN 2): ACTIVE BATCH HERO CARD */}
+          {/* ============================================================== */}
+          <View
             style={[
-              styles.batchTitle,
-              { color: isDark ? '#F8FAFC' : '#0F172A' },
+              styles.bentoSpan2,
+              styles.heroBatchCard,
+              {
+                backgroundColor: cardBg,
+                borderColor: cardBorder,
+              },
             ]}>
-            {activeCourse?.title || activeBatch.batchName}
-          </Text>
-          <Text style={styles.batchSubtitle}>{activeBatch.batchName}</Text>
-
-          <View style={styles.mentorRow}>
-            <Ionicons name="person-circle-outline" size={18} color="#64748B" />
-            <Text style={styles.mentorText}>
-              Mentor: <Text style={styles.mentorName}>{activeBatch.instructorName}</Text>
-            </Text>
-          </View>
-        </View>
-
-        {/* LEARNER SPECIFIC VIEW */}
-        {!isTeacher ? (
-          <>
-            {/* Urgent Notification Banner for Learner */}
-            {unreadAlertNotif && (
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={() => router.push('/(tabs)/grading')}
+            <View style={styles.batchHeader}>
+              <View
                 style={[
-                  styles.urgentNotifBanner,
+                  styles.batchBadge,
                   {
                     backgroundColor:
-                      unreadAlertNotif.type === 'revision'
+                      activeBatch.id === 'batch-edf-402'
                         ? isDark
-                          ? 'rgba(245, 158, 11, 0.15)'
-                          : '#FFFBEB'
+                          ? 'rgba(59, 130, 246, 0.2)'
+                          : '#EBF5FF'
+                        : activeBatch.status === 'completed'
+                        ? isDark
+                          ? 'rgba(16, 185, 129, 0.2)'
+                          : '#ECFDF5'
                         : isDark
-                        ? 'rgba(16, 185, 129, 0.15)'
-                        : '#ECFDF5',
-                    borderColor:
-                      unreadAlertNotif.type === 'revision'
-                        ? '#F59E0B'
-                        : '#10B981',
+                        ? 'rgba(139, 92, 246, 0.2)'
+                        : '#F5F3FF',
                   },
                 ]}>
-                <View
+                <Ionicons
+                  name={
+                    activeBatch.status === 'completed'
+                      ? 'trophy'
+                      : activeBatch.id === 'batch-edf-402'
+                      ? 'flash'
+                      : 'school'
+                  }
+                  size={12}
+                  color={
+                    activeBatch.id === 'batch-edf-402'
+                      ? '#2563EB'
+                      : activeBatch.status === 'completed'
+                      ? '#10B981'
+                      : '#8B5CF6'
+                  }
+                />
+                <Text
                   style={[
-                    styles.urgentNotifIconBox,
+                    styles.batchBadgeText,
+                    {
+                      color:
+                        activeBatch.id === 'batch-edf-402'
+                          ? '#2563EB'
+                          : activeBatch.status === 'completed'
+                          ? '#10B981'
+                          : '#8B5CF6',
+                    },
+                  ]}>
+                  {activeBatch.id === 'batch-edf-402'
+                    ? 'COHORT AKTIF'
+                    : activeBatch.status === 'completed'
+                    ? 'LULUS & TERSERTIFIKASI'
+                    : 'KELAS AKTIF'}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => handleCopyCode(activeBatch.classCode)}
+                activeOpacity={0.7}
+                style={[
+                  styles.codeBadge,
+                  {
+                    backgroundColor:
+                      copiedCode === activeBatch.classCode
+                        ? isDark
+                          ? 'rgba(16, 185, 129, 0.25)'
+                          : '#DCFCE7'
+                        : isDark
+                        ? '#2C2C2E'
+                        : '#F2F2F7',
+                  },
+                ]}>
+                <Ionicons
+                  name={copiedCode === activeBatch.classCode ? 'checkmark' : 'copy-outline'}
+                  size={13}
+                  color={copiedCode === activeBatch.classCode ? '#10B981' : isTeacher ? '#8B5CF6' : '#007AFF'}
+                />
+                <Text style={styles.codeBadgeLabel}>Kode:</Text>
+                <Text
+                  style={[
+                    styles.codeBadgeValue,
+                    {
+                      color:
+                        copiedCode === activeBatch.classCode
+                          ? '#10B981'
+                          : isTeacher
+                          ? '#8B5CF6'
+                          : '#007AFF',
+                    },
+                  ]}>
+                  {copiedCode === activeBatch.classCode ? 'Tersalin!' : activeBatch.classCode}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.batchTitle, { color: textPrimary }]}>
+              {activeCourse?.title || activeBatch.batchName}
+            </Text>
+            <Text style={[styles.batchSubtitle, { color: textSecondary }]}>
+              {activeBatch.batchName}
+            </Text>
+
+            <View style={styles.mentorRow}>
+              <View style={[styles.mentorAvatarIcon, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
+                <Ionicons name="person" size={14} color={isTeacher ? '#8B5CF6' : '#007AFF'} />
+              </View>
+              <Text style={[styles.mentorText, { color: textSecondary }]}>
+                Mentor: <Text style={[styles.mentorName, { color: textPrimary }]}>{activeBatch.instructorName}</Text>
+              </Text>
+            </View>
+          </View>
+
+          {/* ============================================================== */}
+          {/* LEARNER SPECIFIC VIEW */}
+          {/* ============================================================== */}
+          {!isTeacher ? (
+            <>
+              {/* CELL (SPAN 2): URGENT NOTIFICATION BANNER (IF ANY) */}
+              {unreadAlertNotif && (
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => router.push('/(tabs)/grading')}
+                  style={[
+                    styles.bentoSpan2,
+                    styles.urgentNotifBanner,
                     {
                       backgroundColor:
                         unreadAlertNotif.type === 'revision'
-                          ? '#FEF3C7'
-                          : '#D1FAE5',
+                          ? isDark
+                            ? 'rgba(245, 158, 11, 0.15)'
+                            : '#FFFBEB'
+                          : isDark
+                          ? 'rgba(16, 185, 129, 0.15)'
+                          : '#ECFDF5',
+                      borderColor:
+                        unreadAlertNotif.type === 'revision' ? '#F59E0B' : '#10B981',
                     },
                   ]}>
-                  <Ionicons
-                    name={
-                      unreadAlertNotif.type === 'revision'
-                        ? 'alert-circle'
-                        : 'trophy'
-                    }
-                    size={20}
-                    color={
-                      unreadAlertNotif.type === 'revision'
-                        ? '#D97706'
-                        : '#059669'
-                    }
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text
+                  <View
                     style={[
-                      styles.urgentNotifTitle,
+                      styles.urgentNotifIconBox,
                       {
-                        color:
-                          unreadAlertNotif.type === 'revision'
-                            ? '#D97706'
-                            : '#059669',
+                        backgroundColor:
+                          unreadAlertNotif.type === 'revision' ? '#FEF3C7' : '#D1FAE5',
                       },
                     ]}>
-                    {unreadAlertNotif.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.urgentNotifMessage,
-                      { color: isDark ? '#E2E8F0' : '#475569' },
-                    ]}
-                    numberOfLines={2}>
-                    {unreadAlertNotif.message}
-                  </Text>
-                </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={18}
-                  color={
-                    unreadAlertNotif.type === 'revision'
-                      ? '#D97706'
-                      : '#059669'
-                  }
-                />
-              </TouchableOpacity>
-            )}
-
-            {/* Progress Card for Active Class */}
-            <View
-              style={[
-                styles.card,
-                {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: isDark ? '#334155' : '#E2E8F0',
-                },
-              ]}>
-              <View style={styles.cardHeader}>
-                <Text
-                  style={[
-                    styles.cardTitle,
-                    { color: isDark ? '#F8FAFC' : '#0F172A' },
-                  ]}>
-                  📊 Progres Belajar: {activeBatch.classCode}
-                </Text>
-                <Text style={styles.progressPctText}>{evalResult.lessonProgressPct}%</Text>
-              </View>
-
-              {/* Progress Bar */}
-              <View style={styles.progressBarTrack}>
-                <View
-                  style={[
-                    styles.progressBarFill,
-                    { width: `${evalResult.lessonProgressPct}%` },
-                  ]}
-                />
-              </View>
-
-              <View style={styles.metricsGrid}>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricValue}>
-                    {evalResult.completedLessons}/{evalResult.totalLessons}
-                  </Text>
-                  <Text style={styles.metricLabel}>Materi Selesai</Text>
-                </View>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricValue}>
-                    {userQuizAttempts.filter((q) => q.isPassed).length}
-                  </Text>
-                  <Text style={styles.metricLabel}>Kuis Lulus</Text>
-                </View>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricValue}>
-                    {userGrades.length > 0 ? `${userGrades[0].score}/100` : '-'}
-                  </Text>
-                  <Text style={styles.metricLabel}>Nilai Tugas</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => router.push('/(tabs)/syllabus')}
-                style={styles.primaryBtn}>
-                <Text style={styles.primaryBtnText}>Buka Silabus & Kurikulum</Text>
-                <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-
-            {/* ENROLLED COHORTS LIST (Multi-Class Platform ala Wadhwani) */}
-            <View style={styles.sectionHeader}>
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
-                ]}>
-                🏫 Kelas & Program Terdaftar (Enrolled Cohorts)
-              </Text>
-              <Text style={styles.sectionSubtitle}>
-                Daftar kurikulum yang sedang dan telah Anda ikuti
-              </Text>
-            </View>
-
-            {enrolledBatches.length === 0 ? (
-              <View
-                style={[
-                  styles.emptyEnrolledCard,
-                  {
-                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                    borderColor: isDark ? '#334155' : '#E2E8F0',
-                  },
-                ]}>
-                <View style={styles.emptyEnrolledIconCircle}>
-                  <Ionicons name="school-outline" size={36} color="#2563EB" />
-                </View>
-                <Text
-                  style={[
-                    styles.emptyEnrolledTitle,
-                    { color: isDark ? '#F8FAFC' : '#0F172A' },
-                  ]}>
-                  Belum Ada Kelas Terdaftar
-                </Text>
-                <Text style={styles.emptyEnrolledDesc}>
-                  Anda belum bergabung dengan kelas manapun. Masukkan kode kelas yang diberikan oleh pengajar Anda untuk mulai belajar.
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setShowJoinModal(true)}
-                  style={styles.emptyEnrolledBtn}>
-                  <Ionicons name="key-outline" size={16} color="#FFFFFF" />
-                  <Text style={styles.emptyEnrolledBtnText}>+ Masukkan Kode Kelas</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              enrolledBatches.map((b) => {
-                const c = courses.find((course) => course.id === b.courseId);
-                const enr = enrollments.find((e) => e.batchId === b.id);
-                const isSelected = b.id === activeBatch.id;
-                const isDynamic = b.id === 'batch-edf-402';
-                const isCompleted = b.status === 'completed';
-
-              const pct = isDynamic
-                ? evalResult.lessonProgressPct
-                : isCompleted
-                ? 100
-                : enr?.progressPercentage ?? 50;
-
-              return (
-                <View
-                  key={b.id}
-                  style={[
-                    styles.enrolledClassCard,
-                    {
-                      backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                      borderColor: isSelected
-                        ? '#2563EB'
-                        : isDark
-                        ? '#334155'
-                        : '#E2E8F0',
-                      borderWidth: isSelected ? 2 : 1,
-                    },
-                  ]}>
-                  <View style={styles.enrolledHeaderRow}>
-                    <View style={styles.codeAndBadgeRow}>
-                      <View style={styles.codeTag}>
-                        <Text style={styles.codeTagText}>{b.classCode}</Text>
-                      </View>
-                      {isDynamic && (
-                        <View style={[styles.statusPill, { backgroundColor: '#DBEAFE' }]}>
-                          <Ionicons name="sparkles" size={12} color="#1D4ED8" />
-                          <Text style={[styles.statusPillText, { color: '#1D4ED8' }]}>
-                            Cohort Aktif
-                          </Text>
-                        </View>
-                      )}
-                      {isCompleted && (
-                        <View style={[styles.statusPill, { backgroundColor: '#DCFCE7' }]}>
-                          <Ionicons name="ribbon" size={12} color="#15803D" />
-                          <Text style={[styles.statusPillText, { color: '#15803D' }]}>
-                            Tersertifikasi
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-
-                    {isSelected && (
-                      <View style={styles.selectedIndicatorBadge}>
-                        <Text style={styles.selectedIndicatorText}>Sedang Aktif</Text>
-                      </View>
-                    )}
-                  </View>
-
-                  <Text
-                    style={[
-                      styles.enrolledCourseTitle,
-                      { color: isDark ? '#F8FAFC' : '#0F172A' },
-                    ]}>
-                    {c?.title || b.batchName}
-                  </Text>
-                  <Text style={styles.enrolledBatchName}>{b.batchName}</Text>
-
-                  {/* Progress Line */}
-                  <View style={styles.enrolledProgressRow}>
-                    <Text style={styles.enrolledProgressLabel}>Progres Pembelajaran</Text>
-                    <Text style={styles.enrolledProgressValue}>{pct}%</Text>
-                  </View>
-                  <View style={styles.progressBarTrackMini}>
-                    <View
-                      style={[
-                        styles.progressBarFillMini,
-                        {
-                          width: `${pct}%`,
-                          backgroundColor: isCompleted ? '#10B981' : '#2563EB',
-                        },
-                      ]}
+                    <Ionicons
+                      name={unreadAlertNotif.type === 'revision' ? 'alert-circle' : 'trophy'}
+                      size={20}
+                      color={unreadAlertNotif.type === 'revision' ? '#D97706' : '#059669'}
                     />
                   </View>
-
-                  {/* Footer Action */}
-                  <View style={styles.enrolledFooter}>
-                    <View style={styles.mentorMiniRow}>
-                      <Ionicons name="person-circle-outline" size={16} color="#64748B" />
-                      <Text style={styles.mentorMiniText} numberOfLines={1}>
-                        {b.instructorName}
-                      </Text>
-                    </View>
-
-                    <TouchableOpacity
-                      onPress={() => {
-                        selectBatch(b.id);
-                        router.push('/(tabs)/syllabus');
-                      }}
+                  <View style={{ flex: 1 }}>
+                    <Text
                       style={[
-                        styles.enterSyllabusBtn,
+                        styles.urgentNotifTitle,
                         {
-                          backgroundColor: isSelected ? '#2563EB' : isDark ? '#334155' : '#F1F5F9',
+                          color:
+                            unreadAlertNotif.type === 'revision' ? '#D97706' : '#059669',
                         },
                       ]}>
-                      <Text
-                        style={[
-                          styles.enterSyllabusBtnText,
-                          { color: isSelected ? '#FFFFFF' : isDark ? '#F8FAFC' : '#1E293B' },
-                        ]}>
-                        Lihat Silabus
-                      </Text>
-                      <Ionicons
-                        name="chevron-forward"
-                        size={14}
-                        color={isSelected ? '#FFFFFF' : isDark ? '#F8FAFC' : '#1E293B'}
-                      />
-                    </TouchableOpacity>
+                      {unreadAlertNotif.title}
+                    </Text>
+                    <Text
+                      style={[styles.urgentNotifMessage, { color: textSecondary }]}
+                      numberOfLines={2}>
+                      {unreadAlertNotif.message}
+                    </Text>
                   </View>
-                </View>
-              );
-            })
-          )}
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={unreadAlertNotif.type === 'revision' ? '#D97706' : '#059669'}
+                  />
+                </TouchableOpacity>
+              )}
 
-            {/* Join Class Button */}
-            <TouchableOpacity
-              onPress={() => setShowJoinModal(true)}
-              style={[
-                styles.joinClassBtn,
-                {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: '#2563EB',
-                },
-              ]}>
-              <Ionicons name="add-circle-outline" size={20} color="#2563EB" />
-              <View style={styles.joinClassTextCol}>
-                <Text style={styles.joinClassTitle}>Gabung Kelas Baru</Text>
-                <Text style={styles.joinClassSubtitle}>Masukkan kode kelas dari pengajar</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#2563EB" />
-            </TouchableOpacity>
-          </>
-        ) : (
-          /* TEACHER SPECIFIC VIEW */
-          <>
-            {/* Teacher Metrics Overview */}
-            <View
-              style={[
-                styles.card,
-                {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: isDark ? '#334155' : '#E2E8F0',
-                },
-              ]}>
-              <Text
+              {/* CELL (SPAN 2): LEARNER PROGRESS HERO */}
+              <View
                 style={[
-                  styles.cardTitle,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  styles.bentoSpan2,
+                  styles.bentoCard,
+                  {
+                    backgroundColor: cardBg,
+                    borderColor: cardBorder,
+                  },
                 ]}>
-                👨‍🏫 Panel Ringkasan Pengajar
-              </Text>
-
-              <View style={styles.metricsGrid}>
-                <View style={styles.metricItem}>
-                  <Text style={[styles.metricValue, { color: '#8B5CF6' }]}>
-                    {activeBatchEnrolledCount} / {activeBatch.maxStudents}
-                  </Text>
-                  <Text style={styles.metricLabel}>Total Peserta</Text>
+                <View style={styles.cardHeader}>
+                  <View style={styles.bentoCardHeaderLeft}>
+                    <View style={[styles.bentoHeaderIcon, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
+                      <Ionicons name="bar-chart" size={16} color="#007AFF" />
+                    </View>
+                    <Text style={[styles.cardTitle, { color: textPrimary }]}>
+                      Progres Pembelajaran
+                    </Text>
+                  </View>
+                  <Text style={styles.progressPctText}>{evalResult.lessonProgressPct}%</Text>
                 </View>
-                <View style={styles.metricItem}>
+
+                {/* Progress Bar Track */}
+                <View style={[styles.progressBarTrack, { backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA' }]}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      {
+                        width: `${evalResult.lessonProgressPct}%`,
+                        backgroundColor: evalResult.lessonProgressPct === 100 ? '#34C759' : '#007AFF',
+                      },
+                    ]}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => router.push('/(tabs)/syllabus')}
+                  activeOpacity={0.8}
+                  style={styles.primaryBtn}>
+                  <Text style={styles.primaryBtnText}>Buka Silabus & Kurikulum</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+
+              {/* CELL (SPAN 1): METRIC MATERI SELESAI */}
+              <View
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
+                    <Ionicons name="book-outline" size={18} color="#007AFF" />
+                  </View>
+                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Materi</Text>
+                </View>
+                <View style={styles.widgetBody}>
+                  <Text style={[styles.widgetValue, { color: textPrimary }]}>
+                    {evalResult.completedLessons}/{evalResult.totalLessons}
+                  </Text>
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    Selesai Dipelajari
+                  </Text>
+                </View>
+              </View>
+
+              {/* CELL (SPAN 1): METRIC KUIS LULUS */}
+              <View
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(52,199,89,0.2)' : '#EAFBF0' }]}>
+                    <Ionicons name="checkmark-done" size={18} color="#34C759" />
+                  </View>
+                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Kuis</Text>
+                </View>
+                <View style={styles.widgetBody}>
+                  <Text style={[styles.widgetValue, { color: '#34C759' }]}>
+                    {userQuizAttempts.filter((q) => q.isPassed).length}
+                  </Text>
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    Evaluasi Lulus
+                  </Text>
+                </View>
+              </View>
+
+              {/* CELL (SPAN 1): METRIC NILAI TUGAS */}
+              <View
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(255,149,0,0.2)' : '#FFF7EB' }]}>
+                    <Ionicons name="document-text-outline" size={18} color="#FF9500" />
+                  </View>
+                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Tugas</Text>
+                </View>
+                <View style={styles.widgetBody}>
+                  <Text style={[styles.widgetValue, { color: textPrimary }]}>
+                    {userGrades.length > 0 ? `${userGrades[0].score}/100` : '-'}
+                  </Text>
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    {userGrades.length > 0 ? 'Sudah Dinilai' : 'Belum Ada Nilai'}
+                  </Text>
+                </View>
+              </View>
+
+              {/* CELL (SPAN 1): METRIC KELULUSAN */}
+              <View
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(175,82,222,0.2)' : '#F9F0FF' }]}>
+                    <Ionicons name="ribbon-outline" size={18} color="#AF52DE" />
+                  </View>
+                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Status</Text>
+                </View>
+                <View style={styles.widgetBody}>
                   <Text
                     style={[
-                      styles.metricValue,
-                      { color: pendingSubmissions.length > 0 ? '#EF4444' : '#10B981' },
+                      styles.widgetValue,
+                      {
+                        fontSize: 18,
+                        color: evalResult.canGraduate ? '#34C759' : '#007AFF',
+                      },
+                    ]}>
+                    {evalResult.canGraduate ? 'LULUS 🎓' : 'BERJALAN'}
+                  </Text>
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    {evalResult.canGraduate ? 'Sertifikat Terbit' : 'Lengkapi Syarat'}
+                  </Text>
+                </View>
+              </View>
+
+              {/* CELL (SPAN 2): SECTION TITLE COHORTS */}
+              <View style={[styles.bentoSpan2, styles.sectionHeader]}>
+                <Text style={[styles.sectionTitle, { color: textPrimary }]}>
+                  🏫 Kelas & Program Terdaftar
+                </Text>
+                <Text style={[styles.sectionSubtitle, { color: textSecondary }]}>
+                  Daftar kurikulum yang sedang dan telah Anda ikuti
+                </Text>
+              </View>
+
+              {/* ENROLLED COHORTS LIST */}
+              {enrolledBatches.length === 0 ? (
+                <View
+                  style={[
+                    styles.bentoSpan2,
+                    styles.emptyEnrolledCard,
+                    {
+                      backgroundColor: cardBg,
+                      borderColor: cardBorder,
+                    },
+                  ]}>
+                  <View style={[styles.emptyEnrolledIconCircle, { backgroundColor: isDark ? '#2C2C2E' : '#EBF5FF' }]}>
+                    <Ionicons name="school-outline" size={36} color="#007AFF" />
+                  </View>
+                  <Text style={[styles.emptyEnrolledTitle, { color: textPrimary }]}>
+                    Belum Ada Kelas Terdaftar
+                  </Text>
+                  <Text style={[styles.emptyEnrolledDesc, { color: textSecondary }]}>
+                    Anda belum bergabung dengan kelas manapun. Masukkan kode kelas yang diberikan oleh pengajar untuk mulai belajar.
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setShowJoinModal(true)}
+                    activeOpacity={0.8}
+                    style={styles.emptyEnrolledBtn}>
+                    <Ionicons name="key-outline" size={16} color="#FFFFFF" />
+                    <Text style={styles.emptyEnrolledBtnText}>+ Masukkan Kode Kelas</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                enrolledBatches.map((b) => {
+                  const c = courses.find((course) => course.id === b.courseId);
+                  const enr = enrollments.find((e) => e.batchId === b.id);
+                  const isSelected = b.id === activeBatch.id;
+                  const isDynamic = b.id === 'batch-edf-402';
+                  const isCompleted = b.status === 'completed';
+
+                  const pct = isDynamic
+                    ? evalResult.lessonProgressPct
+                    : isCompleted
+                    ? 100
+                    : enr?.progressPercentage ?? 50;
+
+                  return (
+                    <View
+                      key={b.id}
+                      style={[
+                        styles.bentoSpan2,
+                        styles.enrolledClassCard,
+                        {
+                          backgroundColor: cardBg,
+                          borderColor: isSelected
+                            ? '#007AFF'
+                            : cardBorder,
+                          borderWidth: isSelected ? 2 : 1,
+                        },
+                      ]}>
+                      <View style={styles.enrolledHeaderRow}>
+                        <View style={styles.codeAndBadgeRow}>
+                          <View style={[styles.codeTag, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
+                            <Text style={[styles.codeTagText, { color: textPrimary }]}>{b.classCode}</Text>
+                          </View>
+                          {isDynamic && (
+                            <View style={[styles.statusPill, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
+                              <Ionicons name="sparkles" size={11} color="#007AFF" />
+                              <Text style={[styles.statusPillText, { color: '#007AFF' }]}>
+                                Cohort Aktif
+                              </Text>
+                            </View>
+                          )}
+                          {isCompleted && (
+                            <View style={[styles.statusPill, { backgroundColor: isDark ? 'rgba(52,199,89,0.2)' : '#EAFBF0' }]}>
+                              <Ionicons name="ribbon" size={11} color="#34C759" />
+                              <Text style={[styles.statusPillText, { color: '#34C759' }]}>
+                                Tersertifikasi
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+
+                        {isSelected && (
+                          <View style={[styles.selectedIndicatorBadge, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
+                            <Text style={styles.selectedIndicatorText}>Sedang Aktif</Text>
+                          </View>
+                        )}
+                      </View>
+
+                      <Text style={[styles.enrolledCourseTitle, { color: textPrimary }]}>
+                        {c?.title || b.batchName}
+                      </Text>
+                      <Text style={[styles.enrolledBatchName, { color: textSecondary }]}>
+                        {b.batchName}
+                      </Text>
+
+                      {/* Progress Line */}
+                      <View style={styles.enrolledProgressRow}>
+                        <Text style={[styles.enrolledProgressLabel, { color: textSecondary }]}>
+                          Progres Pembelajaran
+                        </Text>
+                        <Text style={styles.enrolledProgressValue}>{pct}%</Text>
+                      </View>
+                      <View style={[styles.progressBarTrackMini, { backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA' }]}>
+                        <View
+                          style={[
+                            styles.progressBarFillMini,
+                            {
+                              width: `${pct}%`,
+                              backgroundColor: isCompleted ? '#34C759' : '#007AFF',
+                            },
+                          ]}
+                        />
+                      </View>
+
+                      {/* Footer Action */}
+                      <View style={[styles.enrolledFooter, { borderTopColor: isDark ? '#2C2C2E' : '#E5E5EA' }]}>
+                        <View style={styles.mentorMiniRow}>
+                          <Ionicons name="person-circle-outline" size={16} color={textSecondary} />
+                          <Text style={[styles.mentorMiniText, { color: textSecondary }]} numberOfLines={1}>
+                            {b.instructorName}
+                          </Text>
+                        </View>
+
+                        <TouchableOpacity
+                          onPress={() => {
+                            selectBatch(b.id);
+                            router.push('/(tabs)/syllabus');
+                          }}
+                          activeOpacity={0.8}
+                          style={[
+                            styles.enterSyllabusBtn,
+                            {
+                              backgroundColor: isSelected ? '#007AFF' : isDark ? '#2C2C2E' : '#F2F2F7',
+                            },
+                          ]}>
+                          <Text
+                            style={[
+                              styles.enterSyllabusBtnText,
+                              { color: isSelected ? '#FFFFFF' : textPrimary },
+                            ]}>
+                            Lihat Silabus
+                          </Text>
+                          <Ionicons
+                            name="chevron-forward"
+                            size={14}
+                            color={isSelected ? '#FFFFFF' : textPrimary}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                })
+              )}
+
+              {/* CELL (SPAN 2): GABUNG KELAS BUTTON */}
+              <TouchableOpacity
+                onPress={() => setShowJoinModal(true)}
+                activeOpacity={0.8}
+                style={[
+                  styles.bentoSpan2,
+                  styles.joinClassBtn,
+                  {
+                    backgroundColor: cardBg,
+                    borderColor: '#007AFF',
+                  },
+                ]}>
+                <View style={[styles.joinClassIconBox, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
+                  <Ionicons name="add" size={22} color="#007AFF" />
+                </View>
+                <View style={styles.joinClassTextCol}>
+                  <Text style={styles.joinClassTitle}>Gabung Kelas Baru</Text>
+                  <Text style={[styles.joinClassSubtitle, { color: textSecondary }]}>
+                    Masukkan kode unik dari pengajar untuk masuk
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#007AFF" />
+              </TouchableOpacity>
+            </>
+          ) : (
+            /* ============================================================== */
+            /* TEACHER SPECIFIC VIEW */
+            /* ============================================================== */
+            <>
+              {/* CELL (SPAN 1): TOTAL PESERTA */}
+              <View
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
+                    <Ionicons name="people" size={18} color="#8B5CF6" />
+                  </View>
+                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Peserta</Text>
+                </View>
+                <View style={styles.widgetBody}>
+                  <Text style={[styles.widgetValue, { color: '#8B5CF6' }]}>
+                    {activeBatchEnrolledCount}/{activeBatch.maxStudents}
+                  </Text>
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    Siswa Terdaftar
+                  </Text>
+                </View>
+              </View>
+
+              {/* CELL (SPAN 1): PERLU DINILAI */}
+              <View
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View
+                    style={[
+                      styles.widgetIconBox,
+                      {
+                        backgroundColor:
+                          pendingSubmissions.length > 0
+                            ? isDark
+                              ? 'rgba(255,59,48,0.2)'
+                              : '#FEE2E2'
+                            : isDark
+                            ? 'rgba(52,199,89,0.2)'
+                            : '#EAFBF0',
+                      },
+                    ]}>
+                    <Ionicons
+                      name="clipboard"
+                      size={18}
+                      color={pendingSubmissions.length > 0 ? '#FF3B30' : '#34C759'}
+                    />
+                  </View>
+                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Antrean</Text>
+                </View>
+                <View style={styles.widgetBody}>
+                  <Text
+                    style={[
+                      styles.widgetValue,
+                      { color: pendingSubmissions.length > 0 ? '#FF3B30' : '#34C759' },
                     ]}>
                     {pendingSubmissions.length}
                   </Text>
-                  <Text style={styles.metricLabel}>Perlu Dinilai</Text>
-                </View>
-                <View style={styles.metricItem}>
-                  <Text style={styles.metricValue}>
-                    {activeBatchAverageGrade > 0 ? `${activeBatchAverageGrade}` : '-'}
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    Perlu Dinilai
                   </Text>
-                  <Text style={styles.metricLabel}>Rerata Tugas</Text>
                 </View>
               </View>
 
+              {/* CELL (SPAN 1): RERATA TUGAS */}
+              <View
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
+                    <Ionicons name="analytics" size={18} color="#007AFF" />
+                  </View>
+                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Rata-rata</Text>
+                </View>
+                <View style={styles.widgetBody}>
+                  <Text style={[styles.widgetValue, { color: textPrimary }]}>
+                    {activeBatchAverageGrade > 0 ? activeBatchAverageGrade : '-'}
+                  </Text>
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    Nilai Kelas
+                  </Text>
+                </View>
+              </View>
+
+              {/* CELL (SPAN 1): PINTASAN KELOLA KELAS */}
+              <TouchableOpacity
+                onPress={() => router.push('/class-manager' as any)}
+                activeOpacity={0.8}
+                style={[
+                  styles.bentoSpan1,
+                  styles.bentoWidget,
+                  {
+                    backgroundColor: secondaryCardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+                <View style={styles.widgetHeader}>
+                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
+                    <Ionicons name="settings-outline" size={18} color="#8B5CF6" />
+                  </View>
+                  <Ionicons name="arrow-forward" size={16} color="#8B5CF6" />
+                </View>
+                <View style={styles.widgetBody}>
+                  <Text style={[styles.widgetValue, { fontSize: 16, color: '#8B5CF6' }]}>
+                    Kelola Kelas
+                  </Text>
+                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                    Atur Kapasitas & Status
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* CELL (SPAN 2): PRIMARY TEACHER ACTION */}
               <TouchableOpacity
                 onPress={() => router.push('/(tabs)/grading')}
-                style={[styles.primaryBtn, { backgroundColor: '#8B5CF6' }]}>
-                <Text style={styles.primaryBtnText}>
-                  Buka Panel Pemeriksaan ({pendingSubmissions.length} Menunggu)
-                </Text>
-                <Ionicons name="clipboard-outline" size={16} color="#FFFFFF" />
+                activeOpacity={0.8}
+                style={[styles.bentoSpan2, styles.teacherActionHeroBtn]}>
+                <View style={styles.teacherActionBtnContent}>
+                  <Ionicons name="clipboard" size={20} color="#FFFFFF" />
+                  <Text style={styles.teacherActionHeroBtnText}>
+                    Buka Panel Pemeriksaan ({pendingSubmissions.length} Menunggu)
+                  </Text>
+                </View>
+                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
               </TouchableOpacity>
-            </View>
 
-            {/* Post Announcement Form */}
-            <View
-              style={[
-                styles.card,
-                {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: isDark ? '#334155' : '#E2E8F0',
-                },
-              ]}>
-              <Text
+              {/* CELL (SPAN 2): POST ANNOUNCEMENT CARD */}
+              <View
                 style={[
-                  styles.cardTitle,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  styles.bentoSpan2,
+                  styles.bentoCard,
+                  {
+                    backgroundColor: cardBg,
+                    borderColor: cardBorder,
+                  },
                 ]}>
-                📢 Buat Pengumuman Baru ke Kelas
-              </Text>
+                <View style={styles.bentoCardHeaderLeft}>
+                  <View style={[styles.bentoHeaderIcon, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
+                    <Ionicons name="megaphone" size={16} color="#8B5CF6" />
+                  </View>
+                  <Text style={[styles.cardTitle, { color: textPrimary }]}>
+                    Buat Pengumuman Baru ke Kelas
+                  </Text>
+                </View>
 
-              <TextInput
-                placeholder="Judul pengumuman..."
-                placeholderTextColor="#94A3B8"
-                value={annTitle}
-                onChangeText={setAnnTitle}
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
-                    color: isDark ? '#F8FAFC' : '#0F172A',
-                  },
-                ]}
-              />
+                <TextInput
+                  placeholder="Judul pengumuman..."
+                  placeholderTextColor="#8E8E93"
+                  value={annTitle}
+                  onChangeText={setAnnTitle}
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: inputBg,
+                      color: textPrimary,
+                    },
+                  ]}
+                />
 
-              <TextInput
-                placeholder="Tulis pesan untuk semua siswa di batch ini..."
-                placeholderTextColor="#94A3B8"
-                value={annMessage}
-                onChangeText={setAnnMessage}
-                multiline
-                numberOfLines={3}
-                style={[
-                  styles.input,
-                  styles.textArea,
-                  {
-                    backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
-                    color: isDark ? '#F8FAFC' : '#0F172A',
-                  },
-                ]}
-              />
+                <TextInput
+                  placeholder="Tulis pesan untuk semua siswa di batch ini..."
+                  placeholderTextColor="#8E8E93"
+                  value={annMessage}
+                  onChangeText={setAnnMessage}
+                  multiline
+                  numberOfLines={3}
+                  style={[
+                    styles.input,
+                    styles.textArea,
+                    {
+                      backgroundColor: inputBg,
+                      color: textPrimary,
+                    },
+                  ]}
+                />
 
+                <TouchableOpacity
+                  onPress={handlePostAnnouncement}
+                  activeOpacity={0.8}
+                  style={[styles.secondaryBtn, { borderColor: '#8B5CF6' }]}>
+                  <Ionicons name="send" size={14} color="#8B5CF6" />
+                  <Text style={[styles.secondaryBtnText, { color: '#8B5CF6' }]}>
+                    Kirim Pengumuman
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* CELL (SPAN 2): BUAT KELAS BARU */}
               <TouchableOpacity
-                onPress={handlePostAnnouncement}
-                style={[styles.secondaryBtn, { borderColor: '#8B5CF6' }]}>
-                <Ionicons name="megaphone-outline" size={16} color="#8B5CF6" />
-                <Text style={[styles.secondaryBtnText, { color: '#8B5CF6' }]}>
-                  Kirim Pengumuman
-                </Text>
+                onPress={() => router.push('/class-manager' as any)}
+                activeOpacity={0.8}
+                style={[
+                  styles.bentoSpan2,
+                  styles.createClassBtn,
+                  {
+                    backgroundColor: cardBg,
+                    borderColor: '#8B5CF6',
+                  },
+                ]}>
+                <View
+                  style={[
+                    styles.createClassIcon,
+                    { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' },
+                  ]}>
+                  <Ionicons name="add" size={22} color="#8B5CF6" />
+                </View>
+                <View style={styles.joinClassTextCol}>
+                  <Text style={[styles.joinClassTitle, { color: '#8B5CF6' }]}>
+                    Buat Kelas & Course Baru
+                  </Text>
+                  <Text style={[styles.joinClassSubtitle, { color: textSecondary }]}>
+                    Rancang kurikulum dan buka angkatan cohort baru
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#8B5CF6" />
               </TouchableOpacity>
-            </View>
+            </>
+          )}
 
-            {/* Create Class Button */}
-            <TouchableOpacity
-              onPress={() => router.push('/class-manager' as any)}
+          {/* ============================================================== */}
+          {/* SECTION HEADER (SPAN 2): ANNOUNCEMENTS STREAM */}
+          {/* ============================================================== */}
+          <View style={[styles.bentoSpan2, styles.sectionHeader]}>
+            <Text style={[styles.sectionTitle, { color: textPrimary }]}>
+              💬 Pengumuman Kelas (Stream)
+            </Text>
+            <Text style={[styles.sectionSubtitle, { color: textSecondary }]}>
+              Informasi terkini dari instruktur kelas
+            </Text>
+          </View>
+
+          {announcements.map((ann) => (
+            <View
+              key={ann.id}
               style={[
-                styles.createClassBtn,
+                styles.bentoSpan2,
+                styles.announcementCard,
                 {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: '#8B5CF6',
+                  backgroundColor: cardBg,
+                  borderColor: cardBorder,
                 },
               ]}>
-              <View style={[
-                styles.createClassIcon,
-                { backgroundColor: isDark ? '#2D1B69' : '#EDE9FE' },
-              ]}>
-                <Ionicons name="add" size={22} color="#8B5CF6" />
-              </View>
-              <View style={styles.joinClassTextCol}>
-                <Text style={[styles.joinClassTitle, { color: '#8B5CF6' }]}>
-                  Buat Kelas Baru
+              <View style={styles.annHeader}>
+                <View style={styles.annAuthor}>
+                  <View style={[styles.annAuthorIconBox, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
+                    <Ionicons name="person" size={14} color="#8B5CF6" />
+                  </View>
+                  <Text style={[styles.annAuthorName, { color: textPrimary }]}>{ann.authorName}</Text>
+                </View>
+                <Text style={styles.annTime}>
+                  {new Date(ann.createdAt).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short',
+                  })}
                 </Text>
-                <Text style={styles.joinClassSubtitle}>
-                  Buat course dan kelas baru untuk siswa Anda
-                </Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color="#8B5CF6" />
-            </TouchableOpacity>
-          </>
-        )}
-
-        {/* Batch Announcements Stream */}
-        <View style={styles.sectionHeader}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: isDark ? '#F8FAFC' : '#0F172A' },
-            ]}>
-            💬 Pengumuman Kelas (Stream)
-          </Text>
-        </View>
-
-        {announcements.map((ann) => (
-          <View
-            key={ann.id}
-            style={[
-              styles.announcementCard,
-              {
-                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                borderColor: isDark ? '#334155' : '#E2E8F0',
-              },
-            ]}>
-            <View style={styles.annHeader}>
-              <View style={styles.annAuthor}>
-                <Ionicons name="person-circle" size={24} color="#8B5CF6" />
-                <Text style={styles.annAuthorName}>{ann.authorName}</Text>
-              </View>
-              <Text style={styles.annTime}>
-                {new Date(ann.createdAt).toLocaleDateString('id-ID', {
-                  day: 'numeric',
-                  month: 'short',
-                })}
-              </Text>
+              <Text style={[styles.annTitle, { color: textPrimary }]}>{ann.title}</Text>
+              <Text style={[styles.annMessage, { color: textSecondary }]}>{ann.message}</Text>
             </View>
-            <Text
-              style={[
-                styles.annTitle,
-                { color: isDark ? '#F8FAFC' : '#0F172A' },
-              ]}>
-              {ann.title}
-            </Text>
-            <Text style={styles.annMessage}>{ann.message}</Text>
-          </View>
-        ))}
+          ))}
+        </View>
       </ScrollView>
 
+      {/* ============================================================== */}
       {/* JOIN CLASS MODAL */}
+      {/* ============================================================== */}
       <Modal
         visible={showJoinModal}
         animationType="slide"
@@ -777,40 +1002,36 @@ export default function DashboardScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
               },
             ]}>
             <View style={styles.modalHeader}>
-              <Text
-                style={[
-                  styles.modalTitle,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
-                ]}>
+              <Text style={[styles.modalTitle, { color: textPrimary }]}>
                 🔑 Gabung Kelas
               </Text>
               <TouchableOpacity onPress={() => setShowJoinModal(false)}>
                 <Ionicons
                   name="close-circle"
                   size={28}
-                  color={isDark ? '#94A3B8' : '#64748B'}
+                  color={isDark ? '#8E8E93' : '#AEAEB2'}
                 />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.modalDesc}>
-              Masukkan kode kelas yang diberikan oleh pengajar untuk bergabung ke kelas baru.
+            <Text style={[styles.modalDesc, { color: textSecondary }]}>
+              Masukkan kode kelas 6 karakter yang diberikan oleh pengajar untuk bergabung.
             </Text>
 
             {joinError !== '' && (
               <View style={styles.modalErrorBox}>
-                <Ionicons name="alert-circle" size={16} color="#DC2626" />
+                <Ionicons name="alert-circle" size={16} color="#FF3B30" />
                 <Text style={styles.modalErrorText}>{joinError}</Text>
               </View>
             )}
 
             <TextInput
-              placeholder="Contoh: ABC-123 atau EDF-402"
-              placeholderTextColor="#94A3B8"
+              placeholder="Contoh: ABC-123"
+              placeholderTextColor="#8E8E93"
               value={joinCode}
               onChangeText={(t) => {
                 setJoinCode(t.toUpperCase());
@@ -820,15 +1041,16 @@ export default function DashboardScreen() {
               style={[
                 styles.modalInput,
                 {
-                  backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
-                  color: isDark ? '#F8FAFC' : '#0F172A',
-                  borderColor: joinError ? '#FCA5A5' : isDark ? '#334155' : '#CBD5E1',
+                  backgroundColor: inputBg,
+                  color: textPrimary,
+                  borderColor: joinError ? '#FF3B30' : cardBorder,
                 },
               ]}
             />
 
             <TouchableOpacity
               onPress={handleJoinClass}
+              activeOpacity={0.8}
               style={styles.modalPrimaryBtn}>
               <Ionicons name="enter-outline" size={18} color="#FFFFFF" />
               <Text style={styles.modalPrimaryBtnText}>Gabung Kelas</Text>
@@ -836,17 +1058,14 @@ export default function DashboardScreen() {
 
             <TouchableOpacity
               onPress={() => setShowJoinModal(false)}
+              activeOpacity={0.7}
               style={[
                 styles.modalSecondaryBtn,
                 {
-                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                  borderColor: isDark ? '#3A3A3C' : '#E5E5EA',
                 },
               ]}>
-              <Text
-                style={[
-                  styles.modalSecondaryBtnText,
-                  { color: isDark ? '#94A3B8' : '#64748B' },
-                ]}>
+              <Text style={[styles.modalSecondaryBtnText, { color: textSecondary }]}>
                 Batal
               </Text>
             </TouchableOpacity>
@@ -862,222 +1081,318 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
     paddingBottom: 40,
   },
-  batchCard: {
-    borderRadius: 16,
+
+  /* ============================================================== */
+  /* iOS BENTO GRID CONTAINER & CELL SPANS */
+  /* ============================================================== */
+  bentoGrid: {
+    padding: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    ...(Platform.OS === 'web' && {
+      display: 'grid' as any,
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gap: 12,
+    }),
+  },
+  bentoSpan2: {
+    width: '100%',
+    ...(Platform.OS === 'web' && {
+      gridColumn: 'span 2' as any,
+    }),
+  },
+  bentoSpan1: {
+    width: Platform.OS === 'web' ? 'auto' : '48%',
+    flex: 1,
+    minWidth: '45%',
+    ...(Platform.OS === 'web' && {
+      gridColumn: 'span 1' as any,
+    }),
+  },
+
+  /* ============================================================== */
+  /* BENTO CARD & CELLS (SQUIRCLE 22PX) */
+  /* ============================================================== */
+  bentoCard: {
+    borderRadius: 22,
     padding: 16,
     borderWidth: 1,
-    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 14,
+    elevation: 2,
   },
+  heroBatchCard: {
+    borderRadius: 22,
+    padding: 18,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.04,
+    shadowRadius: 16,
+    elevation: 3,
+  },
+  bentoWidget: {
+    borderRadius: 22,
+    padding: 16,
+    borderWidth: 1,
+    minHeight: 110,
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
+    elevation: 2,
+  },
+  widgetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  widgetIconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  widgetLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+  },
+  widgetBody: {
+    justifyContent: 'flex-end',
+  },
+  widgetValue: {
+    fontSize: 22,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    marginBottom: 2,
+  },
+  widgetSubLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+
+  /* ============================================================== */
+  /* HERO BATCH CARD CONTENT */
+  /* ============================================================== */
   batchHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   batchBadge: {
-    backgroundColor: '#DCFCE7',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
   batchBadgeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
-    color: '#15803D',
+    letterSpacing: 0.2,
   },
   codeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    minHeight: 32,
   },
   codeBadgeLabel: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#8E8E93',
+    fontWeight: '500',
   },
   codeBadgeValue: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#2563EB',
-    backgroundColor: '#EFF6FF',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    letterSpacing: 0.5,
   },
   batchTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    marginBottom: 8,
-    letterSpacing: -0.3,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
+    letterSpacing: -0.4,
+  },
+  batchSubtitle: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 12,
   },
   mentorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
+  },
+  mentorAvatarIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mentorText: {
     fontSize: 12,
-    color: '#64748B',
   },
   mentorName: {
-    fontWeight: '700',
-    color: '#475569',
+    fontWeight: '600',
   },
-  card: {
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    marginBottom: 16,
-  },
+
+  /* ============================================================== */
+  /* PROGRESS HERO */
+  /* ============================================================== */
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 12,
+  },
+  bentoCardHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 10,
+  },
+  bentoHeaderIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cardTitle: {
     fontSize: 15,
     fontWeight: '700',
+    letterSpacing: -0.3,
   },
   progressPctText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    color: '#2563EB',
+    color: '#007AFF',
   },
   progressBarTrack: {
     height: 8,
-    backgroundColor: '#E2E8F0',
     borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#2563EB',
     borderRadius: 4,
   },
-  metricsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 16,
-    paddingVertical: 8,
-  },
-  metricItem: {
-    alignItems: 'center',
-  },
-  metricValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: 2,
-  },
-  metricLabel: {
-    fontSize: 11,
-    color: '#64748B',
-  },
+
+  /* ============================================================== */
+  /* INTERACTIVE BUTTONS (APPLE HIG 44PX TARGET) */
+  /* ============================================================== */
   primaryBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#007AFF',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    minHeight: 44,
     borderRadius: 12,
     gap: 8,
+    paddingHorizontal: 16,
   },
   primaryBtnText: {
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 14,
+    letterSpacing: -0.2,
   },
-  input: {
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+  teacherActionHeroBtn: {
+    backgroundColor: '#8B5CF6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 48,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  teacherActionBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  teacherActionHeroBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
     fontSize: 14,
-    marginBottom: 10,
-  },
-  textArea: {
-    height: 70,
-    textAlignVertical: 'top',
+    letterSpacing: -0.2,
   },
   secondaryBtn: {
     borderWidth: 1.5,
-    borderRadius: 10,
-    paddingVertical: 10,
+    borderRadius: 12,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 8,
+    paddingHorizontal: 14,
+    marginTop: 4,
   },
   secondaryBtnText: {
     fontWeight: '700',
     fontSize: 13,
   },
-  sectionHeader: {
-    marginTop: 8,
+
+  /* ============================================================== */
+  /* FORMS & INPUTS (SQUIRCLE 12PX) */
+  /* ============================================================== */
+  input: {
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    minHeight: 44,
+    fontSize: 14,
     marginBottom: 10,
   },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: '800',
+  textArea: {
+    minHeight: 70,
+    paddingTop: 12,
+    textAlignVertical: 'top',
   },
-  announcementCard: {
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    marginBottom: 12,
-  },
-  annHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  annAuthor: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  annAuthorName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#64748B',
-  },
-  annTime: {
-    fontSize: 11,
-    color: '#94A3B8',
-  },
-  annTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+
+  /* ============================================================== */
+  /* SECTIONS & ENROLLED COHORTS */
+  /* ============================================================== */
+  sectionHeader: {
+    marginTop: 10,
     marginBottom: 4,
   },
-  annMessage: {
-    fontSize: 13,
-    color: '#64748B',
-    lineHeight: 18,
-  },
-  batchSubtitle: {
-    fontSize: 13,
-    color: '#64748B',
-    marginBottom: 8,
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: '#64748B',
     marginTop: 2,
-    marginBottom: 4,
   },
   enrolledClassCard: {
-    borderRadius: 16,
+    borderRadius: 22,
     padding: 16,
-    marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 10,
     elevation: 2,
   },
   enrolledHeaderRow: {
@@ -1092,15 +1407,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   codeTag: {
-    backgroundColor: '#F1F5F9',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: 8,
   },
   codeTagText: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#475569',
   },
   statusPill: {
     flexDirection: 'row',
@@ -1108,53 +1421,48 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: 8,
   },
   statusPillText: {
     fontSize: 11,
     fontWeight: '700',
   },
   selectedIndicatorBadge: {
-    backgroundColor: '#EFF6FF',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#93C5FD',
+    borderRadius: 8,
   },
   selectedIndicatorText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#1D4ED8',
+    color: '#007AFF',
   },
   enrolledCourseTitle: {
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 2,
+    letterSpacing: -0.3,
   },
   enrolledBatchName: {
     fontSize: 12,
-    color: '#64748B',
     marginBottom: 12,
   },
   enrolledProgressRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   enrolledProgressLabel: {
     fontSize: 11,
-    color: '#64748B',
   },
   enrolledProgressValue: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#2563EB',
+    color: '#007AFF',
   },
   progressBarTrackMini: {
     height: 6,
-    backgroundColor: '#E2E8F0',
     borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 12,
@@ -1167,9 +1475,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 8,
+    paddingTop: 10,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
   },
   mentorMiniRow: {
     flexDirection: 'row',
@@ -1179,29 +1486,39 @@ const styles = StyleSheet.create({
   },
   mentorMiniText: {
     fontSize: 12,
-    color: '#64748B',
   },
   enterSyllabusBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    minHeight: 36,
+    borderRadius: 10,
   },
   enterSyllabusBtnText: {
     fontSize: 12,
     fontWeight: '700',
   },
+
+  /* ============================================================== */
+  /* ACTION CARDS (GABUNG & BUAT KELAS) */
+  /* ============================================================== */
   joinClassBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 22,
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    marginBottom: 12,
+    minHeight: 64,
+  },
+  joinClassIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   joinClassTextCol: {
     flex: 1,
@@ -1209,23 +1526,22 @@ const styles = StyleSheet.create({
   joinClassTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#2563EB',
+    color: '#007AFF',
     marginBottom: 2,
+    letterSpacing: -0.2,
   },
   joinClassSubtitle: {
     fontSize: 11,
-    color: '#64748B',
   },
   createClassBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 22,
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    marginTop: 12,
-    marginBottom: 12,
+    minHeight: 64,
   },
   createClassIcon: {
     width: 40,
@@ -1234,6 +1550,133 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  /* ============================================================== */
+  /* ANNOUNCEMENTS STREAM */
+  /* ============================================================== */
+  announcementCard: {
+    borderRadius: 22,
+    padding: 16,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.02,
+    shadowRadius: 8,
+    elevation: 1,
+  },
+  annHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  annAuthor: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  annAuthorIconBox: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  annAuthorName: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  annTime: {
+    fontSize: 11,
+    color: '#8E8E93',
+  },
+  annTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 4,
+    letterSpacing: -0.2,
+  },
+  annMessage: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+
+  /* ============================================================== */
+  /* URGENT NOTIFICATION BANNER */
+  /* ============================================================== */
+  urgentNotifBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    gap: 12,
+  },
+  urgentNotifIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  urgentNotifTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  urgentNotifMessage: {
+    fontSize: 12,
+    lineHeight: 16,
+  },
+
+  /* ============================================================== */
+  /* EMPTY STATE */
+  /* ============================================================== */
+  emptyEnrolledCard: {
+    padding: 24,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  emptyEnrolledIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  emptyEnrolledTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  emptyEnrolledDesc: {
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 16,
+    maxWidth: 280,
+  },
+  emptyEnrolledBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
+    minHeight: 44,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 8,
+  },
+  emptyEnrolledBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  /* ============================================================== */
+  /* MODAL */
+  /* ============================================================== */
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -1257,10 +1700,10 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '800',
+    letterSpacing: -0.4,
   },
   modalDesc: {
     fontSize: 13,
-    color: '#64748B',
     lineHeight: 18,
     marginBottom: 16,
   },
@@ -1278,15 +1721,15 @@ const styles = StyleSheet.create({
   },
   modalErrorText: {
     fontSize: 13,
-    color: '#DC2626',
+    color: '#FF3B30',
     fontWeight: '600',
     flex: 1,
   },
   modalInput: {
     borderWidth: 1.5,
-    borderRadius: 14,
+    borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    minHeight: 48,
     fontSize: 18,
     fontWeight: '800',
     textAlign: 'center',
@@ -1294,16 +1737,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   modalPrimaryBtn: {
-    backgroundColor: '#2563EB',
-    borderRadius: 14,
-    height: 50,
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     marginBottom: 10,
-    shadowColor: '#2563EB',
-    shadowOpacity: 0.3,
+    shadowColor: '#007AFF',
+    shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 4,
   },
@@ -1314,82 +1757,13 @@ const styles = StyleSheet.create({
   },
   modalSecondaryBtn: {
     borderWidth: 1.5,
-    borderRadius: 14,
-    height: 44,
+    borderRadius: 12,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalSecondaryBtnText: {
     fontSize: 14,
     fontWeight: '600',
-  },
-  emptyEnrolledCard: {
-    padding: 24,
-    borderRadius: 16,
-    borderWidth: 1,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  emptyEnrolledIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#EFF6FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  emptyEnrolledTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  emptyEnrolledDesc: {
-    fontSize: 13,
-    color: '#64748B',
-    textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: 16,
-    maxWidth: 280,
-  },
-  emptyEnrolledBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2563EB',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    gap: 8,
-  },
-  emptyEnrolledBtnText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  urgentNotifBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    marginBottom: 16,
-    gap: 12,
-  },
-  urgentNotifIconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  urgentNotifTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  urgentNotifMessage: {
-    fontSize: 12,
-    lineHeight: 16,
   },
 });

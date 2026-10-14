@@ -28,10 +28,8 @@ export default function TabsLayout() {
     }
   }, [session?.isAuthenticated, router]);
 
-  const activeColor = currentRole === 'teacher' ? '#8B5CF6' : '#2563EB';
-  const inactiveColor = isDark ? '#94A3B8' : '#64748B';
-  const bgColor = isDark ? '#0F172A' : '#FFFFFF';
-  const borderColor = isDark ? '#1E293B' : '#E2E8F0';
+  const activeColor = currentRole === 'teacher' ? '#8B5CF6' : '#007AFF';
+  const inactiveColor = isDark ? '#8E8E93' : '#8E8E93';
 
   return (
     <Tabs
@@ -40,14 +38,22 @@ export default function TabsLayout() {
         tabBarActiveTintColor: activeColor,
         tabBarInactiveTintColor: inactiveColor,
         tabBarStyle: {
-          backgroundColor: bgColor,
-          borderTopColor: borderColor,
+          backgroundColor: isDark
+            ? 'rgba(28, 28, 30, 0.85)'
+            : 'rgba(255, 255, 255, 0.85)',
+          borderTopColor: isDark
+            ? 'rgba(255, 255, 255, 0.08)'
+            : 'rgba(0, 0, 0, 0.06)',
           height: Platform.OS === 'ios' ? 88 : 64,
           paddingBottom: Platform.OS === 'ios' ? 28 : 10,
           paddingTop: 8,
+          ...(Platform.OS === 'web' && ({
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+          } as any)),
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
         },
       }}>
