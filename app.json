@@ -1,16 +1,18 @@
 {
   "expo": {
-    "name": "revisi",
-    "slug": "revisi",
+    "name": "EduFlow Cohort",
+    "slug": "eduflow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "revisi",
+    "scheme": "eduflow",
     "userInterfaceStyle": "automatic",
+    "owner": "depzy",
     "ios": {
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.depzy.eduflow",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -37,6 +39,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "045f05b2-25fd-4440-8e7e-5a02437ae147"
+      }
     }
   }
 }
