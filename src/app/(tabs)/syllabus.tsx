@@ -1,0 +1,3168 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  useColorScheme,
+  Alert,
+  Linking,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { DemoHeader } from '@/components/DemoHeader';
+import { useElearningStore } from '@/store/useElearningStore';
+import {
+  isLessonUnlocked,
+  isQuizUnlocked,
+  isAssignmentUnlocked,
+} from '@/utils/lockEngine';
+import { Lesson, Quiz, Assignment } from '@/types/elearning';
+
+export default function SyllabusScreen() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
+  const {
+    currentRole,
+    modules,
+    lessons,
+    quizzes,
+    assignments,
+    completedLessonIds,
+    quizAttempts,
+    submissions,
+    grades,
+    completeLesson,
+    submitQuiz,
+    submitAssignment,
+    addLesson,
+    deleteLesson,
+    addAssignment,
+    deleteAssignment,
+    updateAssignmentDueDate,
+    batches,
+    courses,
+    selectedBatchId,
+    selectBatch,
+    currentUser,
+    enrollments,
+    addModule,
+  } = useElearningStore();
+
+  const isTeacher = currentRole === 'teacher';
+
+  const userEnrollments = enrollments.filter((e) => e.userId === currentUser.id);
+  const enrolledBatches = batches.filter((b) =>
+    userEnrollments.some((e) => e.batchId === b.id)
+  );
+  const teacherBatches = batches.filter((b) => b.instructorId === currentUser.id);
+
+  const displayBatches = isTeacher
+    ? (teacherBatches.length > 0 ? teacherBatches : batches)
+    : (enrolledBatches.length > 0 ? enrolledBatches : batches);
+
+  const activeBatch =
+    displayBatches.find((b) => b.id === selectedBatchId) ||
+    displayBatches[0] ||
+    batches[0];
+  const activeCourse = courses.find((c) => c.id === activeBatch?.courseId) || courses[0];
+  const currentModules = modules.filter((m) => m.courseId === activeBatch?.courseId);
+  const isDynamicTestingBatch = activeBatch?.id === 'batch-edf-402';
+  const userQuizAttempts = quizAttempts.filter((q) => q.userId === currentUser.id);
+  const userSubmissions = submissions.filter((s) => s.userId === currentUser.id);
+  const userGrades = grades.filter((g) => {
+    const s = submissions.find((sub) => sub.id === g.submissionId);
+    return s ? s.userId === currentUser.id : false;
+  });
+  const lockSnapshot = {
+    completedLessonIds,
+    quizAttempts: userQuizAttempts,
+    submissions: userSubmissions,
+    grades: userGrades,
+  };
+
+  // Student action modal states
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+
+  // Quiz active state
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const [quizResultText, setQuizResultText] = useState<string | null>(null);
+
+  // Assignment active state
+  const [assignmentText, setAssignmentText] = useState('');
+  const [assignmentUrl, setAssignmentUrl] = useState('');
+
+  // Teacher CRUD Modal states
+  const [isAddLessonModalOpen, setIsAddLessonModalOpen] = useState(false);
+  const [targetModuleForLesson, setTargetModuleForLesson] = useState<string>('mod-1');
+  const [newLessonTitle, setNewLessonTitle] = useState('');
+  const [newLessonDuration, setNewLessonDuration] = useState('15');
+  const [newLessonBody, setNewLessonBody] = useState('');
+  const [newLessonType, setNewLessonType] = useState<'reading' | 'video'>('reading');
+  const [newLessonVideoUrl, setNewLessonVideoUrl] = useState('');
+  const [copiedSnippetIndex, setCopiedSnippetIndex] = useState<number | null>(null);
+
+  const currentLessonModule = modules.find((m) => m.id === selectedLesson?.moduleId);
+  const currentModuleLessons = lessons
+    .filter((l) => l.moduleId === selectedLesson?.moduleId)
+    .sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+  const nextLessonInModule = currentModuleLessons.find(
+    (l) => l.sequenceNumber > (selectedLesson?.sequenceNumber || 0)
+  );
+  const currentModuleQuiz = quizzes.find((q) => q.moduleId === selectedLesson?.moduleId);
+
+  const handleCopyCodeSnippet = async (text: string, index: number) => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+      }
+    } catch {
+      // fallback
+    }
+    setCopiedSnippetIndex(index);
+    setTimeout(() => setCopiedSnippetIndex(null), 2000);
+  };
+
+  const [isAddAssignmentModalOpen, setIsAddAssignmentModalOpen] = useState(false);
+  const [targetModuleForAssignment, setTargetModuleForAssignment] = useState<string>('mod-2');
+  const [newAssignTitle, setNewAssignTitle] = useState('');
+  const [newAssignInstructions, setNewAssignInstructions] = useState('');
+  const [newAssignDueDate, setNewAssignDueDate] = useState('2026-11-20 23:59');
+  const [newAssignMaxScore, setNewAssignMaxScore] = useState('100');
+
+  const [isEditDueDateModalOpen, setIsEditDueDateModalOpen] = useState(false);
+  const [targetAssignmentToEdit, setTargetAssignmentToEdit] = useState<Assignment | null>(null);
+  const [editDueDateInput, setEditDueDateInput] = useState('');
+
+  // Teacher Module state
+  const [isAddModuleModalOpen, setIsAddModuleModalOpen] = useState(false);
+  const [newModuleTitle, setNewModuleTitle] = useState('');
+
+  // Handler: Open student item
+  const handleOpenLesson = (lesson: Lesson, unlocked: boolean) => {
+    if (!unlocked && !isTeacher) {
+      Alert.alert('Materi Terkunci', 'Selesaikan materi prasyarat sebelumnya terlebih dahulu.');
+      return;
+    }
+    setSelectedLesson(lesson);
+  };
+
+  const handleOpenQuiz = (quiz: Quiz, unlocked: boolean) => {
+    if (!unlocked && !isTeacher) {
+      Alert.alert('Kuis Terkunci', 'Selesaikan seluruh materi pelajaran di modul ini terlebih dahulu.');
+      return;
+    }
+    setQuizAnswers({});
+    setQuizResultText(null);
+    setSelectedQuiz(quiz);
+  };
+
+  const handleOpenAssignment = (assignment: Assignment, unlocked: boolean) => {
+    if (!unlocked && !isTeacher) {
+      if (assignment.moduleId === 'mod-2') {
+        Alert.alert(
+          'Tugas Terkunci (Perlu Syarat Prasyarat)',
+          'Tugas di Modul 2 terkunci karena Anda belum lulus Kuis Evaluasi Modul 1. Selesaikan materi Modul 1 dan raih nilai kuis minimal 80% untuk membuka tugas ini!'
+        );
+      } else {
+        Alert.alert(
+          'Tugas Terkunci',
+          'Selesaikan materi prasyarat sebelumnya terlebih dahulu.'
+        );
+      }
+      return;
+    }
+    const existing = submissions.find(
+      (s) => s.assignmentId === assignment.id && s.userId === currentUser.id
+    );
+    if (existing) {
+      setAssignmentText(existing.submissionContent);
+      setAssignmentUrl(existing.attachmentUrl || '');
+    } else {
+      setAssignmentText('');
+      setAssignmentUrl('');
+    }
+    setSelectedAssignment(assignment);
+  };
+
+  // Student actions
+  const handleCompleteLessonPress = (autoNext = false) => {
+    if (selectedLesson) {
+      if (!completedLessonIds.includes(selectedLesson.id)) {
+        completeLesson(selectedLesson.id);
+      }
+      if (!autoNext) {
+        Alert.alert('Sukses', 'Materi ditandai selesai! +25 XP ditambahkan.');
+        setSelectedLesson(null);
+      }
+    }
+  };
+
+  const handleNextLessonPress = (nextLesson: Lesson) => {
+    if (selectedLesson && !completedLessonIds.includes(selectedLesson.id)) {
+      completeLesson(selectedLesson.id);
+    }
+    setSelectedLesson(nextLesson);
+  };
+
+  const handleProceedToQuizPress = (quiz: Quiz) => {
+    if (selectedLesson && !completedLessonIds.includes(selectedLesson.id)) {
+      completeLesson(selectedLesson.id);
+    }
+    setSelectedLesson(null);
+    handleOpenQuiz(quiz, true);
+  };
+
+  const handleSubmitQuizPress = () => {
+    if (!selectedQuiz) return;
+    const answeredCount = Object.keys(quizAnswers).length;
+    if (answeredCount < selectedQuiz.questions.length) {
+      Alert.alert('Perhatian', 'Mohon jawab semua pertanyaan kuis sebelum mengirimkan.');
+      return;
+    }
+
+    const answersArray = selectedQuiz.questions.map((_, idx) => quizAnswers[idx] ?? -1);
+    const result = submitQuiz(selectedQuiz.id, answersArray);
+    setQuizResultText(result.explanation);
+
+    if (result.isPassed) {
+      Alert.alert('Selamat!', `${result.explanation}\n+50 XP diperoleh!`, [
+        { text: 'Tutup', onPress: () => setSelectedQuiz(null) },
+      ]);
+    }
+  };
+
+  const handleSubmitAssignmentPress = () => {
+    if (!selectedAssignment) return;
+    if (!assignmentText.trim()) {
+      Alert.alert('Perhatian', 'Catatan/deskripsi tugas wajib diisi.');
+      return;
+    }
+
+    submitAssignment(
+      selectedAssignment.id,
+      activeBatch.id,
+      assignmentText.trim(),
+      assignmentUrl.trim() || undefined
+    );
+
+    Alert.alert(
+      'Tugas Berhasil Dikumpulkan',
+      'Tugas Anda telah masuk ke antrean periksa pengajar. Beralih ke Mode Pengajar untuk memeriksa dan memberi nilai!',
+      [{ text: 'OK', onPress: () => setSelectedAssignment(null) }]
+    );
+  };
+
+  // Teacher CRUD Handlers
+  const handleOpenAddLesson = (moduleId: string) => {
+    setTargetModuleForLesson(moduleId);
+    setNewLessonTitle('');
+    setNewLessonDuration('15');
+    setNewLessonBody('');
+    setNewLessonType('reading');
+    setNewLessonVideoUrl('');
+    setIsAddLessonModalOpen(true);
+  };
+
+  const handleSaveLesson = () => {
+    if (!newLessonTitle.trim() || !newLessonBody.trim()) {
+      Alert.alert('Data Belum Lengkap', 'Judul dan isi materi pelajaran wajib diisi.');
+      return;
+    }
+    const mins = parseInt(newLessonDuration, 10) || 15;
+    addLesson(
+      targetModuleForLesson,
+      newLessonTitle.trim(),
+      newLessonBody.trim(),
+      mins,
+      newLessonType,
+      newLessonVideoUrl.trim() || undefined
+    );
+    setIsAddLessonModalOpen(false);
+    Alert.alert('Sukses', 'Materi pembelajaran baru berhasil ditambahkan!');
+  };
+
+  const handleDeleteLesson = (lesson: Lesson) => {
+    Alert.alert(
+      'Hapus Materi Pelajaran',
+      `Apakah Anda yakin ingin menghapus "${lesson.title}"?`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: () => {
+            deleteLesson(lesson.id);
+            Alert.alert('Terhapus', 'Materi berhasil dihapus dari kurikulum.');
+          },
+        },
+      ]
+    );
+  };
+
+  const handleOpenAddAssignment = (moduleId: string) => {
+    setTargetModuleForAssignment(moduleId);
+    setNewAssignTitle('');
+    setNewAssignInstructions('');
+    setNewAssignDueDate('2026-11-20 23:59');
+    setNewAssignMaxScore('100');
+    setIsAddAssignmentModalOpen(true);
+  };
+
+  const handleSaveAssignment = () => {
+    if (!newAssignTitle.trim() || !newAssignInstructions.trim()) {
+      Alert.alert('Data Belum Lengkap', 'Judul dan instruksi tugas wajib diisi.');
+      return;
+    }
+    const score = parseInt(newAssignMaxScore, 10) || 100;
+    addAssignment(
+      targetModuleForAssignment,
+      newAssignTitle.trim(),
+      newAssignInstructions.trim(),
+      newAssignDueDate.trim(),
+      score
+    );
+    setIsAddAssignmentModalOpen(false);
+    Alert.alert('Sukses', 'Tugas proyek baru berhasil ditambahkan beserta batas waktunya!');
+  };
+
+  const handleDeleteAssignment = (assignment: Assignment) => {
+    Alert.alert(
+      'Hapus Tugas Proyek',
+      `Apakah Anda yakin ingin menghapus "${assignment.title}"? Pengumpulan siswa pada tugas ini juga akan terhapus.`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: () => {
+            deleteAssignment(assignment.id);
+            Alert.alert('Terhapus', 'Tugas proyek berhasil dihapus.');
+          },
+        },
+      ]
+    );
+  };
+
+  const handleOpenEditDueDate = (assignment: Assignment) => {
+    setTargetAssignmentToEdit(assignment);
+    setEditDueDateInput(assignment.dueDate);
+    setIsEditDueDateModalOpen(true);
+  };
+
+  const handleSaveNewDueDate = () => {
+    if (!targetAssignmentToEdit || !editDueDateInput.trim()) return;
+    updateAssignmentDueDate(targetAssignmentToEdit.id, editDueDateInput.trim());
+    setIsEditDueDateModalOpen(false);
+    Alert.alert('Batas Waktu Diperbarui', `Batas waktu tugas diubah menjadi ${editDueDateInput.trim()}`);
+  };
+
+  const handleSaveModule = () => {
+    if (!newModuleTitle.trim()) {
+      Alert.alert('Data Belum Lengkap', 'Judul modul wajib diisi.');
+      return;
+    }
+    addModule(activeCourse.id, newModuleTitle.trim());
+    setNewModuleTitle('');
+    setIsAddModuleModalOpen(false);
+    Alert.alert('Sukses', 'Modul baru berhasil ditambahkan ke kurikulum!');
+  };
+
+  const renderFormattedLessonContent = (body: string, dark: boolean) => {
+    const lines = body.split('\n');
+    const elements: React.ReactNode[] = [];
+    let inCodeBlock = false;
+    let codeBlockBuffer: string[] = [];
+    let codeBlockLang = 'typescript';
+    let codeIndex = 0;
+
+    const renderInlineFormatted = (rawText: string, baseColor: string) => {
+      const parts = rawText.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+      return parts.map((part, pIdx) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          const boldText = part.slice(2, -2);
+          return (
+            <Text
+              key={`inline-${pIdx}`}
+              style={{ fontWeight: '800', color: dark ? '#F1F5F9' : '#0F172A' }}>
+              {boldText}
+            </Text>
+          );
+        }
+        if (part.startsWith('`') && part.endsWith('`')) {
+          const codeSnippet = part.slice(1, -1);
+          return (
+            <Text
+              key={`inline-${pIdx}`}
+              style={{
+                fontFamily: 'monospace',
+                backgroundColor: dark ? '#1E293B' : '#E2E8F0',
+                color: dark ? '#38BDF8' : '#0369A1',
+                fontSize: 12,
+                fontWeight: '600',
+              }}>
+              {` ${codeSnippet} `}
+            </Text>
+          );
+        }
+        return (
+          <Text key={`inline-${pIdx}`} style={{ color: baseColor }}>
+            {part}
+          </Text>
+        );
+      });
+    };
+
+    lines.forEach((line, index) => {
+      if (line.trim().startsWith('```')) {
+        if (inCodeBlock) {
+          const codeText = codeBlockBuffer.join('\n');
+          const currentCodeIdx = codeIndex++;
+          const isCopied = copiedSnippetIndex === currentCodeIdx;
+          elements.push(
+            <View key={`code-${index}`} style={styles.richCodeCard}>
+              <View style={styles.richCodeHeader}>
+                <View style={styles.richCodeDots}>
+                  <View style={[styles.richDot, { backgroundColor: '#EF4444' }]} />
+                  <View style={[styles.richDot, { backgroundColor: '#F59E0B' }]} />
+                  <View style={[styles.richDot, { backgroundColor: '#10B981' }]} />
+                  <Text style={styles.richCodeLang}>{codeBlockLang || 'code'}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => handleCopyCodeSnippet(codeText, currentCodeIdx)}
+                  style={styles.richCopyBtn}>
+                  <Ionicons
+                    name={isCopied ? 'checkmark' : 'copy-outline'}
+                    size={13}
+                    color={isCopied ? '#10B981' : '#94A3B8'}
+                  />
+                  <Text style={[styles.richCopyText, isCopied && { color: '#10B981' }]}>
+                    {isCopied ? 'Tersalin' : 'Salin'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.richCodeScroll}>
+                <Text style={styles.richCodeText}>{codeText}</Text>
+              </ScrollView>
+            </View>
+          );
+          codeBlockBuffer = [];
+          inCodeBlock = false;
+        } else {
+          inCodeBlock = true;
+          codeBlockLang = line.trim().replace(/^```/, '').trim() || 'code';
+        }
+        return;
+      }
+
+      if (inCodeBlock) {
+        codeBlockBuffer.push(line);
+        return;
+      }
+
+      const trimmed = line.trim();
+      if (!trimmed) {
+        elements.push(<View key={`spacer-${index}`} style={{ height: 10 }} />);
+        return;
+      }
+
+      if (trimmed.startsWith('#### ')) {
+        elements.push(
+          <View key={`h4-${index}`} style={styles.richH4Container}>
+            <Text style={[styles.richH4Text, { color: dark ? '#E2E8F0' : '#1E293B' }]}>
+              {trimmed.replace('#### ', '')}
+            </Text>
+          </View>
+        );
+      } else if (trimmed.startsWith('### ')) {
+        elements.push(
+          <View key={`h3-${index}`} style={styles.richH3Container}>
+            <View style={styles.richH3Bar} />
+            <Text style={[styles.richH3Text, { color: dark ? '#F1F5F9' : '#0F172A' }]}>
+              {trimmed.replace('### ', '')}
+            </Text>
+          </View>
+        );
+      } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        elements.push(
+          <View key={`li-${index}`} style={styles.richLiRow}>
+            <View style={styles.richLiBullet} />
+            <Text style={styles.richLiText}>
+              {renderInlineFormatted(trimmed.substring(2), dark ? '#CBD5E1' : '#334155')}
+            </Text>
+          </View>
+        );
+      } else if (/^\d+\.\s/.test(trimmed)) {
+        const match = trimmed.match(/^(\d+)\.\s(.*)$/);
+        const num = match ? match[1] : '1';
+        const text = match ? match[2] : trimmed;
+        elements.push(
+          <View key={`num-${index}`} style={styles.richLiRow}>
+            <View style={styles.richNumBadge}>
+              <Text style={styles.richNumBadgeText}>{num}</Text>
+            </View>
+            <Text style={styles.richLiText}>
+              {renderInlineFormatted(text, dark ? '#CBD5E1' : '#334155')}
+            </Text>
+          </View>
+        );
+      } else {
+        elements.push(
+          <Text key={`p-${index}`} style={styles.richParagraph}>
+            {renderInlineFormatted(trimmed, dark ? '#CBD5E1' : '#334155')}
+          </Text>
+        );
+      }
+    });
+
+    if (inCodeBlock && codeBlockBuffer.length > 0) {
+      const codeText = codeBlockBuffer.join('\n');
+      elements.push(
+        <View key="code-end" style={styles.richCodeCard}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.richCodeScroll}>
+            <Text style={styles.richCodeText}>{codeText}</Text>
+          </ScrollView>
+        </View>
+      );
+    }
+
+    return elements;
+  };
+
+  return (
+    <SafeAreaView
+      edges={['top']}
+      style={[
+        styles.safeArea,
+        { backgroundColor: isDark ? '#090D16' : '#F8FAFC' },
+      ]}>
+      <DemoHeader />
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.headerTitleContainer}>
+          <Text
+            style={[
+              styles.screenTitle,
+              { color: isDark ? '#F8FAFC' : '#0F172A' },
+            ]}>
+            📚 Kurikulum & Silabus Modul
+          </Text>
+          <Text style={styles.screenSubtitle}>
+            {isTeacher
+              ? 'Mode Pengajar: Kelola materi & tugas per kelas, serta tentukan batas waktu'
+              : 'Pilih kelas untuk melihat kurikulum & modul silabus pembelajaran'}
+          </Text>
+        </View>
+
+        {/* Horizontal Class / Cohort Selector */}
+        <View style={styles.classSelectorContainer}>
+          <Text style={[styles.selectorLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+            KELAS & COHORT SAYA:
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.classSelectorScroll}>
+            {displayBatches.map((batch) => {
+              const course = courses.find((c) => c.id === batch.courseId);
+              const isSelected = batch.id === activeBatch.id;
+              const isDynamic = batch.id === 'batch-edf-402';
+              const isCompleted = batch.status === 'completed';
+
+              return (
+                <TouchableOpacity
+                  key={batch.id}
+                  onPress={() => selectBatch(batch.id)}
+                  style={[
+                    styles.classChip,
+                    {
+                      backgroundColor: isSelected
+                        ? isTeacher
+                          ? '#8B5CF6'
+                          : '#2563EB'
+                        : isDark
+                        ? '#1E293B'
+                        : '#FFFFFF',
+                      borderColor: isSelected
+                        ? isTeacher
+                          ? '#7C3AED'
+                          : '#1D4ED8'
+                        : isDark
+                        ? '#334155'
+                        : '#E2E8F0',
+                    },
+                  ]}>
+                  <View style={styles.classChipTop}>
+                    <Ionicons
+                      name={
+                        isDynamic
+                          ? 'phone-portrait-outline'
+                          : isCompleted
+                          ? 'ribbon-outline'
+                          : 'sparkles-outline'
+                      }
+                      size={14}
+                      color={isSelected ? '#FFFFFF' : isDark ? '#94A3B8' : '#64748B'}
+                    />
+                    <Text
+                      style={[
+                        styles.classChipCode,
+                        {
+                          color: isSelected ? '#FFFFFF' : isDark ? '#E2E8F0' : '#1E293B',
+                          fontWeight: isSelected ? '800' : '600',
+                        },
+                      ]}>
+                      {batch.classCode}
+                    </Text>
+                    {isDynamic && (
+                      <View
+                        style={[
+                          styles.chipTag,
+                          {
+                            backgroundColor: isSelected
+                              ? 'rgba(255,255,255,0.25)'
+                              : '#EFF6FF',
+                          },
+                        ]}>
+                        <Text
+                          style={[
+                            styles.chipTagText,
+                            { color: isSelected ? '#FFFFFF' : '#2563EB' },
+                          ]}>
+                          Aktif
+                        </Text>
+                      </View>
+                    )}
+                    {isCompleted && (
+                      <View
+                        style={[
+                          styles.chipTag,
+                          {
+                            backgroundColor: isSelected
+                              ? 'rgba(255,255,255,0.25)'
+                              : '#DCFCE7',
+                          },
+                        ]}>
+                        <Text
+                          style={[
+                            styles.chipTagText,
+                            { color: isSelected ? '#FFFFFF' : '#15803D' },
+                          ]}>
+                          Lulus
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.classChipTitle,
+                      { color: isSelected ? '#FFFFFF' : isDark ? '#CBD5E1' : '#475569' },
+                    ]}>
+                    {course?.title || batch.batchName}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Active Class Hero Banner */}
+        <View
+          style={[
+            styles.courseBannerCard,
+            {
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+              borderColor: isDark ? '#334155' : '#E2E8F0',
+            },
+          ]}>
+          <View style={styles.courseBannerHeader}>
+            <View
+              style={[
+                styles.categoryBadge,
+                {
+                  backgroundColor: isDynamicTestingBatch
+                    ? '#DBEAFE'
+                    : activeBatch.status === 'completed'
+                    ? '#DCFCE7'
+                    : '#EDE9FE',
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.categoryBadgeText,
+                  {
+                    color: isDynamicTestingBatch
+                      ? '#1E40AF'
+                      : activeBatch.status === 'completed'
+                      ? '#15803D'
+                      : '#7C3AED',
+                  },
+                ]}>
+                {activeCourse?.category || 'Program Sertifikasi'}
+              </Text>
+            </View>
+
+            <View style={styles.cohortCodeBadge}>
+              <Text style={styles.cohortCodeText}>{activeBatch.classCode}</Text>
+            </View>
+          </View>
+
+          <Text
+            style={[
+              styles.courseBannerTitle,
+              { color: isDark ? '#F8FAFC' : '#0F172A' },
+            ]}>
+            {activeCourse?.title}
+          </Text>
+          <Text style={styles.courseBannerDesc}>{activeCourse?.description}</Text>
+
+          <View style={styles.courseBannerMetaRow}>
+            <View style={styles.metaCol}>
+              <Text style={styles.metaLabel}>Instruktur:</Text>
+              <Text
+                style={[
+                  styles.metaValue,
+                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                ]}>
+                {activeBatch.instructorName}
+              </Text>
+            </View>
+            <View style={styles.metaCol}>
+              <Text style={styles.metaLabel}>Status Kelas:</Text>
+              <Text
+                style={[
+                  styles.metaValue,
+                  {
+                    color:
+                      activeBatch.status === 'completed' ? '#10B981' : '#2563EB',
+                  },
+                ]}>
+                {activeBatch.status === 'completed' ? 'Selesai (Graduated)' : 'Aktif Berjalan'}
+              </Text>
+            </View>
+          </View>
+
+          {/* Dynamic Interactive Hint */}
+          {isDynamicTestingBatch ? (
+            <View style={styles.dynamicNoticeBox}>
+              <Ionicons name="sparkles" size={16} color="#2563EB" />
+              <Text style={styles.dynamicNoticeText}>
+                Kelas ini menerapkan <Text style={{ fontWeight: '700' }}>kurikulum terstruktur & interaktif</Text> (pembelajaran bertahap, evaluasi kuis, pengumpulan proyek, penilaian mentor & penerbitan sertifikat resmi).
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.referenceNoticeBox}>
+              <Ionicons
+                name={activeBatch.status === 'completed' ? 'ribbon' : 'information-circle'}
+                size={16}
+                color={activeBatch.status === 'completed' ? '#15803D' : '#64748B'}
+              />
+              <Text
+                style={[
+                  styles.referenceNoticeText,
+                  {
+                    color:
+                      activeBatch.status === 'completed' ? '#15803D' : '#64748B',
+                  },
+                ]}>
+                {activeBatch.status === 'completed'
+                  ? 'Siswa telah menuntaskan kurikulum ini dan sertifikat digital telah diterbitkan di Profil.'
+                  : 'Kurikulum & modul silabus dapat dibaca dan dieksplorasi.'}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Modules Section Header */}
+        <View style={styles.moduleSectionHeader}>
+          <Text
+            style={[
+              styles.moduleSectionTitle,
+              { color: isDark ? '#F8FAFC' : '#0F172A' },
+            ]}>
+            Daftar Modul ({currentModules.length})
+          </Text>
+          {isTeacher && (
+            <TouchableOpacity
+              onPress={() => {
+                setNewModuleTitle('');
+                setIsAddModuleModalOpen(true);
+              }}
+              style={styles.addModuleHeaderBtn}>
+              <Ionicons name="add-circle" size={16} color="#8B5CF6" />
+              <Text style={styles.addModuleHeaderBtnText}>+ Modul Baru</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {currentModules.length === 0 && (
+          <View
+            style={[
+              styles.emptyStateCard,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                borderColor: isDark ? '#334155' : '#E2E8F0',
+              },
+            ]}>
+            <Ionicons name="folder-outline" size={40} color="#94A3B8" />
+            <Text
+              style={[
+                styles.emptyStateTitle,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Belum Ada Modul
+            </Text>
+            <Text style={styles.emptyStateDesc}>
+              Kurikulum untuk kelas ini sedang dipersiapkan oleh tim akademik.
+            </Text>
+          </View>
+        )}
+
+        {currentModules.map((mod) => {
+          const modLessons = lessons.filter((l) => l.moduleId === mod.id);
+          const modQuiz = quizzes.find((q) => q.moduleId === mod.id);
+          const modAssignments = assignments.filter((a) => a.moduleId === mod.id);
+
+          return (
+            <View
+              key={mod.id}
+              style={[
+                styles.moduleCard,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  borderColor: isDark ? '#334155' : '#E2E8F0',
+                },
+              ]}>
+              {/* Module Header with Teacher Action Buttons */}
+              <View style={styles.moduleHeaderRow}>
+                <View style={styles.moduleTitleContainer}>
+                  <Ionicons name="folder-open" size={20} color="#2563EB" />
+                  <Text
+                    style={[
+                      styles.moduleTitle,
+                      { color: isDark ? '#F8FAFC' : '#0F172A' },
+                    ]}>
+                    {mod.title}
+                  </Text>
+                </View>
+
+                {isTeacher && (
+                  <View style={styles.teacherActionBtnGroup}>
+                    <TouchableOpacity
+                      onPress={() => handleOpenAddLesson(mod.id)}
+                      style={styles.addMiniBtn}>
+                      <Ionicons name="add-circle" size={14} color="#8B5CF6" />
+                      <Text style={styles.addMiniBtnText}>+ Materi</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => handleOpenAddAssignment(mod.id)}
+                      style={[styles.addMiniBtn, { borderColor: '#6366F1' }]}>
+                      <Ionicons name="add-circle" size={14} color="#6366F1" />
+                      <Text style={[styles.addMiniBtnText, { color: '#6366F1' }]}>+ Tugas</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.itemsList}>
+                {/* Render Lessons */}
+                {modLessons.map((lesson) => {
+                  const isDone = completedLessonIds.includes(lesson.id);
+                  const unlocked = isLessonUnlocked(
+                    lesson,
+                    lessons,
+                    quizzes,
+                    lockSnapshot
+                  );
+
+                  return (
+                    <View
+                      key={lesson.id}
+                      style={[
+                        styles.itemRow,
+                        {
+                          backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                          borderColor: isDone
+                            ? '#10B981'
+                            : unlocked || isTeacher
+                            ? '#3B82F6'
+                            : isDark
+                            ? '#1E293B'
+                            : '#E2E8F0',
+                          opacity: unlocked || isTeacher ? 1 : 0.6,
+                        },
+                      ]}>
+                      <TouchableOpacity
+                        onPress={() => handleOpenLesson(lesson, unlocked)}
+                        style={styles.itemLeft}>
+                        <View
+                          style={[
+                            styles.statusIcon,
+                            {
+                              backgroundColor: isDone
+                                ? '#DCFCE7'
+                                : unlocked || isTeacher
+                                ? '#DBEAFE'
+                                : '#F1F5F9',
+                            },
+                          ]}>
+                          <Ionicons
+                            name={
+                              isDone
+                                ? 'checkmark-circle'
+                                : unlocked || isTeacher
+                                ? 'play'
+                                : 'lock-closed'
+                            }
+                            size={16}
+                            color={
+                              isDone
+                                ? '#15803D'
+                                : unlocked || isTeacher
+                                ? '#2563EB'
+                                : '#94A3B8'
+                            }
+                          />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text
+                            style={[
+                              styles.itemTitle,
+                              { color: isDark ? '#F8FAFC' : '#0F172A' },
+                            ]}>
+                            {lesson.title}
+                          </Text>
+                          <Text style={styles.itemMeta}>
+                            Materi Bacaan • {lesson.durationMinutes} menit
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+
+                      <View style={styles.itemRightRow}>
+                        <View
+                          style={[
+                            styles.badgePill,
+                            {
+                              backgroundColor: isDone
+                                ? '#DCFCE7'
+                                : unlocked || isTeacher
+                                ? '#EFF6FF'
+                                : '#F1F5F9',
+                            },
+                          ]}>
+                          <Text
+                            style={[
+                              styles.badgeText,
+                              {
+                                color: isDone
+                                  ? '#15803D'
+                                  : unlocked || isTeacher
+                                  ? '#2563EB'
+                                  : '#94A3B8',
+                              },
+                            ]}>
+                            {isDone ? 'Selesai' : unlocked || isTeacher ? 'Buka' : 'Terkunci'}
+                          </Text>
+                        </View>
+
+                        {/* Teacher Delete Lesson Button */}
+                        {isTeacher && (
+                          <TouchableOpacity
+                            onPress={() => handleDeleteLesson(lesson)}
+                            style={styles.deleteIconBtn}
+                            accessibilityLabel="Hapus materi">
+                            <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    </View>
+                  );
+                })}
+
+                {/* Render Quiz if exists */}
+                {modQuiz && (() => {
+                  const quizAttempt = quizAttempts.find(
+                    (q) => q.quizId === modQuiz.id && q.userId === currentUser.id
+                  );
+                  const isPassed = quizAttempt?.isPassed ?? false;
+                  const unlocked = isQuizUnlocked(modQuiz, lessons, lockSnapshot);
+
+                  return (
+                    <TouchableOpacity
+                      key={modQuiz.id}
+                      onPress={() => handleOpenQuiz(modQuiz, unlocked)}
+                      style={[
+                        styles.itemRow,
+                        {
+                          backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                          borderColor: isPassed
+                            ? '#10B981'
+                            : unlocked || isTeacher
+                            ? '#F59E0B'
+                            : isDark
+                            ? '#1E293B'
+                            : '#E2E8F0',
+                          opacity: unlocked || isTeacher ? 1 : 0.6,
+                        },
+                      ]}>
+                      <View style={styles.itemLeft}>
+                        <View
+                          style={[
+                            styles.statusIcon,
+                            {
+                              backgroundColor: isPassed
+                                ? '#DCFCE7'
+                                : unlocked || isTeacher
+                                ? '#FEF3C7'
+                                : '#F1F5F9',
+                            },
+                          ]}>
+                          <Ionicons
+                            name={
+                              isPassed
+                                ? 'shield-checkmark'
+                                : unlocked || isTeacher
+                                ? 'help-circle'
+                                : 'lock-closed'
+                            }
+                            size={16}
+                            color={isPassed ? '#15803D' : unlocked || isTeacher ? '#D97706' : '#94A3B8'}
+                          />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text
+                            style={[
+                              styles.itemTitle,
+                              { color: isDark ? '#F8FAFC' : '#0F172A' },
+                            ]}>
+                            {modQuiz.title}
+                          </Text>
+                          <Text style={styles.itemMeta}>
+                            Kuis Evaluasi • Min {modQuiz.passingScorePercentage}%
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View
+                        style={[
+                          styles.badgePill,
+                          {
+                            backgroundColor: isPassed
+                              ? '#DCFCE7'
+                              : unlocked || isTeacher
+                              ? '#FEF3C7'
+                              : '#F1F5F9',
+                          },
+                        ]}>
+                        <Text
+                          style={[
+                            styles.badgeText,
+                            {
+                              color: isPassed
+                                ? '#15803D'
+                                : unlocked || isTeacher
+                                ? '#D97706'
+                                : '#94A3B8',
+                            },
+                          ]}>
+                          {isPassed
+                            ? `Lulus (${quizAttempt?.scorePercentage}%)`
+                            : unlocked || isTeacher
+                            ? 'Mulai Kuis'
+                            : 'Terkunci'}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })()}
+
+                {/* Render Assignments */}
+                {modAssignments.map((assignment) => {
+                  const sub = submissions.find(
+                    (s) => s.assignmentId === assignment.id && s.userId === currentUser.id
+                  );
+                  const grade = grades.find((g) => g.submissionId === sub?.id);
+                  const unlocked = isAssignmentUnlocked(
+                    assignment,
+                    lockSnapshot
+                  );
+
+                  return (
+                    <View
+                      key={assignment.id}
+                      style={[
+                        styles.itemRow,
+                        {
+                          backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                          borderColor:
+                            grade && grade.score >= 75
+                              ? '#10B981'
+                              : sub
+                              ? '#8B5CF6'
+                              : unlocked || isTeacher
+                              ? '#6366F1'
+                              : isDark
+                              ? '#1E293B'
+                              : '#E2E8F0',
+                          opacity: unlocked || isTeacher ? 1 : 0.6,
+                        },
+                      ]}>
+                      <TouchableOpacity
+                        onPress={() => handleOpenAssignment(assignment, unlocked)}
+                        style={styles.itemLeft}>
+                        <View
+                          style={[
+                            styles.statusIcon,
+                            {
+                              backgroundColor:
+                                grade && grade.score >= 75
+                                  ? '#DCFCE7'
+                                  : sub
+                                  ? '#EDE9FE'
+                                  : unlocked || isTeacher
+                                  ? '#E0E7FF'
+                                  : '#F1F5F9',
+                            },
+                          ]}>
+                          <Ionicons
+                            name={
+                              grade && grade.score >= 75
+                                ? 'ribbon'
+                                : sub
+                                ? 'time'
+                                : unlocked || isTeacher
+                                ? 'cloud-upload'
+                                : 'lock-closed'
+                            }
+                            size={16}
+                            color={
+                              grade && grade.score >= 75
+                                ? '#15803D'
+                                : sub
+                                ? '#7C3AED'
+                                : unlocked || isTeacher
+                                ? '#4F46E5'
+                                : '#94A3B8'
+                            }
+                          />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text
+                            style={[
+                              styles.itemTitle,
+                              { color: isDark ? '#F8FAFC' : '#0F172A' },
+                            ]}>
+                            {assignment.title}
+                          </Text>
+                          <Text style={styles.itemMeta}>
+                            Tugas Proyek • Max {assignment.maxScore} Poin
+                          </Text>
+                          <Text style={styles.dueDateLabel}>
+                            ⏰ Batas Waktu: {assignment.dueDate}
+                          </Text>
+                          {!unlocked && !isTeacher && (
+                            <Text style={styles.lockHintText}>
+                              🔒 Terkunci (Selesaikan materi Modul 1 & Kuis Modul 1 dahulu)
+                            </Text>
+                          )}
+                        </View>
+                      </TouchableOpacity>
+
+                      <View style={styles.itemRightRow}>
+                        <View
+                          style={[
+                            styles.badgePill,
+                            {
+                              backgroundColor:
+                                grade && grade.score >= 75
+                                  ? '#DCFCE7'
+                                  : sub
+                                  ? '#EDE9FE'
+                                  : unlocked || isTeacher
+                                  ? '#E0E7FF'
+                                  : '#F1F5F9',
+                            },
+                          ]}>
+                          <Text
+                            style={[
+                              styles.badgeText,
+                              {
+                                color:
+                                  grade && grade.score >= 75
+                                    ? '#15803D'
+                                    : sub
+                                    ? '#7C3AED'
+                                    : unlocked || isTeacher
+                                    ? '#4F46E5'
+                                    : '#94A3B8',
+                              },
+                            ]}>
+                            {grade
+                              ? `Nilai: ${grade.score}`
+                              : sub
+                              ? 'Menunggu Nilai'
+                              : unlocked || isTeacher
+                              ? 'Kumpulkan'
+                              : 'Terkunci'}
+                          </Text>
+                        </View>
+
+                        {/* Teacher Actions for Assignment: Edit Deadline & Delete */}
+                        {isTeacher && (
+                          <View style={styles.teacherActionIcons}>
+                            <TouchableOpacity
+                              onPress={() => handleOpenEditDueDate(assignment)}
+                              style={styles.editDateBtn}
+                              accessibilityLabel="Ubah batas waktu">
+                              <Ionicons name="calendar-outline" size={16} color="#8B5CF6" />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              onPress={() => handleDeleteAssignment(assignment)}
+                              style={styles.deleteIconBtn}
+                              accessibilityLabel="Hapus tugas">
+                              <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          );
+        })}
+      </ScrollView>
+
+      {/* MODAL 1: RICH LESSON READER & PLAYER (STUDENT) */}
+      <Modal
+        visible={!!selectedLesson}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setSelectedLesson(null)}>
+        <SafeAreaView
+          style={[
+            styles.modalContainer,
+            { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' },
+          ]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setSelectedLesson(null)}>
+              <Ionicons name="close" size={24} color={isDark ? '#F8FAFC' : '#0F172A'} />
+            </TouchableOpacity>
+            <View style={{ flex: 1, alignItems: 'center', paddingHorizontal: 8 }}>
+              <Text
+                style={[
+                  styles.modalHeaderTitle,
+                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                ]}>
+                Materi Pembelajaran
+              </Text>
+              {currentLessonModule && (
+                <Text style={styles.modalHeaderSub} numberOfLines={1}>
+                  {currentLessonModule.title}
+                </Text>
+              )}
+            </View>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <ScrollView
+            style={styles.modalScroll}
+            contentContainerStyle={{ paddingBottom: 40 }}
+            showsVerticalScrollIndicator={false}>
+            {selectedLesson && (
+              <>
+                <View style={styles.lessonMetaRow}>
+                  <View
+                    style={[
+                      styles.lessonTypeBadge,
+                      {
+                        backgroundColor:
+                          selectedLesson.contentType === 'video'
+                            ? (isDark ? '#450A0A' : '#FEE2E2')
+                            : (isDark ? '#172554' : '#EFF6FF'),
+                      },
+                    ]}>
+                    <Ionicons
+                      name={
+                        selectedLesson.contentType === 'video'
+                          ? 'play-circle'
+                          : 'book-outline'
+                      }
+                      size={14}
+                      color={
+                        selectedLesson.contentType === 'video' ? '#EF4444' : '#2563EB'
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.lessonTypeBadgeText,
+                        {
+                          color:
+                            selectedLesson.contentType === 'video'
+                              ? '#EF4444'
+                              : '#2563EB',
+                        },
+                      ]}>
+                      {selectedLesson.contentType === 'video'
+                        ? 'Video Pelajaran'
+                        : 'Materi Bacaan'}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.lessonDurationBadge,
+                      { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
+                    ]}>
+                    <Ionicons name="time-outline" size={13} color="#64748B" />
+                    <Text style={styles.lessonDurationText}>
+                      {selectedLesson.durationMinutes} Menit
+                    </Text>
+                  </View>
+
+                  {completedLessonIds.includes(selectedLesson.id) && (
+                    <View style={styles.completedBadgePill}>
+                      <Ionicons name="checkmark-circle" size={13} color="#10B981" />
+                      <Text style={styles.completedBadgePillText}>Selesai</Text>
+                    </View>
+                  )}
+                </View>
+
+                <Text
+                  style={[
+                    styles.modalTitle,
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  ]}>
+                  {selectedLesson.title}
+                </Text>
+
+                {/* Video Player Card Preview if video lesson */}
+                {selectedLesson.contentType === 'video' && (
+                  <View
+                    style={[
+                      styles.videoPlayerCard,
+                      {
+                        backgroundColor: isDark ? '#020617' : '#1E293B',
+                        borderColor: isDark ? '#334155' : '#0F172A',
+                      },
+                    ]}>
+                    <View style={styles.videoPlayerScreen}>
+                      <View style={styles.videoIconCircle}>
+                        <Ionicons name="play" size={28} color="#FFFFFF" />
+                      </View>
+                      <Text style={styles.videoPlayerTitle}>Pemutar Video Interaktif</Text>
+                      <Text style={styles.videoPlayerSub} numberOfLines={1}>
+                        {selectedLesson.videoUrl
+                          ? selectedLesson.videoUrl
+                          : 'Tautan video pembelajaran modul'}
+                      </Text>
+                      {selectedLesson.videoUrl && (
+                        <TouchableOpacity
+                          style={styles.videoLaunchBtn}
+                          onPress={() => {
+                            if (selectedLesson.videoUrl) {
+                              Linking.openURL(selectedLesson.videoUrl).catch(() => {
+                                Alert.alert('Tautan Video', selectedLesson.videoUrl);
+                              });
+                            }
+                          }}>
+                          <Ionicons name="open-outline" size={14} color="#FFFFFF" />
+                          <Text style={styles.videoLaunchBtnText}>Buka Tautan Video</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                )}
+
+                {/* Formatted Content */}
+                <View style={styles.formattedContentWrapper}>
+                  {renderFormattedLessonContent(selectedLesson.contentBody, isDark)}
+                </View>
+              </>
+            )}
+          </ScrollView>
+
+          {/* Smart Next-Step Footer */}
+          <View
+            style={[
+              styles.modalFooterMulti,
+              {
+                backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                borderTopColor: isDark ? '#1E293B' : '#E2E8F0',
+              },
+            ]}>
+            <TouchableOpacity
+              onPress={() => handleCompleteLessonPress(false)}
+              style={[
+                styles.modalPrimaryBtn,
+                completedLessonIds.includes(selectedLesson?.id || '') && {
+                  backgroundColor: '#10B981',
+                },
+              ]}>
+              <Ionicons
+                name={
+                  completedLessonIds.includes(selectedLesson?.id || '')
+                    ? 'checkmark-circle'
+                    : 'checkmark-done'
+                }
+                size={18}
+                color="#FFFFFF"
+              />
+              <Text style={styles.modalPrimaryBtnText}>
+                {completedLessonIds.includes(selectedLesson?.id || '')
+                  ? 'Materi Sudah Selesai ✓'
+                  : 'Tandai Selesai (+25 XP)'}
+              </Text>
+            </TouchableOpacity>
+
+            {nextLessonInModule && (
+              <TouchableOpacity
+                onPress={() => handleNextLessonPress(nextLessonInModule)}
+                style={[
+                  styles.nextStepBtn,
+                  {
+                    backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                    borderColor: isDark ? '#334155' : '#E2E8F0',
+                  },
+                ]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.nextStepSmallLabel}>Lanjut ke Materi Berikutnya:</Text>
+                  <Text
+                    style={[
+                      styles.nextStepTitle,
+                      { color: isDark ? '#F8FAFC' : '#0F172A' },
+                    ]}
+                    numberOfLines={1}>
+                    {nextLessonInModule.title}
+                  </Text>
+                </View>
+                <Ionicons name="arrow-forward-circle" size={26} color="#8B5CF6" />
+              </TouchableOpacity>
+            )}
+
+            {!nextLessonInModule && currentModuleQuiz && (
+              <TouchableOpacity
+                onPress={() => handleProceedToQuizPress(currentModuleQuiz)}
+                style={[
+                  styles.nextStepBtn,
+                  {
+                    borderColor: '#10B981',
+                    backgroundColor: isDark ? '#064E3B' : '#ECFDF5',
+                  },
+                ]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.nextStepSmallLabel, { color: '#059669' }]}>
+                    Materi Selesai! Uji Pemahaman:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.nextStepTitle,
+                      { color: isDark ? '#6EE7B7' : '#047857' },
+                    ]}
+                    numberOfLines={1}>
+                    {currentModuleQuiz.title}
+                  </Text>
+                </View>
+                <Ionicons name="help-circle" size={26} color="#10B981" />
+              </TouchableOpacity>
+            )}
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* MODAL 2: INTERACTIVE QUIZ (STUDENT) */}
+      <Modal
+        visible={!!selectedQuiz}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setSelectedQuiz(null)}>
+        <SafeAreaView
+          style={[
+            styles.modalContainer,
+            { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' },
+          ]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setSelectedQuiz(null)}>
+              <Ionicons name="close" size={24} color={isDark ? '#F8FAFC' : '#0F172A'} />
+            </TouchableOpacity>
+            <Text
+              style={[
+                styles.modalHeaderTitle,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Kuis Evaluasi Modul
+            </Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <ScrollView style={styles.modalScroll}>
+            {selectedQuiz && (
+              <>
+                <Text
+                  style={[
+                    styles.modalTitle,
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  ]}>
+                  {selectedQuiz.title}
+                </Text>
+                <Text style={styles.quizInstructions}>
+                  Pilih jawaban yang paling tepat. Minimal kelulusan adalah{' '}
+                  {selectedQuiz.passingScorePercentage}%.
+                </Text>
+
+                {selectedQuiz.questions.map((q, qIndex) => (
+                  <View
+                    key={q.id}
+                    style={[
+                      styles.quizQuestionCard,
+                      {
+                        backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                        borderColor: isDark ? '#334155' : '#E2E8F0',
+                      },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.questionText,
+                        { color: isDark ? '#F8FAFC' : '#0F172A' },
+                      ]}>
+                      {qIndex + 1}. {q.questionText}
+                    </Text>
+
+                    {q.options.map((opt, optIdx) => {
+                      const isSelected = quizAnswers[qIndex] === optIdx;
+
+                      return (
+                        <TouchableOpacity
+                          key={optIdx}
+                          onPress={() =>
+                            setQuizAnswers((prev) => ({
+                              ...prev,
+                              [qIndex]: optIdx,
+                            }))
+                          }
+                          style={[
+                            styles.optionRow,
+                            {
+                              backgroundColor: isSelected
+                                ? isDark
+                                  ? '#1E3A8A'
+                                  : '#EFF6FF'
+                                : isDark
+                                ? '#0F172A'
+                                : '#FFFFFF',
+                              borderColor: isSelected
+                                ? '#2563EB'
+                                : isDark
+                                ? '#334155'
+                                : '#E2E8F0',
+                            },
+                          ]}>
+                          <View
+                            style={[
+                              styles.radioCircle,
+                              isSelected && styles.radioCircleSelected,
+                            ]}>
+                            {isSelected && <View style={styles.radioDot} />}
+                          </View>
+                          <Text
+                            style={[
+                              styles.optionText,
+                              {
+                                color: isDark ? '#F8FAFC' : '#0F172A',
+                                fontWeight: isSelected ? '700' : '400',
+                              },
+                            ]}>
+                            {opt}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ))}
+
+                {quizResultText && (
+                  <View style={styles.resultBox}>
+                    <Text style={styles.resultText}>{quizResultText}</Text>
+                  </View>
+                )}
+              </>
+            )}
+          </ScrollView>
+
+          <View style={styles.modalFooter}>
+            <TouchableOpacity
+              onPress={handleSubmitQuizPress}
+              style={[styles.modalPrimaryBtn, { backgroundColor: '#F59E0B' }]}>
+              <Ionicons name="send" size={18} color="#FFFFFF" />
+              <Text style={styles.modalPrimaryBtnText}>Kirim Jawaban Kuis</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* MODAL 3: ASSIGNMENT SUBMISSION (STUDENT) */}
+      <Modal
+        visible={!!selectedAssignment}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setSelectedAssignment(null)}>
+        <SafeAreaView
+          style={[
+            styles.modalContainer,
+            { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' },
+          ]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setSelectedAssignment(null)}>
+              <Ionicons name="close" size={24} color={isDark ? '#F8FAFC' : '#0F172A'} />
+            </TouchableOpacity>
+            <Text
+              style={[
+                styles.modalHeaderTitle,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Pengumpulan Tugas Proyek
+            </Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <ScrollView style={styles.modalScroll}>
+            {selectedAssignment && (
+              <>
+                <Text
+                  style={[
+                    styles.modalTitle,
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  ]}>
+                  {selectedAssignment.title}
+                </Text>
+
+                <View
+                  style={[
+                    styles.instructionsBox,
+                    {
+                      backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
+                      borderColor: isDark ? '#334155' : '#E2E8F0',
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      styles.instructionsTitle,
+                      { color: isDark ? '#93C5FD' : '#1D4ED8' },
+                    ]}>
+                    📋 Instruksi Tugas dari Pengajar:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.instructionsText,
+                      { color: isDark ? '#CBD5E1' : '#475569' },
+                    ]}>
+                    {selectedAssignment.instructions}
+                  </Text>
+                  <Text style={styles.modalDueDateBadge}>
+                    ⏰ Batas Waktu: {selectedAssignment.dueDate}
+                  </Text>
+                </View>
+
+                <Text
+                  style={[
+                    styles.inputLabel,
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  ]}>
+                  Tautan Repository / Berkas (Opsional):
+                </Text>
+                <TextInput
+                  placeholder="https://github.com/username/project..."
+                  placeholderTextColor="#94A3B8"
+                  value={assignmentUrl}
+                  onChangeText={setAssignmentUrl}
+                  style={[
+                    styles.modalInput,
+                    {
+                      backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
+                      borderColor: isDark ? '#334155' : '#CBD5E1',
+                    },
+                  ]}
+                />
+
+                <Text
+                  style={[
+                    styles.inputLabel,
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  ]}>
+                  Deskripsi & Jawaban Siswa *:
+                </Text>
+                <TextInput
+                  placeholder="Tuliskan ringkasan implementasi tugas Anda di sini..."
+                  placeholderTextColor="#94A3B8"
+                  value={assignmentText}
+                  onChangeText={setAssignmentText}
+                  multiline
+                  numberOfLines={4}
+                  style={[
+                    styles.modalInput,
+                    styles.modalTextArea,
+                    {
+                      backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
+                      borderColor: isDark ? '#334155' : '#CBD5E1',
+                    },
+                  ]}
+                />
+              </>
+            )}
+          </ScrollView>
+
+          <View style={styles.modalFooter}>
+            <TouchableOpacity
+              onPress={handleSubmitAssignmentPress}
+              style={[styles.modalPrimaryBtn, { backgroundColor: '#6366F1' }]}>
+              <Ionicons name="cloud-upload" size={18} color="#FFFFFF" />
+              <Text style={styles.modalPrimaryBtnText}>
+                Kumpulkan Tugas ke Pengajar (+75 XP)
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* TEACHER MODAL 1: ADD NEW LESSON */}
+      <Modal
+        visible={isAddLessonModalOpen}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setIsAddLessonModalOpen(false)}>
+        <SafeAreaView
+          style={[
+            styles.modalContainer,
+            { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' },
+          ]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setIsAddLessonModalOpen(false)}>
+              <Ionicons name="close" size={24} color={isDark ? '#F8FAFC' : '#0F172A'} />
+            </TouchableOpacity>
+            <Text
+              style={[
+                styles.modalHeaderTitle,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Tambah Materi Pelajaran Baru
+            </Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <ScrollView style={styles.modalScroll}>
+            {/* Target Module Picker */}
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Modul Tujuan *:
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginBottom: 14 }}>
+              {currentModules.map((m) => {
+                const isSelected = targetModuleForLesson === m.id;
+                return (
+                  <TouchableOpacity
+                    key={m.id}
+                    onPress={() => setTargetModuleForLesson(m.id)}
+                    style={[
+                      styles.moduleSelectChip,
+                      {
+                        backgroundColor: isSelected
+                          ? '#8B5CF6'
+                          : isDark
+                          ? '#1E293B'
+                          : '#F1F5F9',
+                        borderColor: isSelected
+                          ? '#7C3AED'
+                          : isDark
+                          ? '#334155'
+                          : '#CBD5E1',
+                      },
+                    ]}>
+                    <Ionicons
+                      name="folder-open"
+                      size={13}
+                      color={isSelected ? '#FFFFFF' : '#8B5CF6'}
+                    />
+                    <Text
+                      style={[
+                        styles.moduleSelectChipText,
+                        {
+                          color: isSelected
+                            ? '#FFFFFF'
+                            : isDark
+                            ? '#CBD5E1'
+                            : '#475569',
+                          fontWeight: isSelected ? '700' : '500',
+                        },
+                      ]}>
+                      {m.title}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Judul Materi *:
+            </Text>
+            <TextInput
+              placeholder="Contoh: 1.3 Navigasi Lanjutan dengan Expo Router"
+              placeholderTextColor="#94A3B8"
+              value={newLessonTitle}
+              onChangeText={setNewLessonTitle}
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}
+            />
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Estimasi Durasi (Menit):
+            </Text>
+            <TextInput
+              placeholder="15"
+              placeholderTextColor="#94A3B8"
+              value={newLessonDuration}
+              onChangeText={setNewLessonDuration}
+              keyboardType="numeric"
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}
+            />
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Tipe Materi Pembelajaran *:
+            </Text>
+            <View style={styles.typeSelectorRow}>
+              <TouchableOpacity
+                onPress={() => setNewLessonType('reading')}
+                style={[
+                  styles.typeSelectorChip,
+                  newLessonType === 'reading' && styles.typeSelectorChipActive,
+                  {
+                    backgroundColor:
+                      newLessonType === 'reading'
+                        ? '#8B5CF6'
+                        : isDark
+                        ? '#1E293B'
+                        : '#F1F5F9',
+                    borderColor:
+                      newLessonType === 'reading'
+                        ? '#7C3AED'
+                        : isDark
+                        ? '#334155'
+                        : '#CBD5E1',
+                  },
+                ]}>
+                <Ionicons
+                  name="book-outline"
+                  size={15}
+                  color={newLessonType === 'reading' ? '#FFFFFF' : '#8B5CF6'}
+                />
+                <Text
+                  style={[
+                    styles.typeSelectorText,
+                    {
+                      color:
+                        newLessonType === 'reading'
+                          ? '#FFFFFF'
+                          : isDark
+                          ? '#CBD5E1'
+                          : '#475569',
+                      fontWeight: newLessonType === 'reading' ? '700' : '500',
+                    },
+                  ]}>
+                  Bacaan & Teks
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setNewLessonType('video')}
+                style={[
+                  styles.typeSelectorChip,
+                  newLessonType === 'video' && styles.typeSelectorChipActive,
+                  {
+                    backgroundColor:
+                      newLessonType === 'video'
+                        ? '#EF4444'
+                        : isDark
+                        ? '#1E293B'
+                        : '#F1F5F9',
+                    borderColor:
+                      newLessonType === 'video'
+                        ? '#DC2626'
+                        : isDark
+                        ? '#334155'
+                        : '#CBD5E1',
+                  },
+                ]}>
+                <Ionicons
+                  name="videocam-outline"
+                  size={15}
+                  color={newLessonType === 'video' ? '#FFFFFF' : '#EF4444'}
+                />
+                <Text
+                  style={[
+                    styles.typeSelectorText,
+                    {
+                      color:
+                        newLessonType === 'video'
+                          ? '#FFFFFF'
+                          : isDark
+                          ? '#CBD5E1'
+                          : '#475569',
+                      fontWeight: newLessonType === 'video' ? '700' : '500',
+                    },
+                  ]}>
+                  Video Pelajaran
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {newLessonType === 'video' && (
+              <>
+                <Text
+                  style={[
+                    styles.inputLabel,
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  ]}>
+                  Tautan Video Pembelajaran (Opsional):
+                </Text>
+                <TextInput
+                  placeholder="https://youtube.com/watch?v=... atau https://vimeo.com/..."
+                  placeholderTextColor="#94A3B8"
+                  value={newLessonVideoUrl}
+                  onChangeText={setNewLessonVideoUrl}
+                  style={[
+                    styles.modalInput,
+                    {
+                      backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
+                      borderColor: isDark ? '#334155' : '#CBD5E1',
+                    },
+                  ]}
+                />
+              </>
+            )}
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Isi Materi Pembelajaran *:
+            </Text>
+            <TextInput
+              placeholder="Tulis materi penjelasan, konsep, atau tautan bacaan untuk siswa..."
+              placeholderTextColor="#94A3B8"
+              value={newLessonBody}
+              onChangeText={setNewLessonBody}
+              multiline
+              numberOfLines={6}
+              style={[
+                styles.modalInput,
+                styles.modalTextAreaLarge,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}
+            />
+          </ScrollView>
+
+          <View style={styles.modalFooter}>
+            <TouchableOpacity
+              onPress={handleSaveLesson}
+              style={[styles.modalPrimaryBtn, { backgroundColor: '#8B5CF6' }]}>
+              <Ionicons name="add-circle" size={18} color="#FFFFFF" />
+              <Text style={styles.modalPrimaryBtnText}>Simpan Materi Baru</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* TEACHER MODAL 2: ADD NEW ASSIGNMENT */}
+      <Modal
+        visible={isAddAssignmentModalOpen}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setIsAddAssignmentModalOpen(false)}>
+        <SafeAreaView
+          style={[
+            styles.modalContainer,
+            { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' },
+          ]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setIsAddAssignmentModalOpen(false)}>
+              <Ionicons name="close" size={24} color={isDark ? '#F8FAFC' : '#0F172A'} />
+            </TouchableOpacity>
+            <Text
+              style={[
+                styles.modalHeaderTitle,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Tambah Tugas Proyek Baru
+            </Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <ScrollView style={styles.modalScroll}>
+            {/* Target Module Picker */}
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Modul Tujuan *:
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginBottom: 14 }}>
+              {currentModules.map((m) => {
+                const isSelected = targetModuleForAssignment === m.id;
+                return (
+                  <TouchableOpacity
+                    key={m.id}
+                    onPress={() => setTargetModuleForAssignment(m.id)}
+                    style={[
+                      styles.moduleSelectChip,
+                      {
+                        backgroundColor: isSelected
+                          ? '#6366F1'
+                          : isDark
+                          ? '#1E293B'
+                          : '#F1F5F9',
+                        borderColor: isSelected
+                          ? '#4F46E5'
+                          : isDark
+                          ? '#334155'
+                          : '#CBD5E1',
+                      },
+                    ]}>
+                    <Ionicons
+                      name="folder-open"
+                      size={13}
+                      color={isSelected ? '#FFFFFF' : '#6366F1'}
+                    />
+                    <Text
+                      style={[
+                        styles.moduleSelectChipText,
+                        {
+                          color: isSelected
+                            ? '#FFFFFF'
+                            : isDark
+                            ? '#CBD5E1'
+                            : '#475569',
+                          fontWeight: isSelected ? '700' : '500',
+                        },
+                      ]}>
+                      {m.title}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Judul Tugas *:
+            </Text>
+            <TextInput
+              placeholder="Contoh: Tugas 2: Pembuatan Komponen Reaktif"
+              placeholderTextColor="#94A3B8"
+              value={newAssignTitle}
+              onChangeText={setNewAssignTitle}
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}
+            />
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Batas Waktu Pengerjaan (Deadline) *:
+            </Text>
+            <TextInput
+              placeholder="Contoh: 2026-11-20 23:59"
+              placeholderTextColor="#94A3B8"
+              value={newAssignDueDate}
+              onChangeText={setNewAssignDueDate}
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}
+            />
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Skor Maksimal:
+            </Text>
+            <TextInput
+              placeholder="100"
+              placeholderTextColor="#94A3B8"
+              value={newAssignMaxScore}
+              onChangeText={setNewAssignMaxScore}
+              keyboardType="numeric"
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}
+            />
+
+            <Text
+              style={[
+                styles.inputLabel,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              Instruksi Tugas *:
+            </Text>
+            <TextInput
+              placeholder="Jelaskan kriteria penilaian dan apa yang wajib dikumpulkan siswa..."
+              placeholderTextColor="#94A3B8"
+              value={newAssignInstructions}
+              onChangeText={setNewAssignInstructions}
+              multiline
+              numberOfLines={5}
+              style={[
+                styles.modalInput,
+                styles.modalTextArea,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}
+            />
+          </ScrollView>
+
+          <View style={styles.modalFooter}>
+            <TouchableOpacity
+              onPress={handleSaveAssignment}
+              style={[styles.modalPrimaryBtn, { backgroundColor: '#6366F1' }]}>
+              <Ionicons name="save-outline" size={18} color="#FFFFFF" />
+              <Text style={styles.modalPrimaryBtnText}>Simpan Tugas Baru</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* TEACHER MODAL 3: EDIT DUE DATE */}
+      <Modal
+        visible={isEditDueDateModalOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setIsEditDueDateModalOpen(false)}>
+        <View style={styles.promptModalOverlay}>
+          <View
+            style={[
+              styles.promptModalCard,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                borderColor: isDark ? '#334155' : '#E2E8F0',
+              },
+            ]}>
+            <Text
+              style={[
+                styles.promptTitle,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              ⏰ Tentukan Batas Waktu Tugas
+            </Text>
+            <Text style={styles.promptSubtitle}>
+              {targetAssignmentToEdit?.title}
+            </Text>
+
+            <TextInput
+              placeholder="Contoh: 2026-11-25 23:59"
+              placeholderTextColor="#94A3B8"
+              value={editDueDateInput}
+              onChangeText={setEditDueDateInput}
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                  marginTop: 10,
+                },
+              ]}
+            />
+
+            <View style={styles.promptBtnRow}>
+              <TouchableOpacity
+                onPress={() => setIsEditDueDateModalOpen(false)}
+                style={styles.promptCancelBtn}>
+                <Text style={styles.promptCancelText}>Batal</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleSaveNewDueDate}
+                style={styles.promptSaveBtn}>
+                <Text style={styles.promptSaveText}>Perbarui Batas Waktu</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* TEACHER MODAL 4: ADD NEW MODULE */}
+      <Modal
+        visible={isAddModuleModalOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setIsAddModuleModalOpen(false)}>
+        <View style={styles.promptModalOverlay}>
+          <View
+            style={[
+              styles.promptModalCard,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                borderColor: isDark ? '#334155' : '#E2E8F0',
+              },
+            ]}>
+            <Text
+              style={[
+                styles.promptTitle,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}>
+              📁 Tambah Modul Baru
+            </Text>
+
+            <Text style={styles.promptSubtitle}>
+              Buat bab/modul baru dalam kelas &quot;{activeCourse.title}&quot;
+            </Text>
+
+            <TextInput
+              value={newModuleTitle}
+              onChangeText={setNewModuleTitle}
+              placeholder="Contoh: Modul 3: Deployment & CI/CD"
+              placeholderTextColor="#94A3B8"
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                  marginTop: 10,
+                },
+              ]}
+            />
+
+            <View style={styles.promptBtnRow}>
+              <TouchableOpacity
+                onPress={() => setIsAddModuleModalOpen(false)}
+                style={styles.promptCancelBtn}>
+                <Text style={styles.promptCancelText}>Batal</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleSaveModule}
+                style={[styles.promptSaveBtn, { backgroundColor: '#8B5CF6' }]}>
+                <Text style={styles.promptSaveText}>Simpan Modul</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  headerTitleContainer: {
+    marginBottom: 16,
+  },
+  moduleSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  moduleSectionTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  addModuleHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#EDE9FE',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  addModuleHeaderBtnText: {
+    color: '#8B5CF6',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  screenTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+    marginBottom: 4,
+  },
+  screenSubtitle: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+  moduleCard: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  moduleHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  moduleTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  moduleTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    flex: 1,
+  },
+  teacherActionBtnGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  addMiniBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderWidth: 1,
+    borderColor: '#8B5CF6',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: '#F5F3FF',
+  },
+  addMiniBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#8B5CF6',
+  },
+  itemsList: {
+    gap: 10,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  itemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  statusIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  itemTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  itemMeta: {
+    fontSize: 11,
+    color: '#64748B',
+  },
+  dueDateLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#D97706',
+    marginTop: 2,
+  },
+  lockHintText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#EF4444',
+    marginTop: 2,
+  },
+  itemRightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  badgePill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  deleteIconBtn: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  teacherActionIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  editDateBtn: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: '#EDE9FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // MODAL STYLES
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  modalHeaderTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  modalScroll: {
+    flex: 1,
+    padding: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: 14,
+  },
+  modalBodyText: {
+    fontSize: 15,
+    lineHeight: 24,
+    color: '#475569',
+  },
+  modalFooter: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  modalPrimaryBtn: {
+    backgroundColor: '#2563EB',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    gap: 8,
+  },
+  modalPrimaryBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  quizInstructions: {
+    fontSize: 13,
+    color: '#64748B',
+    marginBottom: 16,
+  },
+  quizQuestionCard: {
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  questionText: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  optionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+    gap: 10,
+  },
+  radioCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#94A3B8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioCircleSelected: {
+    borderColor: '#2563EB',
+  },
+  radioDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#2563EB',
+  },
+  optionText: {
+    fontSize: 13,
+    flex: 1,
+  },
+  resultBox: {
+    backgroundColor: '#EFF6FF',
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  resultText: {
+    fontSize: 13,
+    color: '#1E40AF',
+    fontWeight: '600',
+  },
+  instructionsBox: {
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  instructionsTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  instructionsText: {
+    fontSize: 12,
+    lineHeight: 18,
+    marginBottom: 6,
+  },
+  modalDueDateBadge: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#D97706',
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    marginBottom: 14,
+  },
+  modalTextArea: {
+    height: 90,
+    textAlignVertical: 'top',
+  },
+  modalTextAreaLarge: {
+    height: 140,
+    textAlignVertical: 'top',
+  },
+  promptModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  promptModalCard: {
+    width: '100%',
+    maxWidth: 360,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+  },
+  promptTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  promptSubtitle: {
+    fontSize: 12,
+    color: '#64748B',
+    marginBottom: 8,
+  },
+  promptBtnRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+    marginTop: 6,
+  },
+  promptCancelBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  promptCancelText: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  promptSaveBtn: {
+    backgroundColor: '#8B5CF6',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  promptSaveText: {
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  classSelectorContainer: {
+    marginBottom: 16,
+  },
+  selectorLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  classSelectorScroll: {
+    gap: 10,
+    paddingRight: 10,
+  },
+  classChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    minWidth: 160,
+    maxWidth: 220,
+  },
+  classChipTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  classChipCode: {
+    fontSize: 12,
+  },
+  chipTag: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  chipTagText: {
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  classChipTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  courseBannerCard: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  courseBannerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  categoryBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  categoryBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  cohortCodeBadge: {
+    backgroundColor: 'rgba(100, 116, 139, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  cohortCodeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#64748B',
+  },
+  courseBannerTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 6,
+  },
+  courseBannerDesc: {
+    fontSize: 13,
+    color: '#64748B',
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  courseBannerMetaRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginBottom: 12,
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E2E8F0',
+  },
+  metaCol: {
+    flex: 1,
+  },
+  metaLabel: {
+    fontSize: 11,
+    color: '#94A3B8',
+    marginBottom: 2,
+  },
+  metaValue: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  dynamicNoticeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFF6FF',
+    padding: 10,
+    borderRadius: 10,
+    gap: 8,
+  },
+  dynamicNoticeText: {
+    fontSize: 12,
+    color: '#1D4ED8',
+    flex: 1,
+    lineHeight: 16,
+  },
+  referenceNoticeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    padding: 10,
+    borderRadius: 10,
+    gap: 8,
+  },
+  referenceNoticeText: {
+    fontSize: 12,
+    flex: 1,
+    lineHeight: 16,
+  },
+  emptyStateCard: {
+    padding: 30,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  emptyStateTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  emptyStateDesc: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+  },
+  moduleSelectChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    marginRight: 8,
+  },
+  moduleSelectChipText: {
+    fontSize: 12,
+  },
+  modalHeaderSub: {
+    fontSize: 11,
+    color: '#8B5CF6',
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  lessonMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+    flexWrap: 'wrap',
+  },
+  lessonTypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  lessonTypeBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  lessonDurationBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  lessonDurationText: {
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  completedBadgePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  completedBadgePillText: {
+    fontSize: 11,
+    color: '#10B981',
+    fontWeight: '700',
+  },
+  videoPlayerCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    marginBottom: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  videoPlayerScreen: {
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  videoIconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  videoPlayerTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  videoPlayerSub: {
+    fontSize: 12,
+    color: '#94A3B8',
+    marginBottom: 12,
+    maxWidth: '90%',
+    textAlign: 'center',
+  },
+  videoLaunchBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  videoLaunchBtnText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  formattedContentWrapper: {
+    marginTop: 6,
+  },
+  modalFooterMulti: {
+    padding: 16,
+    borderTopWidth: 1,
+    gap: 10,
+  },
+  nextStepBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 10,
+  },
+  nextStepSmallLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#8B5CF6',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  nextStepTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  richCodeCard: {
+    backgroundColor: '#0B1120',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#1E293B',
+    overflow: 'hidden',
+    marginVertical: 10,
+  },
+  richCodeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#0F172A',
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E293B',
+  },
+  richCodeDots: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  richDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
+  },
+  richCodeLang: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#94A3B8',
+    marginLeft: 6,
+    textTransform: 'uppercase',
+  },
+  richCopyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  richCopyText: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '600',
+  },
+  richCodeScroll: {
+    padding: 14,
+  },
+  richCodeText: {
+    fontFamily: 'monospace',
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#38BDF8',
+  },
+  richH3Container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 14,
+    marginBottom: 6,
+    gap: 8,
+  },
+  richH3Bar: {
+    width: 4,
+    height: 16,
+    borderRadius: 2,
+    backgroundColor: '#8B5CF6',
+  },
+  richH3Text: {
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.2,
+  },
+  richH4Container: {
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  richH4Text: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  richLiRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginVertical: 4,
+    paddingLeft: 4,
+  },
+  richLiBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#8B5CF6',
+    marginTop: 7,
+  },
+  richNumBadge: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#EDE9FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
+  },
+  richNumBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#7C3AED',
+  },
+  richLiText: {
+    fontSize: 13,
+    lineHeight: 20,
+    flex: 1,
+  },
+  richParagraph: {
+    fontSize: 14,
+    lineHeight: 22,
+    marginVertical: 4,
+  },
+  typeSelectorRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
+  },
+  typeSelectorChip: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1.5,
+  },
+  typeSelectorChipActive: {
+    elevation: 2,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  typeSelectorText: {
+    fontSize: 12,
+  },
+});
+
