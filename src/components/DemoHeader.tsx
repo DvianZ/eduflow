@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { NotificationModal } from '@/components/NotificationModal';
+import { FeatureTourModal } from '@/components/FeatureTourModal';
 
 export function DemoHeader() {
   const colorScheme = useColorScheme();
@@ -19,6 +20,8 @@ export function DemoHeader() {
   const router = useRouter();
 
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showFeatureTour, setShowFeatureTour] = useState(false);
+
   const {
     currentRole,
     switchRole,
@@ -26,9 +29,20 @@ export function DemoHeader() {
     resetDemoData,
     currentUser,
     notifications,
+    hasSeenAppTour,
   } = useElearningStore();
   const { logout, getCurrentUser } = useAuthStore();
   const authUser = getCurrentUser();
+
+  // Auto-show guided tour if user hasn't seen it yet
+  useEffect(() => {
+    if (!hasSeenAppTour) {
+      const timer = setTimeout(() => {
+        setShowFeatureTour(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenAppTour]);
 
   const userNotifications = notifications.filter(
     (n) => n.userId === currentUser.id
@@ -120,6 +134,27 @@ export function DemoHeader() {
             <Text style={styles.streakText}>🔥 {userStreak.currentStreak}d</Text>
             <Text style={styles.xpText}>{userStreak.totalXp} XP</Text>
           </View>
+
+          {/* Feature Tour Guide Button */}
+          <TouchableOpacity
+            onPress={() => setShowFeatureTour(true)}
+            style={[
+              styles.tourBtn,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#EFF6FF',
+                borderColor: isDark ? '#334155' : '#BFDBFE',
+              },
+            ]}
+            accessibilityLabel="Panduan Fitur Aplikasi">
+            <Ionicons name="sparkles" size={13} color="#2563EB" />
+            <Text
+              style={[
+                styles.tourBtnText,
+                { color: isDark ? '#93C5FD' : '#1D4ED8' },
+              ]}>
+              Panduan
+            </Text>
+          </TouchableOpacity>
 
           {/* In-App Notification Bell */}
           <TouchableOpacity
@@ -248,6 +283,12 @@ export function DemoHeader() {
         </View>
       )}
 
+      {/* In-App Guided Feature Tour Modal */}
+      <FeatureTourModal
+        visible={showFeatureTour}
+        onClose={() => setShowFeatureTour(false)}
+      />
+
       {/* Notification Center Modal */}
       <NotificationModal
         visible={showNotifications}
@@ -328,6 +369,19 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  tourBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 4,
+  },
+  tourBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
   },
   roleSwitchContainer: {
     flexDirection: 'row',

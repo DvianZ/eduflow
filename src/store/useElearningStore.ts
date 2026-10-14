@@ -55,6 +55,7 @@ interface ElearningState {
   certificates: Certificate[];
   userStreak: UserStreak;
   notifications: InAppNotification[];
+  hasSeenAppTour: boolean;
 
   // Actions
   selectBatch: (batchId: string) => void;
@@ -100,6 +101,7 @@ interface ElearningState {
   updateCertificateName: (certificateName: string) => void;
   recordDailyActivity: () => void;
   resetDemoData: () => void;
+  setHasSeenAppTour: (seen: boolean) => void;
 
   // In-App Notification actions
   addNotification: (
@@ -187,6 +189,11 @@ export const useElearningStore = create<ElearningState>()(
       certificates: INITIAL_CERTIFICATES,
       userStreak: INITIAL_STREAK,
       notifications: INITIAL_NOTIFICATIONS,
+      hasSeenAppTour: false,
+
+      setHasSeenAppTour: (seen: boolean) => {
+        set({ hasSeenAppTour: seen });
+      },
 
       selectBatch: (batchId: string) => {
         set({ selectedBatchId: batchId });
@@ -666,6 +673,7 @@ export const useElearningStore = create<ElearningState>()(
           certificates: INITIAL_CERTIFICATES,
           userStreak: INITIAL_STREAK,
           notifications: INITIAL_NOTIFICATIONS,
+          hasSeenAppTour: false,
         });
       },
 

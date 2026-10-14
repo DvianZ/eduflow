@@ -78,7 +78,19 @@ Aplikasi ini menggunakan pendekatan **Full Local Dinamis** bertenaga **Reactive 
   - Notifikasi bagi pengajar saat ada siswa baru mendaftar atau mengumpulkan tugas.
 - **Filter Tabs**: Tab *Semua Notifikasi* dan *Belum Dibaca*, tombol *Tandai Dibaca*, serta tombol navigasi cepat ke layar terkait.
 
-### 9. 🔥 Gamifikasi & Pemantauan Konsistensi
+### 9. 🧭 Panduan Fitur Interaktif & Onboarding Pengujian Client (Interactive Feature Tour)
+- **Auto-Prompt Pengguna Baru**: Saat pertama kali membuka aplikasi, pop-up modal panduan interaktif otomatis menyapa untuk mengenalkan alur pengujian.
+- **6 Langkah Panduan Interaktif Berstruktur**:
+  1. *Platform Overview*: 100% Dinamis & Lokal, Desain Gamified Bento + Tactile 3D.
+  2. *Switcher Mode Instan*: Siswa vs Pengajar untuk pengujian cepat tanpa re-login.
+  3. *Silabus & Sequential Gating Lock*: Kunci materi bertingkat & KKM Kuis 80%.
+  4. *Kuis Taktil 3D & Tugas Proyek*: Pengalaman belajar interaktif & upload portofolio.
+  5. *Panel Penilaian & Ekspor CSV*: Grading pengajar & unduh rekap nilai Excel UTF-8 BOM.
+  6. *Kelulusan & Sertifikat Digital*: Bobot Wadhwani 30:30:40 & multi-sertifikat bergelar.
+- **Akses Fleksibel**: Dapat dibuka kapan saja via kartu *"Panduan Fitur Aplikasi"* di layar Login maupun tombol *"Panduan"* di bilah header utama dashboard.
+- **Navigasi Intuitif**: Dilengkapi indikator segmen progres, tombol navigasi mundur/maju/lewati, tips pengujian client, serta tautan langsung untuk mencoba fitur terkait.
+
+### 10. 🔥 Gamifikasi & Pemantauan Konsistensi
 - **Daily Streak Counter**: Menghitung hari aktif belajar berturut-turut.
 - **Experience Points (XP)**: Reward XP untuk setiap penyelesaian materi, kuis, dan pengumpulan tugas.
 

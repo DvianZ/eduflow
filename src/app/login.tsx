@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useElearningStore } from '@/store/useElearningStore';
+import { FeatureTourModal } from '@/components/FeatureTourModal';
 
 export default function LoginScreen() {
   const colorScheme = useColorScheme();
@@ -30,6 +31,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showTour, setShowTour] = useState(false);
 
   const handleLogin = () => {
     setError('');
@@ -316,8 +318,43 @@ export default function LoginScreen() {
               Tekan nama lalu klik &quot;Masuk&quot; (password: demo123)
             </Text>
           </View>
+
+          {/* Client Testing Tour Showcase */}
+          <TouchableOpacity
+            style={[
+              styles.tourCard,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#EFF6FF',
+                borderColor: isDark ? '#3B82F6' : '#93C5FD',
+              },
+            ]}
+            onPress={() => setShowTour(true)}
+            activeOpacity={0.85}>
+            <View style={styles.tourCardLeft}>
+              <View style={styles.tourIconBadge}>
+                <Ionicons name="sparkles" size={20} color="#2563EB" />
+              </View>
+              <View style={styles.tourCardTexts}>
+                <View style={styles.tourPill}>
+                  <Text style={styles.tourPillText}>CLIENT TESTING</Text>
+                </View>
+                <Text style={[styles.tourCardTitle, { color: textPrimary }]}>
+                  Panduan Fitur Aplikasi
+                </Text>
+                <Text style={[styles.tourCardDesc, { color: textSecondary }]}>
+                  Pelajari alur kuis, sequential gate, peran, & sertifikat
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#2563EB" />
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <FeatureTourModal
+        visible={showTour}
+        onClose={() => setShowTour(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -518,5 +555,55 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     fontStyle: 'italic',
+  },
+  tourCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
+    marginTop: 14,
+  },
+  tourCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  tourIconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tourCardTexts: {
+    flex: 1,
+  },
+  tourPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  tourPillText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  tourCardTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  tourCardDesc: {
+    fontSize: 11,
+    lineHeight: 15,
   },
 });
