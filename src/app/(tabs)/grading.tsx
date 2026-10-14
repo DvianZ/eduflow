@@ -171,26 +171,41 @@ export default function GradingScreen() {
       edges={['top']}
       style={[
         styles.safeArea,
-        { backgroundColor: isDark ? '#090D16' : '#F8FAFC' },
+        { backgroundColor: isDark ? '#0B0F19' : '#F4F6FA' },
       ]}>
       <DemoHeader />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        <View style={styles.headerTitleContainer}>
-          <Text
-            style={[
-              styles.screenTitle,
-              { color: isDark ? '#F8FAFC' : '#0F172A' },
-            ]}>
-            {isTeacher ? '📝 Panel Pemeriksaan Tugas Pengajar' : '📑 Status Tugas & Feedback Guru'}
-          </Text>
-          <Text style={styles.screenSubtitle}>
-            {isTeacher
-              ? 'Periksa hasil pengumpulan tugas proyek siswa dan berikan evaluasi'
-              : 'Pantau nilai resmi dan ulasan perbaikan dari mentor Anda'}
-          </Text>
+        <View
+          style={[
+            styles.heroHeaderCard,
+            {
+              backgroundColor: isTeacher ? '#4F46E5' : '#2563EB',
+              borderColor: isTeacher ? '#4338CA' : '#1D4ED8',
+              borderBottomColor: isTeacher ? '#312E81' : '#1E40AF',
+            },
+          ]}>
+          <View style={styles.heroHeaderContent}>
+            <View style={styles.heroIconBadge}>
+              <Ionicons
+                name={isTeacher ? 'school' : 'ribbon'}
+                size={22}
+                color="#FFFFFF"
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.heroHeaderTitle}>
+                {isTeacher ? 'Panel Pemeriksaan Tugas' : 'Status Tugas & Feedback'}
+              </Text>
+              <Text style={styles.heroHeaderSubtitle}>
+                {isTeacher
+                  ? 'Periksa hasil pengumpulan tugas proyek siswa dan berikan evaluasi'
+                  : 'Pantau nilai resmi dan ulasan perbaikan dari mentor Anda'}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Teacher Gradebook Export Action Card */}
@@ -201,6 +216,7 @@ export default function GradingScreen() {
               {
                 backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                 borderColor: isDark ? '#334155' : '#E2E8F0',
+                borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
               },
             ]}>
             <View style={styles.exportActionLeft}>
@@ -249,13 +265,19 @@ export default function GradingScreen() {
                       ? '#8B5CF6'
                       : isDark
                       ? '#1E293B'
-                      : '#F1F5F9',
+                      : '#FFFFFF',
                   borderColor:
                     selectedBatchFilter === 'all'
                       ? '#7C3AED'
                       : isDark
                       ? '#334155'
                       : '#E2E8F0',
+                  borderBottomColor:
+                    selectedBatchFilter === 'all'
+                      ? '#6D28D9'
+                      : isDark
+                      ? '#0F172A'
+                      : '#CBD5E1',
                 },
               ]}>
               <Text
@@ -289,12 +311,17 @@ export default function GradingScreen() {
                         ? '#8B5CF6'
                         : isDark
                         ? '#1E293B'
-                        : '#F1F5F9',
+                        : '#FFFFFF',
                       borderColor: isSelected
                         ? '#7C3AED'
                         : isDark
                         ? '#334155'
                         : '#E2E8F0',
+                      borderBottomColor: isSelected
+                        ? '#6D28D9'
+                        : isDark
+                        ? '#0F172A'
+                        : '#CBD5E1',
                     },
                   ]}>
                   <Text
@@ -363,6 +390,11 @@ export default function GradingScreen() {
                       : isRevision
                       ? '#EF4444'
                       : '#F59E0B',
+                    borderBottomColor: isGraded
+                      ? '#047857'
+                      : isRevision
+                      ? '#B91C1C'
+                      : '#D97706',
                   },
                 ]}>
                 <View style={styles.subHeader}>
@@ -473,7 +505,17 @@ export default function GradingScreen() {
                     onPress={() => handleOpenGradeModal(sub)}
                     style={[
                       styles.gradeActionBtn,
-                      { backgroundColor: isGraded ? '#8B5CF6' : '#2563EB' },
+                      isGraded
+                        ? {
+                            backgroundColor: '#8B5CF6',
+                            borderColor: '#7C3AED',
+                            borderBottomColor: '#6D28D9',
+                          }
+                        : {
+                            backgroundColor: '#2563EB',
+                            borderColor: '#1D4ED8',
+                            borderBottomColor: '#1E40AF',
+                          },
                     ]}>
                     <Ionicons
                       name={isGraded ? 'create-outline' : 'checkmark-circle-outline'}
@@ -984,18 +1026,45 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
   },
-  headerTitleContainer: {
+  heroHeaderCard: {
+    borderRadius: 26,
+    borderWidth: 2,
+    borderBottomWidth: 6,
+    padding: 18,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  screenTitle: {
-    fontSize: 20,
+  heroHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  heroIconBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+  },
+  heroHeaderTitle: {
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: -0.3,
-    marginBottom: 4,
+    color: '#FFFFFF',
+    letterSpacing: -0.2,
+    marginBottom: 3,
   },
-  screenSubtitle: {
+  heroHeaderSubtitle: {
     fontSize: 12,
-    color: '#64748B',
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: 16,
+    fontWeight: '500',
   },
   filterChipsRow: {
     flexDirection: 'row',
@@ -1004,10 +1073,13 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   filterChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
+    minHeight: 38,
+    justifyContent: 'center',
   },
   filterChipText: {
     fontSize: 12,
@@ -1025,9 +1097,11 @@ const styles = StyleSheet.create({
     color: '#7C3AED',
   },
   emptyCard: {
-    borderRadius: 16,
+    borderRadius: 24,
     padding: 32,
-    borderWidth: 1,
+    borderWidth: 2,
+    borderBottomWidth: 5,
+    borderBottomColor: '#CBD5E1',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
@@ -1045,16 +1119,22 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   submissionCard: {
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 24,
+    padding: 18,
     borderWidth: 2,
+    borderBottomWidth: 5,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   subHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   studentInfo: {
     flexDirection: 'row',
@@ -1063,30 +1143,31 @@ const styles = StyleSheet.create({
   },
   studentName: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   statusPill: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
   },
   statusPillText: {
     fontSize: 10,
     fontWeight: '800',
+    letterSpacing: 0.4,
   },
   assignTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   attachmentBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#EFF6FF',
-    padding: 8,
-    borderRadius: 8,
-    marginBottom: 8,
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 10,
   },
   attachmentText: {
     fontSize: 12,
@@ -1095,23 +1176,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentBox: {
-    marginBottom: 10,
+    marginBottom: 12,
   },
   contentLabel: {
     fontSize: 11,
     fontWeight: '700',
     color: '#64748B',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   contentText: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
   },
   gradeResultBox: {
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 12,
     borderWidth: 1,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   gradeResultHeader: {
     flexDirection: 'row',
@@ -1147,13 +1228,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderRadius: 10,
-    gap: 6,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderBottomWidth: 5,
+    minHeight: 48,
+    gap: 8,
   },
   gradeActionBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 13,
+    fontWeight: '800',
+    fontSize: 14,
   },
   // MODAL STYLES
   modalContainer: {
@@ -1170,7 +1255,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   modalScroll: {
     flex: 1,
@@ -1182,8 +1267,8 @@ const styles = StyleSheet.create({
   },
   reviewBox: {
     backgroundColor: '#F1F5F9',
-    padding: 12,
-    borderRadius: 10,
+    padding: 14,
+    borderRadius: 14,
     marginBottom: 16,
   },
   reviewLabel: {
@@ -1205,19 +1290,19 @@ const styles = StyleSheet.create({
   },
   inputFieldLabel: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     marginBottom: 6,
   },
   modalInput: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderWidth: 1.5,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     fontSize: 14,
     marginBottom: 14,
   },
   modalTextArea: {
-    height: 90,
+    height: 95,
     textAlignVertical: 'top',
   },
   modalFooterRow: {
@@ -1229,40 +1314,50 @@ const styles = StyleSheet.create({
   },
   revisionBtn: {
     flex: 1,
+    backgroundColor: '#FEF2F2',
     borderWidth: 1.5,
-    borderColor: '#EF4444',
+    borderColor: '#F87171',
+    borderBottomColor: '#DC2626',
+    borderBottomWidth: 4,
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 14,
+    minHeight: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },
   revisionBtnText: {
-    color: '#EF4444',
-    fontWeight: '700',
+    color: '#DC2626',
+    fontWeight: '800',
     fontSize: 13,
   },
   saveGradeBtn: {
     flex: 2,
     backgroundColor: '#10B981',
+    borderColor: '#059669',
+    borderWidth: 1.5,
+    borderBottomColor: '#047857',
+    borderBottomWidth: 4,
     flexDirection: 'row',
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 14,
+    minHeight: 48,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
   },
   saveGradeBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 13,
+    fontWeight: '800',
+    fontSize: 14,
   },
   exportActionCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
+    padding: 16,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderBottomWidth: 5,
     marginBottom: 16,
     gap: 12,
     shadowColor: '#000',
@@ -1275,18 +1370,18 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   exportIconBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     backgroundColor: 'rgba(16, 185, 129, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   exportCardTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
     marginBottom: 2,
   },
@@ -1300,14 +1395,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#10B981',
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 10,
+    borderColor: '#059669',
+    borderWidth: 1.5,
+    borderBottomColor: '#047857',
+    borderBottomWidth: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    minHeight: 42,
   },
   openExportModalBtnText: {
     color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   modalHeaderSub: {
     fontSize: 11,
@@ -1322,10 +1422,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   exportFilterChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderBottomWidth: 3.5,
   },
   exportFilterChipActive: {
     elevation: 2,
@@ -1337,10 +1438,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-    borderWidth: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
     marginBottom: 16,
   },
   statBox: {
@@ -1350,7 +1452,7 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 10,
     color: '#94A3B8',
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 2,
     textTransform: 'uppercase',
   },
@@ -1376,11 +1478,13 @@ const styles = StyleSheet.create({
   tableScrollHint: {
     fontSize: 11,
     color: '#8B5CF6',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   tableWrapper: {
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
+    borderBottomColor: '#CBD5E1',
     marginBottom: 16,
     overflow: 'hidden',
   },
@@ -1428,7 +1532,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     backgroundColor: '#EFF6FF',
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     gap: 8,
     marginTop: 4,
   },
@@ -1450,10 +1554,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    borderRadius: 10,
-    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
+    borderBottomColor: '#94A3B8',
+    borderBottomWidth: 4,
+    minHeight: 48,
   },
   copyCSVBtnText: {
     fontSize: 13,
@@ -1465,13 +1573,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#10B981',
-    paddingHorizontal: 16,
-    paddingVertical: 11,
-    borderRadius: 10,
+    borderColor: '#059669',
+    borderWidth: 1.5,
+    borderBottomColor: '#047857',
+    borderBottomWidth: 4,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 14,
+    minHeight: 48,
   },
   downloadCSVBtnText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#FFFFFF',
   },
 });

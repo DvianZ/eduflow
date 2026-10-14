@@ -160,26 +160,27 @@ export default function ProfileScreen() {
       edges={['top']}
       style={[
         styles.safeArea,
-        { backgroundColor: isDark ? '#090D16' : '#F8FAFC' },
+        { backgroundColor: isDark ? '#0B0F19' : '#F4F6FA' },
       ]}>
       <DemoHeader />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {/* User Identity Card */}
+        {/* User Identity Hero Card */}
         <View
           style={[
             styles.userCard,
             {
-              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-              borderColor: isDark ? '#334155' : '#E2E8F0',
+              backgroundColor: isTeacher ? '#7C3AED' : '#4F46E5',
+              borderColor: isTeacher ? '#6D28D9' : '#4338CA',
+              borderBottomColor: isTeacher ? '#5B21B6' : '#312E81',
             },
           ]}>
           <View
             style={[
               styles.avatarCircle,
-              { backgroundColor: isTeacher ? '#8B5CF6' : '#3B82F6' },
+              { backgroundColor: 'rgba(255, 255, 255, 0.22)' },
             ]}>
             <Ionicons
               name={isTeacher ? 'school' : 'person'}
@@ -191,7 +192,7 @@ export default function ProfileScreen() {
             <Text
               style={[
                 styles.userName,
-                { color: isDark ? '#F8FAFC' : '#0F172A' },
+                { color: '#FFFFFF' },
               ]}>
               {currentUser.fullName}
             </Text>
@@ -200,14 +201,15 @@ export default function ProfileScreen() {
               style={[
                 styles.roleBadge,
                 {
-                  backgroundColor: isTeacher ? '#EDE9FE' : '#DBEAFE',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderColor: 'rgba(255, 255, 255, 0.35)',
                 },
               ]}>
               <Text
                 style={[
                   styles.roleBadgeText,
                   {
-                    color: isTeacher ? '#7C3AED' : '#1E40AF',
+                    color: '#FFFFFF',
                   },
                 ]}>
                 {isTeacher
@@ -226,6 +228,7 @@ export default function ProfileScreen() {
               {
                 backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                 borderColor: isDark ? '#334155' : '#E2E8F0',
+                borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
               },
             ]}>
             <View style={styles.certNameHeader}>
@@ -284,6 +287,7 @@ export default function ProfileScreen() {
               {
                 backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                 borderColor: isDark ? '#334155' : '#E2E8F0',
+                borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
               },
             ]}>
             <View style={styles.teacherHeader}>
@@ -320,6 +324,7 @@ export default function ProfileScreen() {
                         {
                           backgroundColor: isSelected ? '#8B5CF6' : isDark ? '#0F172A' : '#F1F5F9',
                           borderColor: isSelected ? '#7C3AED' : isDark ? '#334155' : '#E2E8F0',
+                          borderBottomColor: isSelected ? '#6D28D9' : isDark ? '#0B0F19' : '#CBD5E1',
                         },
                       ]}>
                       <Text
@@ -341,6 +346,7 @@ export default function ProfileScreen() {
                 {
                   backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
                   borderColor: isDark ? '#334155' : '#E2E8F0',
+                  borderBottomColor: isDark ? '#0B0F19' : '#CBD5E1',
                 },
               ]}>
               <Text
@@ -427,6 +433,7 @@ export default function ProfileScreen() {
                 {
                   backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                   borderColor: isDark ? '#334155' : '#E2E8F0',
+                  borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
                 },
               ]}>
               <View style={styles.galleryHeader}>
@@ -477,6 +484,11 @@ export default function ProfileScreen() {
                                 : isDark
                                 ? '#334155'
                                 : '#E2E8F0',
+                              borderBottomColor: isSelected
+                                ? '#B45309'
+                                : isDark
+                                ? '#0B0F19'
+                                : '#CBD5E1',
                             },
                           ]}>
                           <Ionicons
@@ -490,10 +502,10 @@ export default function ProfileScreen() {
                               styles.certChipTitle,
                               {
                                 color: isSelected
-                                  ? '#92400E'
-                                  : isDark
-                                  ? '#F8FAFC'
-                                  : '#0F172A',
+                                    ? '#92400E'
+                                    : isDark
+                                    ? '#F8FAFC'
+                                    : '#0F172A',
                                 fontWeight: isSelected ? '800' : '600',
                               },
                             ]}>
@@ -627,6 +639,7 @@ export default function ProfileScreen() {
                 {
                   backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                   borderColor: isDark ? '#334155' : '#E2E8F0',
+                  borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
                 },
               ]}>
               <View style={styles.evalHeader}>
@@ -662,6 +675,7 @@ export default function ProfileScreen() {
                           {
                             backgroundColor: isSelected ? '#2563EB' : isDark ? '#0F172A' : '#F1F5F9',
                             borderColor: isSelected ? '#1D4ED8' : isDark ? '#334155' : '#E2E8F0',
+                            borderBottomColor: isSelected ? '#1E40AF' : isDark ? '#0B0F19' : '#CBD5E1',
                           },
                         ]}>
                         <Text
@@ -819,6 +833,12 @@ export default function ProfileScreen() {
                         backgroundColor: evalResult.canGraduate
                           ? '#10B981'
                           : '#94A3B8',
+                        borderColor: evalResult.canGraduate
+                          ? '#059669'
+                          : '#64748B',
+                        borderBottomColor: evalResult.canGraduate
+                          ? '#047857'
+                          : '#475569',
                         opacity: evalResult.canGraduate ? 1 : 0.6,
                       },
                     ]}>
@@ -838,11 +858,8 @@ export default function ProfileScreen() {
         {/* Logout Button */}
         <TouchableOpacity
           onPress={handleLogout}
-          style={[
-            styles.logoutBtn,
-            { borderColor: isDark ? '#7F1D1D' : '#FCA5A5' },
-          ]}>
-          <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+          style={styles.logoutBtn}>
+          <Ionicons name="log-out-outline" size={18} color="#DC2626" />
           <Text style={styles.logoutBtnText}>
             Keluar dari Akun (Logout)
           </Text>
@@ -862,7 +879,11 @@ export default function ProfileScreen() {
           }}
           style={[
             styles.resetContainerBtn,
-            { borderColor: isDark ? '#334155' : '#E2E8F0' },
+            {
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+              borderColor: isDark ? '#334155' : '#E2E8F0',
+              borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
+            },
           ]}>
           <Ionicons name="refresh-circle-outline" size={18} color="#EF4444" />
           <Text style={styles.resetContainerText}>
@@ -884,6 +905,7 @@ export default function ProfileScreen() {
               {
                 backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                 borderColor: isDark ? '#334155' : '#E2E8F0',
+                borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
               },
             ]}>
             <View style={styles.promptModalHeader}>
@@ -929,7 +951,14 @@ export default function ProfileScreen() {
 
               <TouchableOpacity
                 onPress={handleSaveCertName}
-                style={[styles.promptSaveBtn, { backgroundColor: '#2563EB' }]}>
+                style={[
+                  styles.promptSaveBtn,
+                  {
+                    backgroundColor: '#2563EB',
+                    borderColor: '#1D4ED8',
+                    borderBottomColor: '#1E40AF',
+                  },
+                ]}>
                 <Text style={styles.promptSaveText}>Simpan Nama</Text>
               </TouchableOpacity>
             </View>
@@ -953,59 +982,80 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#F87171',
+    borderBottomColor: '#DC2626',
+    borderBottomWidth: 4,
     backgroundColor: '#FEF2F2',
     gap: 8,
     marginBottom: 12,
+    minHeight: 48,
   },
   logoutBtnText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#DC2626',
   },
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    padding: 18,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderBottomWidth: 6,
     marginBottom: 16,
-    gap: 12,
+    gap: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   avatarCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   userName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
+    color: '#FFFFFF',
     marginBottom: 2,
+    letterSpacing: -0.2,
   },
   userEmail: {
     fontSize: 12,
-    color: '#64748B',
-    marginBottom: 6,
+    color: 'rgba(255, 255, 255, 0.85)',
+    marginBottom: 8,
   },
   roleBadge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   roleBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   // TEACHER PANEL STYLES
   teacherCard: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    padding: 18,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderBottomWidth: 5,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   teacherHeader: {
     flexDirection: 'row',
@@ -1024,12 +1074,13 @@ const styles = StyleSheet.create({
   },
   studentMonitorBox: {
     padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
   },
   monitorTitle: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     marginBottom: 10,
   },
   studentItemRow: {
@@ -1041,7 +1092,7 @@ const styles = StyleSheet.create({
   },
   studentItemName: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
     marginBottom: 2,
   },
   studentItemMeta: {
@@ -1055,20 +1106,26 @@ const styles = StyleSheet.create({
     color: '#2563EB',
   },
   certBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   certBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   // LEARNER EVAL STYLES
   evalCard: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    padding: 18,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderBottomWidth: 5,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   evalHeader: {
     flexDirection: 'row',
@@ -1077,7 +1134,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   evalTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
   },
   finalScoreBadge: {
@@ -1094,7 +1151,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
@@ -1105,19 +1162,19 @@ const styles = StyleSheet.create({
   },
   metricRowText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   metricRowValue: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#2563EB',
   },
   statusNoteBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    padding: 10,
-    borderRadius: 10,
+    padding: 12,
+    borderRadius: 14,
     marginTop: 14,
     marginBottom: 14,
   },
@@ -1130,22 +1187,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 10,
-    gap: 6,
+    paddingVertical: 13,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderBottomWidth: 5,
+    minHeight: 48,
+    gap: 8,
   },
   claimBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 14,
   },
   // CERTIFICATE STYLES
   certificateCard: {
     backgroundColor: '#FFFBEB',
-    borderRadius: 16,
-    padding: 8,
+    borderRadius: 20,
+    padding: 10,
     borderWidth: 3,
     borderColor: '#D97706',
+    borderBottomWidth: 6,
+    borderBottomColor: '#B45309',
     marginBottom: 20,
     shadowColor: '#D97706',
     shadowOpacity: 0.15,
@@ -1155,7 +1217,7 @@ const styles = StyleSheet.create({
   certInnerBorder: {
     borderWidth: 1.5,
     borderColor: '#F59E0B',
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
     alignItems: 'center',
   },
@@ -1244,17 +1306,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
     gap: 8,
+    minHeight: 48,
   },
   resetContainerText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#EF4444',
   },
   cohortSelectorBox: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   cohortSelectorLabel: {
     fontSize: 10,
@@ -1267,23 +1331,27 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cohortPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderBottomWidth: 3.5,
+    minHeight: 38,
+    justifyContent: 'center',
   },
   cohortPillText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   galleryCard: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    padding: 18,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderBottomWidth: 5,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
   },
@@ -1307,11 +1375,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     backgroundColor: '#FEF3C7',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1.5,
     borderColor: '#FDE68A',
+    borderBottomColor: '#D97706',
+    borderBottomWidth: 3,
   },
   certCountBadgeText: {
     fontSize: 11,
@@ -1334,11 +1404,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 10,
+    borderRadius: 14,
     borderWidth: 1.5,
+    borderBottomWidth: 3.5,
     maxWidth: 240,
+    minHeight: 40,
   },
   certChipTitle: {
     fontSize: 12,
@@ -1368,16 +1440,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 10,
-    borderRadius: 8,
-    borderWidth: 1,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderBottomWidth: 3.5,
     borderColor: '#FDE68A',
+    borderBottomColor: '#D97706',
     backgroundColor: '#FEF3C7',
+    minHeight: 42,
   },
   certActionBtnText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#B45309',
   },
   evalCohortSelector: {
@@ -1393,27 +1468,32 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   evalCohortPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderBottomWidth: 3.5,
+    minHeight: 38,
+    justifyContent: 'center',
   },
   evalCohortPillText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   alreadyCertifiedBox: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#DCFCE7',
-    padding: 12,
-    borderRadius: 10,
+    padding: 14,
+    borderRadius: 14,
     gap: 10,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#86EFAC',
+    borderBottomColor: '#4ADE80',
+    borderBottomWidth: 3.5,
   },
   alreadyCertifiedTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
     color: '#15803D',
     marginBottom: 2,
@@ -1425,10 +1505,16 @@ const styles = StyleSheet.create({
   },
   // OFFICIAL CERTIFICATE NAME CARD
   certNameCard: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    padding: 18,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderBottomWidth: 5,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   certNameHeader: {
     flexDirection: 'row',
@@ -1437,10 +1523,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   certNameIconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#EFF6FF',
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: 'rgba(37, 99, 235, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1452,6 +1538,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#64748B',
     marginTop: 2,
+    lineHeight: 15,
   },
   certNameValueBox: {
     flexDirection: 'row',
@@ -1459,29 +1546,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#F8FAFC',
     paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1.5,
     borderColor: '#E2E8F0',
   },
   certNameValueText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
     flex: 1,
   },
   editCertNameBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    gap: 5,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     backgroundColor: '#EFF6FF',
-    borderRadius: 8,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#BFDBFE',
+    borderBottomColor: '#93C5FD',
+    borderBottomWidth: 3.5,
   },
   editCertNameBtnText: {
     color: '#2563EB',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   // EMPTY CERTIFICATE PORTFOLIO
   emptyCertPortfolio: {
@@ -1489,18 +1580,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFBEB',
-    borderRadius: 16,
-    borderWidth: 1,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderBottomWidth: 5,
     borderColor: '#FDE68A',
+    borderBottomColor: '#F59E0B',
   },
   emptyCertIconCircle: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 20,
     backgroundColor: '#FEF3C7',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+    borderWidth: 1.5,
+    borderColor: '#FDE68A',
   },
   emptyCertTitle: {
     fontSize: 15,
@@ -1517,7 +1612,7 @@ const styles = StyleSheet.create({
   },
   emptyMonitoringBox: {
     padding: 16,
-    borderRadius: 10,
+    borderRadius: 14,
     backgroundColor: 'rgba(148, 163, 184, 0.1)',
     alignItems: 'center',
   },
@@ -1537,9 +1632,10 @@ const styles = StyleSheet.create({
   promptModalCard: {
     width: '100%',
     maxWidth: 400,
-    padding: 20,
-    borderRadius: 18,
-    borderWidth: 1,
+    padding: 22,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderBottomWidth: 5,
   },
   promptModalHeader: {
     flexDirection: 'row',
@@ -1558,8 +1654,8 @@ const styles = StyleSheet.create({
   },
   promptInput: {
     height: 48,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 14,
+    borderWidth: 1.5,
     paddingHorizontal: 14,
     fontSize: 14,
     marginBottom: 16,
@@ -1571,27 +1667,32 @@ const styles = StyleSheet.create({
   promptCancelBtn: {
     flex: 1,
     height: 44,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#CBD5E1',
+    borderBottomColor: '#94A3B8',
+    borderBottomWidth: 4,
+    backgroundColor: '#F8FAFC',
   },
   promptCancelText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#64748B',
   },
   promptSaveBtn: {
     flex: 1,
     height: 44,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
   },
   promptSaveText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#FFFFFF',
   },
   teacherManageClassBtn: {
@@ -1600,13 +1701,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     backgroundColor: '#8B5CF6',
-    borderRadius: 14,
-    height: 48,
+    borderColor: '#7C3AED',
+    borderWidth: 1.5,
+    borderBottomColor: '#6D28D9',
+    borderBottomWidth: 5,
+    borderRadius: 16,
+    minHeight: 48,
     marginTop: 14,
   },
   teacherManageClassBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 14,
   },
   certNameNoticeRow: {
