@@ -5,6 +5,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6.svg?style=flat&logo=typescript)](https://www.typescriptlang.org)
 [![Zustand](https://img.shields.io/badge/State-Zustand%20%2B%20AsyncStorage-orange.svg?style=flat)](https://github.com/pmndrs/zustand)
 [![Tests](https://img.shields.io/badge/Unit%20Tests-32%20Passed%20(100%25)-success.svg?style=flat)](https://jestjs.io)
+[![Download APK](https://img.shields.io/badge/Download-Android%20APK%20(v1.0.0)-green.svg?style=for-the-badge&logo=android)](https://expo.dev/artifacts/eas/w28S7T-hmN2IQ6xYiXR7yePvCg0e89rmvw2CpRHyP1U.apk)
+
+> 📲 **Download APK Siap Uji Client (Android Standalone)**:
+> - **Unduh Langsung File APK**: [Unduh eduflow-cohort.apk](https://expo.dev/artifacts/eas/w28S7T-hmN2IQ6xYiXR7yePvCg0e89rmvw2CpRHyP1U.apk)
+> - **Halaman Build & QR Code Mobile**: [Buka di Expo Dashboard](https://expo.dev/accounts/depzy/projects/eduflow/builds/d526649f-9dbe-4f6c-b0e5-940f303536fa)
+> 
+> *Catatan Pengujian: APK ini adalah versi mandiri (internal distribution), klien cukup mengunduh file `.apk` ke smartphone Android dan langsung membukanya untuk memasang.*
 
 **EduFlow Cohort** adalah aplikasi mobile e-learning modern yang mengadopsi metodologi pembelajaran berbasis angkatan (*cohort-based learning*) berstandar internasional (seperti Wadhwani Foundation dan program akselerator digital). 
 
