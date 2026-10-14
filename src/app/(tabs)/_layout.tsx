@@ -4,11 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme, Platform } from 'react-native';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useTranslation } from '@/i18n';
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t } = useTranslation();
   const session = useAuthStore((state) => state.session);
   const currentRole = useElearningStore((state) => state.currentRole);
   const currentUser = useElearningStore((state) => state.currentUser);
@@ -60,7 +62,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: t.common.dashboard,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="grid-outline" size={size} color={color} />
           ),
@@ -69,7 +71,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="syllabus"
         options={{
-          title: 'Silabus',
+          title: t.common.syllabus,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="layers-outline" size={size} color={color} />
           ),
@@ -78,7 +80,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="grading"
         options={{
-          title: currentRole === 'teacher' ? 'Periksa' : 'Tugas',
+          title: currentRole === 'teacher' ? t.common.gradebook : t.common.assignments,
           tabBarBadge:
             currentRole === 'teacher' && pendingSubmissionsCount > 0
               ? pendingSubmissionsCount
@@ -95,7 +97,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: currentRole === 'teacher' ? 'Akun & Evaluasi' : 'Kelulusan',
+          title: currentRole === 'teacher' ? t.common.profile : t.common.graduation,
           tabBarIcon: ({ color, size }) => (
             <Ionicons
               name={currentRole === 'teacher' ? 'person-circle-outline' : 'ribbon-outline'}

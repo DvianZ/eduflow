@@ -17,11 +17,13 @@ import { DemoHeader } from '@/components/DemoHeader';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { calculateBatchEvaluation } from '@/utils/lockEngine';
+import { useTranslation } from '@/i18n';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t, language } = useTranslation();
   const { logout, registeredUsers, updateCertificateName: authUpdateCertName } =
     useAuthStore();
 
@@ -213,8 +215,8 @@ export default function ProfileScreen() {
                   },
                 ]}>
                 {isTeacher
-                  ? '👨‍🏫 Pengajar & Mentor Kelas'
-                  : '👨‍🎓 Siswa Peserta Cohort'}
+                  ? (language === 'en' ? '👨‍🏫 Certified Cohort Instructor' : '👨‍🏫 Pengajar & Mentor Kelas')
+                  : (language === 'en' ? '👨‍🎓 Active Cohort Learner' : '👨‍🎓 Siswa Peserta Cohort')}
               </Text>
             </View>
           </View>
@@ -241,10 +243,10 @@ export default function ProfileScreen() {
                     styles.certNameCardTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Nama Resmi di Sertifikat
+                  {t.profile.officialNameTitle}
                 </Text>
                 <Text style={styles.certNameCardSubtitle}>
-                  Nama ini akan dicetak secara sah pada sertifikat kelulusan digital
+                  {t.profile.officialNameDesc}
                 </Text>
               </View>
             </View>
@@ -266,14 +268,18 @@ export default function ProfileScreen() {
                 }}
                 style={styles.editCertNameBtn}>
                 <Ionicons name="create-outline" size={15} color="#2563EB" />
-                <Text style={styles.editCertNameBtnText}>Ubah / Lengkapi</Text>
+                <Text style={styles.editCertNameBtnText}>
+                  {language === 'en' ? 'Edit Legal Name' : 'Ubah / Lengkapi'}
+                </Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.certNameNoticeRow}>
               <Ionicons name="information-circle-outline" size={14} color="#64748B" />
               <Text style={styles.certNameNoticeText}>
-                Pastikan nama sesuai kartu identitas resmi (KTP/Ijazah). Nama di sertifikat tidak dapat diubah setelah diterbitkan.
+                {language === 'en'
+                  ? 'Ensure name matches your government-issued ID. Name cannot be altered once credential is officially issued.'
+                  : 'Pastikan nama sesuai kartu identitas resmi (KTP/Ijazah). Nama di sertifikat tidak dapat diubah setelah diterbitkan.'}
               </Text>
             </View>
           </View>
@@ -551,13 +557,17 @@ export default function ProfileScreen() {
                       </Text>
                     </View>
 
-                    <Text style={styles.certLead}>Dengan ini menyatakan bahwa:</Text>
+                    <Text style={styles.certLead}>
+                      {language === 'en' ? 'This is to officially certify that:' : 'Dengan ini menyatakan bahwa:'}
+                    </Text>
                     <Text style={styles.certStudentName}>
                       {certToDisplay.studentName}
                     </Text>
 
                     <Text style={styles.certBody}>
-                      Telah berhasil menyelesaikan seluruh kurikulum, evaluasi kuis, dan tugas proyek pada program sertifikasi:
+                      {language === 'en'
+                        ? 'has successfully completed all required modules, assessments, and project deliverables for the accredited program:'
+                        : 'Telah berhasil menyelesaikan seluruh kurikulum, evaluasi kuis, dan tugas proyek pada program sertifikasi:'}
                     </Text>
                     <Text style={styles.certCourseName}>
                       {certToDisplay.courseTitle}
@@ -568,7 +578,9 @@ export default function ProfileScreen() {
 
                     <View style={styles.certFooter}>
                       <View style={styles.certScoreBox}>
-                        <Text style={styles.certScoreLabel}>NILAI AKHIR</Text>
+                        <Text style={styles.certScoreLabel}>
+                          {language === 'en' ? 'FINAL SCORE' : 'NILAI AKHIR'}
+                        </Text>
                         <Text style={styles.certScoreValue}>
                           {certToDisplay.finalScore} / 100
                         </Text>
@@ -589,26 +601,32 @@ export default function ProfileScreen() {
                       <TouchableOpacity
                         onPress={() =>
                           Alert.alert(
-                            'Nomor Kredensial',
-                            `Nomor Sertifikat: ${certToDisplay.certificateNumber}\n\nNomor ini telah disalin untuk keperluan verifikasi portofolio Anda.`
+                            language === 'en' ? 'Credential ID' : 'Nomor Kredensial',
+                            language === 'en'
+                              ? `Certificate ID: ${certToDisplay.certificateNumber}\n\nID copied for your professional portfolio verification.`
+                              : `Nomor Sertifikat: ${certToDisplay.certificateNumber}\n\nNomor ini telah disalin untuk keperluan verifikasi portofolio Anda.`
                           )
                         }
                         style={styles.certActionBtn}>
                         <Ionicons name="copy-outline" size={14} color="#D97706" />
-                        <Text style={styles.certActionBtnText}>Salin ID Kredensial</Text>
+                        <Text style={styles.certActionBtnText}>
+                          {language === 'en' ? 'Copy Credential ID' : 'Salin ID Kredensial'}
+                        </Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
                         onPress={() =>
                           Alert.alert(
-                            'Status Keabsahan Kredensial',
-                            `✅ Kredensial ${certToDisplay.certificateNumber} telah TERVERIFIKASI RESMI di blockchain ledger EduFlow & terakreditasi model Wadhwani Foundation.`
+                            language === 'en' ? 'Credential Status' : 'Status Keabsahan Kredensial',
+                            language === 'en'
+                              ? `✅ Credential ${certToDisplay.certificateNumber} is OFFICIALLY VERIFIED on the EduFlow ledger & aligned with Wadhwani Cohort standards.`
+                              : `✅ Kredensial ${certToDisplay.certificateNumber} telah TERVERIFIKASI RESMI di blockchain ledger EduFlow & terakreditasi model Wadhwani Foundation.`
                           )
                         }
                         style={[styles.certActionBtn, { backgroundColor: '#DCFCE7', borderColor: '#86EFAC' }]}>
                         <Ionicons name="checkmark-done" size={14} color="#15803D" />
                         <Text style={[styles.certActionBtnText, { color: '#15803D' }]}>
-                          Terverifikasi Sah
+                          {language === 'en' ? 'Verified Official' : 'Terverifikasi Sah'}
                         </Text>
                       </TouchableOpacity>
 
@@ -617,13 +635,18 @@ export default function ProfileScreen() {
                           if (typeof window !== 'undefined' && window.print) {
                             window.print();
                           } else {
-                            Alert.alert('Unduh Sertifikat', `Sertifikat ${certToDisplay.certificateNumber} siap dicetak.`);
+                            Alert.alert(
+                              language === 'en' ? 'Print Certificate' : 'Unduh Sertifikat',
+                              language === 'en'
+                                ? `Certificate ${certToDisplay.certificateNumber} ready for printing.`
+                                : `Sertifikat ${certToDisplay.certificateNumber} siap dicetak.`
+                            );
                           }
                         }}
                         style={[styles.certActionBtn, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]}>
                         <Ionicons name="print-outline" size={14} color="#2563EB" />
                         <Text style={[styles.certActionBtnText, { color: '#2563EB' }]}>
-                          Cetak / Simpan PDF
+                          {language === 'en' ? 'Print / Save PDF' : 'Cetak / Simpan PDF'}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -648,17 +671,17 @@ export default function ProfileScreen() {
                     styles.evalTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  🎓 Evaluasi Kelulusan & Klaim Sertifikat
+                  {language === 'en' ? '🎓 Graduation Evaluator & Certificate Claim' : '🎓 Evaluasi Kelulusan & Klaim Sertifikat'}
                 </Text>
                 <Text style={styles.finalScoreBadge}>
-                  Skor: {evalResult.finalScore}/100
+                  {language === 'en' ? 'Score:' : 'Skor:'} {evalResult.finalScore}/100
                 </Text>
               </View>
 
               {/* Cohort Switcher for Evaluation */}
               <View style={styles.evalCohortSelector}>
                 <Text style={[styles.evalCohortLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-                  PILIH KELAS UNTUK EVALUASI KELULUSAN:
+                  {language === 'en' ? 'SELECT COHORT TO EVALUATE:' : 'PILIH KELAS UNTUK EVALUASI KELULUSAN:'}
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.evalCohortPills}>
                   {availableBatches.map((b) => {
@@ -683,7 +706,7 @@ export default function ProfileScreen() {
                             styles.evalCohortPillText,
                             { color: isSelected ? '#FFFFFF' : isDark ? '#CBD5E1' : '#475569' },
                           ]}>
-                          {b.classCode} {isDynamic ? '(Aktif)' : isCertExists ? '(Lulus)' : ''}
+                          {b.classCode} {isDynamic ? (language === 'en' ? '(Active)' : '(Aktif)') : isCertExists ? (language === 'en' ? '(Graduated)' : '(Lulus)') : ''}
                         </Text>
                       </TouchableOpacity>
                     );
@@ -697,17 +720,19 @@ export default function ProfileScreen() {
                   <Ionicons name="checkmark-circle" size={20} color="#15803D" />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.alreadyCertifiedTitle}>
-                      Kelas Telah Tersertifikasi!
+                      {language === 'en' ? 'Cohort Officially Certified!' : 'Kelas Telah Tersertifikasi!'}
                     </Text>
                     <Text style={styles.alreadyCertifiedDesc}>
-                      Sertifikat nomor <Text style={{ fontWeight: '700' }}>{existingCert.certificateNumber}</Text> untuk program &quot;{existingCert.courseTitle}&quot; telah terbit dengan nilai akhir {existingCert.finalScore}/100.
+                      {language === 'en'
+                        ? `Certificate #${existingCert.certificateNumber} for "${existingCert.courseTitle}" issued with composite score ${existingCert.finalScore}/100.`
+                        : `Sertifikat nomor ${existingCert.certificateNumber} untuk program "${existingCert.courseTitle}" telah terbit dengan nilai akhir ${existingCert.finalScore}/100.`}
                     </Text>
                   </View>
                 </View>
               ) : (
                 <>
                   <Text style={styles.formulaDesc}>
-                    Formula: (Materi × 30%) + (Kuis × 30%) + (Tugas Pengajar × 40%)
+                    {t.profile.weightedFormula}
                   </Text>
 
                   {/* Metric 1 */}
@@ -731,14 +756,15 @@ export default function ProfileScreen() {
                           styles.metricRowText,
                           { color: isDark ? '#F8FAFC' : '#0F172A' },
                         ]}>
-                        Progres Materi ({evalResult.completedLessons}/{evalResult.totalLessons} • Bobot 30%)
+                        {language === 'en'
+                          ? `Curriculum Progress (${evalResult.completedLessons}/${evalResult.totalLessons} • 30% Weight)`
+                          : `Progres Materi (${evalResult.completedLessons}/${evalResult.totalLessons} • Bobot 30%)`}
                       </Text>
                     </View>
                     <Text style={styles.metricRowValue}>
                       {evalResult.lessonProgressPct}%
                     </Text>
                   </View>
-
                   {/* Metric 2 */}
                   <View style={styles.metricRow}>
                     <View style={styles.metricRowLeft}>
@@ -756,7 +782,7 @@ export default function ProfileScreen() {
                           styles.metricRowText,
                           { color: isDark ? '#F8FAFC' : '#0F172A' },
                         ]}>
-                        Rerata Kuis Lulus (Bobot 30%)
+                        {language === 'en' ? 'Quiz Assessment Average (30% Weight)' : 'Rerata Kuis Lulus (Bobot 30%)'}
                       </Text>
                     </View>
                     <Text style={styles.metricRowValue}>{evalResult.quizAvg}%</Text>
@@ -779,13 +805,13 @@ export default function ProfileScreen() {
                           styles.metricRowText,
                           { color: isDark ? '#F8FAFC' : '#0F172A' },
                         ]}>
-                        Nilai Tugas Pengajar (Bobot 40%)
+                        {language === 'en' ? 'Instructor Project Score (40% Weight)' : 'Nilai Tugas Pengajar (Bobot 40%)'}
                       </Text>
                     </View>
                     <Text style={styles.metricRowValue}>
                       {evalResult.assignmentGrade > 0
                         ? `${evalResult.assignmentGrade}/100`
-                        : 'Belum Dinilai'}
+                        : (language === 'en' ? 'Pending Review' : 'Belum Dinilai')}
                     </Text>
                   </View>
 
@@ -818,8 +844,12 @@ export default function ProfileScreen() {
                         },
                       ]}>
                       {evalResult.canGraduate
-                        ? 'Seluruh kriteria kelulusan terpenuhi! Anda berhak mengklaim sertifikat.'
-                        : 'Syarat kelulusan: Materi 100% tuntas, Kuis lulus, dan Tugas dinilai pengajar minimal 75.'}
+                        ? (language === 'en'
+                            ? 'All graduation criteria satisfied! You are eligible to claim your official credential.'
+                            : 'Seluruh kriteria kelulusan terpenuhi! Anda berhak mengklaim sertifikat.')
+                        : (language === 'en'
+                            ? 'Graduation standard: 100% lessons, all quizzes passed (≥80%), and project deliverable graded ≥75.'
+                            : 'Syarat kelulusan: Materi 100% tuntas, Kuis lulus, dan Tugas dinilai pengajar minimal 75.')}
                     </Text>
                   </View>
 
@@ -845,8 +875,8 @@ export default function ProfileScreen() {
                     <Ionicons name="ribbon-outline" size={18} color="#FFFFFF" />
                     <Text style={styles.claimBtnText}>
                       {evalResult.canGraduate
-                        ? 'Klaim Sertifikat Resmi (+200 XP)'
-                        : 'Sertifikat Belum Terbuka'}
+                        ? (language === 'en' ? 'Claim Official Certificate (+200 XP)' : 'Klaim Sertifikat Resmi (+200 XP)')
+                        : (language === 'en' ? 'Certificate Locked' : 'Sertifikat Belum Terbuka')}
                     </Text>
                   </TouchableOpacity>
                 </>
@@ -861,7 +891,7 @@ export default function ProfileScreen() {
           style={styles.logoutBtn}>
           <Ionicons name="log-out-outline" size={18} color="#DC2626" />
           <Text style={styles.logoutBtnText}>
-            Keluar dari Akun (Logout)
+            {t.common.logout}
           </Text>
         </TouchableOpacity>
 

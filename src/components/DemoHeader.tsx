@@ -13,11 +13,13 @@ import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { NotificationModal } from '@/components/NotificationModal';
 import { FeatureTourModal } from '@/components/FeatureTourModal';
+import { useTranslation } from '@/i18n';
 
 export function DemoHeader() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showFeatureTour, setShowFeatureTour] = useState(false);
@@ -51,16 +53,16 @@ export function DemoHeader() {
 
   const handleReset = () => {
     if (typeof window !== 'undefined' && window.confirm) {
-      if (window.confirm('Reset semua data demo ke kondisi awal?')) {
+      if (window.confirm(t.header.resetConfirmMsg)) {
         resetDemoData();
       }
     } else {
       Alert.alert(
-        'Reset Data Demo',
-        'Kembalikan semua progres belajar, kuis, dan tugas ke kondisi awal?',
+        t.header.resetConfirmTitle,
+        t.header.resetConfirmMsg,
         [
-          { text: 'Batal', style: 'cancel' },
-          { text: 'Reset', style: 'destructive', onPress: resetDemoData },
+          { text: t.common.cancel, style: 'cancel' },
+          { text: t.common.reset, style: 'destructive', onPress: resetDemoData },
         ]
       );
     }
@@ -74,13 +76,13 @@ export function DemoHeader() {
     };
 
     if (typeof window !== 'undefined' && window.confirm) {
-      if (window.confirm('Keluar dari akun?')) {
+      if (window.confirm(t.header.logoutConfirmMsg)) {
         doLogout();
       }
     } else {
-      Alert.alert('Logout', 'Keluar dari akun EduFlow?', [
-        { text: 'Batal', style: 'cancel' },
-        { text: 'Keluar', style: 'destructive', onPress: doLogout },
+      Alert.alert(t.header.logoutConfirmTitle, t.header.logoutConfirmMsg, [
+        { text: t.common.cancel, style: 'cancel' },
+        { text: t.common.logout, style: 'destructive', onPress: doLogout },
       ]);
     }
   };
@@ -117,7 +119,7 @@ export function DemoHeader() {
                 styles.brandTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              EduFlow <Text style={styles.cohortTag}>Cohort</Text>
+              EduFlow <Text style={styles.cohortTag}>{t.header.cohortTag}</Text>
             </Text>
             <Text style={styles.userSubtitle} numberOfLines={1}>
               {displayName}
@@ -145,14 +147,14 @@ export function DemoHeader() {
                 borderColor: isDark ? '#334155' : '#BFDBFE',
               },
             ]}
-            accessibilityLabel="Panduan Fitur Aplikasi">
+            accessibilityLabel={t.header.guideBtn}>
             <Ionicons name="sparkles" size={13} color="#2563EB" />
             <Text
               style={[
                 styles.tourBtnText,
                 { color: isDark ? '#93C5FD' : '#1D4ED8' },
               ]}>
-              Panduan
+              {t.header.guideBtn}
             </Text>
           </TouchableOpacity>
 
@@ -164,7 +166,7 @@ export function DemoHeader() {
               styles.notifBtn,
               { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
             ]}
-            accessibilityLabel={`Notifikasi (${unreadCount} belum dibaca)`}>
+            accessibilityLabel={`${t.common.notifications} (${unreadCount})`}>
             <Ionicons
               name={unreadCount > 0 ? 'notifications' : 'notifications-outline'}
               size={17}
@@ -181,13 +183,28 @@ export function DemoHeader() {
             )}
           </TouchableOpacity>
 
+          {/* Settings Button */}
+          <TouchableOpacity
+            onPress={() => router.push('/settings')}
+            style={[
+              styles.iconBtn,
+              { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
+            ]}
+            accessibilityLabel={t.common.settings}>
+            <Ionicons
+              name="settings-outline"
+              size={16}
+              color={isDark ? '#94A3B8' : '#64748B'}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity
             onPress={handleReset}
             style={[
               styles.iconBtn,
               { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
             ]}
-            accessibilityLabel="Reset Demo Data">
+            accessibilityLabel={t.common.reset}>
             <Ionicons
               name="refresh-outline"
               size={16}
@@ -201,7 +218,7 @@ export function DemoHeader() {
               styles.iconBtn,
               { backgroundColor: isDark ? '#371520' : '#FEE2E2' },
             ]}
-            accessibilityLabel="Logout">
+            accessibilityLabel={t.common.logout}>
             <Ionicons name="log-out-outline" size={16} color="#DC2626" />
           </TouchableOpacity>
         </View>
@@ -230,7 +247,7 @@ export function DemoHeader() {
                 styles.rolePillText,
                 { color: !isTeacher ? '#FFFFFF' : isDark ? '#94A3B8' : '#64748B' },
               ]}>
-              Mode Siswa (Budi)
+              {t.common.modeLearner}
             </Text>
           </TouchableOpacity>
 
@@ -250,7 +267,7 @@ export function DemoHeader() {
                 styles.rolePillText,
                 { color: isTeacher ? '#FFFFFF' : isDark ? '#94A3B8' : '#64748B' },
               ]}>
-              Mode Pengajar (Pak Alex)
+              {t.common.modeInstructor}
             </Text>
           </TouchableOpacity>
         </View>
@@ -278,7 +295,7 @@ export function DemoHeader() {
               styles.roleIndicatorText,
               { color: isTeacher ? '#A78BFA' : '#60A5FA' },
             ]}>
-            Login sebagai {isTeacher ? 'Pengajar' : 'Siswa'}
+            {t.header.loggedInAs} {isTeacher ? t.common.instructor : t.common.learner}
           </Text>
         </View>
       )}

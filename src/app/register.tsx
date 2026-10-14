@@ -16,12 +16,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useElearningStore } from '@/store/useElearningStore';
+import { useTranslation } from '@/i18n';
 import type { UserRole } from '@/types/elearning';
 
 export default function RegisterScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t } = useTranslation();
 
   const { register, login } = useAuthStore();
   const { syncUserFromAuth } = useElearningStore();
@@ -39,15 +41,15 @@ export default function RegisterScreen() {
     setError('');
 
     if (!fullName.trim() || !email.trim() || !password.trim()) {
-      setError('Semua field wajib diisi.');
+      setError(t.common.error);
       return;
     }
     if (password !== confirmPassword) {
-      setError('Konfirmasi password tidak cocok.');
+      setError('Passwords do not match.');
       return;
     }
     if (password.length < 6) {
-      setError('Password minimal 6 karakter.');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
@@ -118,10 +120,10 @@ export default function RegisterScreen() {
             </TouchableOpacity>
             <View style={styles.headerTextCol}>
               <Text style={[styles.headerTitle, { color: textPrimary }]}>
-                Buat Akun Baru
+                {t.auth.registerTitle}
               </Text>
               <Text style={[styles.headerSubtitle, { color: textSecondary }]}>
-                Daftar sebagai siswa atau pengajar
+                {t.auth.registerSubtitle}
               </Text>
             </View>
           </View>
@@ -168,7 +170,7 @@ export default function RegisterScreen() {
                         : '#64748B',
                   },
                 ]}>
-                Siswa
+                {t.common.learner}
               </Text>
               <Text
                 style={[
@@ -182,7 +184,7 @@ export default function RegisterScreen() {
                         : '#94A3B8',
                   },
                 ]}>
-                Belajar & ikuti kelas
+                {t.auth.demoBudiDesc}
               </Text>
             </TouchableOpacity>
 
@@ -219,7 +221,7 @@ export default function RegisterScreen() {
                         : '#64748B',
                   },
                 ]}>
-                Pengajar
+                {t.common.instructor}
               </Text>
               <Text
                 style={[
@@ -233,7 +235,7 @@ export default function RegisterScreen() {
                         : '#94A3B8',
                   },
                 ]}>
-                Buat & kelola kelas
+                {t.auth.demoAlexDesc}
               </Text>
             </TouchableOpacity>
           </View>
@@ -257,7 +259,7 @@ export default function RegisterScreen() {
             {/* Full Name */}
             <View style={styles.inputGroup}>
               <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                Nama Lengkap
+                {t.auth.fullNameLabel}
               </Text>
               <View
                 style={[
@@ -271,7 +273,7 @@ export default function RegisterScreen() {
                 />
                 <TextInput
                   style={[styles.textInput, { color: textPrimary }]}
-                  placeholder="Masukkan nama lengkap"
+                  placeholder={t.auth.fullNamePlaceholder}
                   placeholderTextColor={textSecondary}
                   value={fullName}
                   onChangeText={setFullName}
@@ -283,7 +285,7 @@ export default function RegisterScreen() {
             {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                Email
+                {t.auth.emailLabel}
               </Text>
               <View
                 style={[
@@ -297,7 +299,7 @@ export default function RegisterScreen() {
                 />
                 <TextInput
                   style={[styles.textInput, { color: textPrimary }]}
-                  placeholder="nama@email.com"
+                  placeholder={t.auth.emailPlaceholder}
                   placeholderTextColor={textSecondary}
                   value={email}
                   onChangeText={setEmail}
@@ -311,7 +313,7 @@ export default function RegisterScreen() {
             {/* Password */}
             <View style={styles.inputGroup}>
               <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                Password
+                {t.auth.passwordLabel}
               </Text>
               <View
                 style={[
@@ -325,7 +327,7 @@ export default function RegisterScreen() {
                 />
                 <TextInput
                   style={[styles.textInput, { color: textPrimary }]}
-                  placeholder="Minimal 6 karakter"
+                  placeholder={t.auth.passwordPlaceholder}
                   placeholderTextColor={textSecondary}
                   value={password}
                   onChangeText={setPassword}
@@ -345,7 +347,7 @@ export default function RegisterScreen() {
             {/* Confirm Password */}
             <View style={styles.inputGroup}>
               <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                Konfirmasi Password
+                Confirm Password
               </Text>
               <View
                 style={[
@@ -359,7 +361,7 @@ export default function RegisterScreen() {
                 />
                 <TextInput
                   style={[styles.textInput, { color: textPrimary }]}
-                  placeholder="Ulangi password"
+                  placeholder="Repeat your password"
                   placeholderTextColor={textSecondary}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
@@ -387,8 +389,8 @@ export default function RegisterScreen() {
                 <>
                   <Ionicons name="checkmark-circle-outline" size={18} color="#FFFFFF" />
                   <Text style={styles.primaryButtonText}>
-                    Daftar sebagai{' '}
-                    {selectedRole === 'teacher' ? 'Pengajar' : 'Siswa'}
+                    {t.auth.registerSubmitBtn} (
+                    {selectedRole === 'teacher' ? t.common.instructor : t.common.learner})
                   </Text>
                 </>
               )}
@@ -399,10 +401,7 @@ export default function RegisterScreen() {
               style={styles.linkRow}
               onPress={handleBack}>
               <Text style={[styles.linkText, { color: textSecondary }]}>
-                Sudah punya akun?{' '}
-                <Text style={{ color: '#2563EB', fontWeight: '700' }}>
-                  Masuk di sini
-                </Text>
+                {t.auth.alreadyHaveAccount}
               </Text>
             </TouchableOpacity>
           </View>

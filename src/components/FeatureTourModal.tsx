@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   useColorScheme,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
+import { useTranslation } from '@/i18n';
 
 interface FeatureTourModalProps {
   visible: boolean;
@@ -40,210 +40,187 @@ interface TourStep {
   actionLabel?: string;
 }
 
-const TOUR_STEPS: TourStep[] = [
-  {
-    id: 'intro',
-    badge: 'PENGENALAN PLATFORM',
-    icon: 'school',
-    themeColor: '#4F46E5',
-    themeBg: '#EEF2FF',
-    themeBorder: '#C7D2FE',
-    themeLip: '#818CF8',
-    title: 'Selamat Datang di EduFlow Cohort!',
-    subtitle: 'Platform E-Learning Kolaboratif & Terakreditasi',
-    description:
-      'EduFlow Cohort dirancang khusus untuk pembelajaran berbasis cohort berbatas waktu dengan metodologi standar Wadhwani Foundation, menyajikan kurikulum terstruktur dan evaluasi dua arah.',
-    features: [
-      {
-        icon: 'flash-outline',
-        title: '100% Dinamis & Lokal',
-        desc: 'Semua data tersimpan otomatis di perangkat lokal tanpa konfigurasi backend rumit, siap diuji coba langsung oleh client.',
-      },
-      {
-        icon: 'color-palette-outline',
-        title: 'Gamified Bento + Tactile 3D UI',
-        desc: 'Antarmuka modular bergaya widget iOS dan tombol taktil 3D interaktif ala Duolingo yang memikat dan tidak membosankan.',
-      },
-    ],
-    testingGuide: [
-      'Gunakan bilah tab bawah untuk berpindah antar modul: Dashboard, Silabus, Tugas/Periksa, dan Kelulusan.',
-      'Data progres selalu tersimpan secara instan di storage aplikasi.',
-    ],
-    targetTab: '/(tabs)',
-    actionLabel: 'Buka Dashboard Utama',
-  },
-  {
-    id: 'dual-role',
-    badge: 'FITUR UTAMA: DUAL ROLE',
-    icon: 'swap-horizontal',
-    themeColor: '#2563EB',
-    themeBg: '#EFF6FF',
-    themeBorder: '#BFDBFE',
-    themeLip: '#60A5FA',
-    title: 'Beralih Peran Siswa & Guru 1-Klik',
-    subtitle: 'Uji Seluruh Alur Dua Arah Tanpa Login Ulang',
-    description:
-      'Di bagian atas layar terdapat pill selector peran instan yang memungkinkan Anda berganti sudut pandang antara Siswa (Budi) dan Pengajar (Pak Alex) dalam sekejap.',
-    features: [
-      {
-        icon: 'person-outline',
-        title: 'Mode Siswa (Budi Santoso)',
-        desc: 'Belajar modul, menonton video materi, mengerjakan kuis evaluasi, kumpul proyek, dan klaim sertifikat ijazah resmi.',
-      },
-      {
-        icon: 'ribbon-outline',
-        title: 'Mode Pengajar (Pak Alex)',
-        desc: 'Menilai tugas siswa, meminta revisi perbaikan, mengelola kelas (Class Manager), dan mengunduh rekap nilai ke CSV/Excel.',
-      },
-    ],
-    testingGuide: [
-      'Klik tombol "Mode Pengajar (Pak Alex)" di header atas aplikasi untuk melihat perspektif guru.',
-      'Siswa mengumpulkan tugas ➔ Ganti ke Pengajar ➔ Tugas langsung masuk antrean pemeriksaan.',
-    ],
-    targetRole: 'teacher',
-    actionLabel: 'Coba Switch ke Guru',
-  },
-  {
-    id: 'syllabus-gate',
-    badge: 'TAB SILABUS: GATEKEEPER',
-    icon: 'layers',
-    themeColor: '#8B5CF6',
-    themeBg: '#F5F3FF',
-    themeBorder: '#DDD6FE',
-    themeLip: '#A78BFA',
-    title: 'Silabus & Sequential Gating Lock',
-    subtitle: 'Materi & Kuis Terbuka Bertahap',
-    description:
-      'EduFlow menerapkan sistem kunci gerbang belajar (Gatekeeper) otomatis untuk memastikan siswa menuntaskan materi secara berurutan dan terarah.',
-    features: [
-      {
-        icon: 'lock-closed-outline',
-        title: 'Materi Terkunci Berurutan',
-        desc: 'Materi berikutnya (Lesson 1.2) terkunci sampai materi sebelumnya (Lesson 1.1) ditandai selesai.',
-      },
-      {
-        icon: 'shield-checkmark-outline',
-        title: 'Gerbang Kuis Modul (KKM 80)',
-        desc: 'Kuis Modul terkunci sampai seluruh materi selesai. Modul berikutnya baru terbuka bila kuis lulus minimal 80%.',
-      },
-    ],
-    testingGuide: [
-      'Buka tab "Silabus" dalam Mode Siswa, klik Lesson 1.1 dan tandai selesai.',
-      'Perhatikan gembok Lesson 1.2 yang langsung terbuka secara otomatis!',
-    ],
-    targetTab: '/(tabs)/syllabus',
-    targetRole: 'learner',
-    actionLabel: 'Buka Tab Silabus',
-  },
-  {
-    id: 'interactive-quiz',
-    badge: 'EVALUASI INTERAKTIF',
-    icon: 'checkmark-done-circle',
-    themeColor: '#10B981',
-    themeBg: '#ECFDF5',
-    themeBorder: '#A7F3D0',
-    themeLip: '#34D399',
-    title: 'Kuis Taktil 3D & Tugas Proyek',
-    subtitle: 'Uji Kompetensi Kognitif & Proyek Portofolio',
-    description:
-      'Dua instrumen evaluasi utama memastikan pemahaman mendalam: kuis pilihan ganda otomatis dengan umpan balik, serta pengumpulan tugas proyek nyata.',
-    features: [
-      {
-        icon: 'help-circle-outline',
-        title: 'Kuis Pilihan Ganda Gamifikasi',
-        desc: 'Tombol opsi taktil 3D dengan umpan balik instan, pembahasan jawaban, dan penambahan +50 XP bila lulus.',
-      },
-      {
-        icon: 'cloud-upload-outline',
-        title: 'Pengumpulan Tugas Portofolio',
-        desc: 'Siswa menulis rangkuman solusi dan menyematkan tautan repository (GitHub/Figma/Drive) untuk dinilai pengajar.',
-      },
-    ],
-    testingGuide: [
-      'Buka Kuis Modul di tab Silabus dan rasakan sensasi tombol opsi taktil 3D.',
-      'Kumpulkan tugas proyek untuk melihat statusnya berubah menjadi "Menunggu Diperiksa".',
-    ],
-    targetTab: '/(tabs)/syllabus',
-    targetRole: 'learner',
-    actionLabel: 'Coba Kuis di Silabus',
-  },
-  {
-    id: 'teacher-grading',
-    badge: 'TAB PERIKSA: OTORITAS GURU',
-    icon: 'document-text',
-    themeColor: '#D97706',
-    themeBg: '#FFFBEB',
-    themeBorder: '#FDE68A',
-    themeLip: '#FBBF24',
-    title: 'Panel Penilaian & Ekspor CSV/Excel',
-    subtitle: 'Koreksi Tugas, Revisi & Rekapitulasi Lengkap',
-    description:
-      'Pada Mode Pengajar, tab berganti menjadi "Periksa". Pengajar dapat memeriksa jawaban siswa, memberikan ulasan kualitatif, serta mengunduh rekap nilai.',
-    features: [
-      {
-        icon: 'create-outline',
-        title: 'Penilaian & Permintaan Revisi',
-        desc: 'Beri skor 0-100 dengan feedback tertulis, atau minta siswa melakukan revisi perbaikan.',
-      },
-      {
-        icon: 'download-outline',
-        title: 'Ekspor Rekap Nilai CSV (Excel)',
-        desc: 'Format CSV disandikan UTF-8 BOM otomatis sehingga langsung terbuka rapi di Microsoft Excel & Google Sheets tanpa error karakter.',
-      },
-    ],
-    testingGuide: [
-      'Ganti ke Mode Pengajar, buka tab "Periksa", lalu tekan tombol hijau "Unduh Rekap Nilai".',
-      'Lihat pratinjau data rekap nilai lengkap dengan progress materi, kuis, dan status kelulusan.',
-    ],
-    targetTab: '/(tabs)/grading',
-    targetRole: 'teacher',
-    actionLabel: 'Buka Tab Periksa & Ekspor',
-  },
-  {
-    id: 'graduation-cert',
-    badge: 'TAB KELULUSAN & MANAJEMEN KELAS',
-    icon: 'ribbon',
-    themeColor: '#E11D48',
-    themeBg: '#FFF1F2',
-    themeBorder: '#FECDD3',
-    themeLip: '#FB7185',
-    title: 'Evaluasi Terbobot & Sertifikat Digital',
-    subtitle: 'Formula Bobot Industri (30:30:40) & Ijazah Digital',
-    description:
-      'Tab Kelulusan menghitung nilai akhir transparan: (Materi 30%) + (Kuis 30%) + (Tugas 40%). Jika tuntas, tombol Klaim Sertifikat Resmi akan aktif.',
-    features: [
-      {
-        icon: 'trophy-outline',
-        title: 'Sertifikat Digital Kredensial Resmi',
-        desc: 'Dilengkapi Nomor Kredensial unik, status terverifikasi sah, nama resmi bergelar, dan fitur Cetak / Simpan PDF.',
-      },
-      {
-        icon: 'people-outline',
-        title: 'Manajemen Kelas & Notifikasi In-App',
-        desc: 'Pengajar dapat membuat kelas cohort baru dengan kode 6 karakter, mengelola kapasitas, dan broadcast pengumuman.',
-      },
-    ],
-    testingGuide: [
-      'Periksa tab "Kelulusan" untuk melihat portofolio sertifikat terakreditasi milik Budi Santoso.',
-      'Coba ubah nama resmi di sertifikat menggunakan tombol "Ubah / Lengkapi".',
-    ],
-    targetTab: '/(tabs)/profile',
-    targetRole: 'learner',
-    actionLabel: 'Buka Tab Kelulusan',
-  },
-];
-
 export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t } = useTranslation();
   const { setHasSeenAppTour, switchRole } = useElearningStore();
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const activeStep = TOUR_STEPS[currentStepIndex] || TOUR_STEPS[0];
+  const tourSteps: TourStep[] = [
+    {
+      id: 'intro',
+      badge: t.tour.step1Tag,
+      icon: 'school',
+      themeColor: '#4F46E5',
+      themeBg: '#EEF2FF',
+      themeBorder: '#C7D2FE',
+      themeLip: '#818CF8',
+      title: t.tour.step1Title,
+      subtitle: t.tour.step1Subtitle,
+      description: t.tour.step1Desc,
+      features: [
+        {
+          icon: 'flash-outline',
+          title: t.tour.step1Feature1Title,
+          desc: t.tour.step1Feature1Desc,
+        },
+        {
+          icon: 'color-palette-outline',
+          title: t.tour.step1Feature2Title,
+          desc: t.tour.step1Feature2Desc,
+        },
+      ],
+      testingGuide: [t.tour.step1Tip1, t.tour.step1Tip2],
+      targetTab: '/(tabs)',
+      actionLabel: t.tour.step1Action,
+    },
+    {
+      id: 'dual-role',
+      badge: t.tour.step2Tag,
+      icon: 'swap-horizontal',
+      themeColor: '#2563EB',
+      themeBg: '#EFF6FF',
+      themeBorder: '#BFDBFE',
+      themeLip: '#60A5FA',
+      title: t.tour.step2Title,
+      subtitle: t.tour.step2Subtitle,
+      description: t.tour.step2Desc,
+      features: [
+        {
+          icon: 'person-outline',
+          title: t.tour.step2Feature1Title,
+          desc: t.tour.step2Feature1Desc,
+        },
+        {
+          icon: 'ribbon-outline',
+          title: t.tour.step2Feature2Title,
+          desc: t.tour.step2Feature2Desc,
+        },
+      ],
+      testingGuide: [t.tour.step2Tip1, t.tour.step2Tip2],
+      targetRole: 'teacher',
+      actionLabel: t.tour.step2Action,
+    },
+    {
+      id: 'gatekeeper',
+      badge: t.tour.step3Tag,
+      icon: 'layers',
+      themeColor: '#7C3AED',
+      themeBg: '#F5F3FF',
+      themeBorder: '#DDD6FE',
+      themeLip: '#A78BFA',
+      title: t.tour.step3Title,
+      subtitle: t.tour.step3Subtitle,
+      description: t.tour.step3Desc,
+      features: [
+        {
+          icon: 'lock-closed-outline',
+          title: t.tour.step3Feature1Title,
+          desc: t.tour.step3Feature1Desc,
+        },
+        {
+          icon: 'shield-checkmark-outline',
+          title: t.tour.step3Feature2Title,
+          desc: t.tour.step3Feature2Desc,
+        },
+      ],
+      testingGuide: [t.tour.step3Tip1, t.tour.step3Tip2],
+      targetTab: '/(tabs)/syllabus',
+      targetRole: 'learner',
+      actionLabel: t.tour.step3Action,
+    },
+    {
+      id: 'quiz-assignments',
+      badge: t.tour.step4Tag,
+      icon: 'help-circle',
+      themeColor: '#D97706',
+      themeBg: '#FFFBEB',
+      themeBorder: '#FDE68A',
+      themeLip: '#FBBF24',
+      title: t.tour.step4Title,
+      subtitle: t.tour.step4Subtitle,
+      description: t.tour.step4Desc,
+      features: [
+        {
+          icon: 'radio-button-on-outline',
+          title: t.tour.step4Feature1Title,
+          desc: t.tour.step4Feature1Desc,
+        },
+        {
+          icon: 'document-attach-outline',
+          title: t.tour.step4Feature2Title,
+          desc: t.tour.step4Feature2Desc,
+        },
+      ],
+      testingGuide: [t.tour.step4Tip1, t.tour.step4Tip2],
+      targetTab: '/(tabs)/grading',
+      targetRole: 'learner',
+      actionLabel: t.tour.step4Action,
+    },
+    {
+      id: 'teacher-grading',
+      badge: t.tour.step5Tag,
+      icon: 'clipboard',
+      themeColor: '#059669',
+      themeBg: '#ECFDF5',
+      themeBorder: '#A7F3D0',
+      themeLip: '#34D399',
+      title: t.tour.step5Title,
+      subtitle: t.tour.step5Subtitle,
+      description: t.tour.step5Desc,
+      features: [
+        {
+          icon: 'create-outline',
+          title: t.tour.step5Feature1Title,
+          desc: t.tour.step5Feature1Desc,
+        },
+        {
+          icon: 'download-outline',
+          title: t.tour.step5Feature2Title,
+          desc: t.tour.step5Feature2Desc,
+        },
+      ],
+      testingGuide: [t.tour.step5Tip1, t.tour.step5Tip2],
+      targetTab: '/(tabs)/grading',
+      targetRole: 'teacher',
+      actionLabel: t.tour.step5Action,
+    },
+    {
+      id: 'graduation-cert',
+      badge: t.tour.step6Tag,
+      icon: 'ribbon',
+      themeColor: '#E11D48',
+      themeBg: '#FFF1F2',
+      themeBorder: '#FECDD3',
+      themeLip: '#FB7185',
+      title: t.tour.step6Title,
+      subtitle: t.tour.step6Subtitle,
+      description: t.tour.step6Desc,
+      features: [
+        {
+          icon: 'trophy-outline',
+          title: t.tour.step6Feature1Title,
+          desc: t.tour.step6Feature1Desc,
+        },
+        {
+          icon: 'people-outline',
+          title: t.tour.step6Feature2Title,
+          desc: t.tour.step6Feature2Desc,
+        },
+      ],
+      testingGuide: [t.tour.step6Tip1, t.tour.step6Tip2],
+      targetTab: '/(tabs)/profile',
+      targetRole: 'learner',
+      actionLabel: t.tour.step6Action,
+    },
+  ];
+
+  const activeStep = tourSteps[currentStepIndex] || tourSteps[0];
   const isFirstStep = currentStepIndex === 0;
-  const isLastStep = currentStepIndex === TOUR_STEPS.length - 1;
+  const isLastStep = currentStepIndex === tourSteps.length - 1;
 
   const handleNext = () => {
     if (isLastStep) {
@@ -297,7 +274,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
           <View style={styles.cardHeader}>
             <View style={styles.stepCounterBadge}>
               <Text style={styles.stepCounterText}>
-                Langkah {currentStepIndex + 1} dari {TOUR_STEPS.length}
+                {t.tour.stepIndicator} {currentStepIndex + 1} / {tourSteps.length}
               </Text>
             </View>
 
@@ -305,14 +282,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
               onPress={handleFinish}
               style={styles.skipButton}
               activeOpacity={0.7}>
-              <Text style={styles.skipButtonText}>Lewati Panduan</Text>
+              <Text style={styles.skipButtonText}>{t.tour.skipTour}</Text>
               <Ionicons name="close" size={16} color="#64748B" />
             </TouchableOpacity>
           </View>
 
           {/* Segmented Progress Bars (Clickable) */}
           <View style={styles.progressBarContainer}>
-            {TOUR_STEPS.map((step, idx) => {
+            {tourSteps.map((step, idx) => {
               const isActive = idx === currentStepIndex;
               const isPast = idx < currentStepIndex;
               return (
@@ -454,7 +431,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
               <View style={styles.testingGuideHeader}>
                 <Ionicons name="sparkles" size={16} color="#10B981" />
                 <Text style={styles.testingGuideTitle}>
-                  Panduan Pengujian untuk Client:
+                  {t.tour.clientTestingTipsTitle}:
                 </Text>
               </View>
               {activeStep.testingGuide.map((tip, idx) => (
@@ -492,7 +469,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
                     styles.directActionText,
                     { color: activeStep.themeColor },
                   ]}>
-                  {activeStep.actionLabel} sekarang ➔
+                  {activeStep.actionLabel} ➔
                 </Text>
               </TouchableOpacity>
             )}
@@ -528,7 +505,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
                     styles.prevButtonText,
                     { color: isDark ? '#CBD5E1' : '#475569' },
                   ]}>
-                  Sebelumnya
+                  {t.tour.prevBtn}
                 </Text>
               </TouchableOpacity>
             )}
@@ -545,7 +522,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
                 },
               ]}>
               <Text style={styles.nextButtonText}>
-                {isLastStep ? 'Mulai Eksplorasi EduFlow 🚀' : 'Lanjut ➔'}
+                {isLastStep ? t.tour.finishBtn : `${t.tour.nextBtn} ➔`}
               </Text>
               {!isLastStep && (
                 <Ionicons name="chevron-forward" size={16} color="#FFFFFF" />
@@ -561,96 +538,88 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.72)',
-    alignItems: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.75)',
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 16,
-    ...(Platform.OS === 'web' && ({
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
-    } as any)),
   },
   tourCard: {
     width: '100%',
-    maxWidth: 480,
-    maxHeight: '90%',
-    borderRadius: 28,
+    maxWidth: 420,
+    maxHeight: '92%',
+    borderRadius: 24,
     borderWidth: 2,
     borderBottomWidth: 6,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    elevation: 8,
+    display: 'flex',
+    flexDirection: 'column',
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 10,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
   stepCounterBadge: {
-    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+    backgroundColor: '#EEF2FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 10,
+    borderRadius: 12,
   },
   stepCounterText: {
-    fontSize: 12,
-    fontWeight: '800',
     color: '#4F46E5',
-    letterSpacing: 0.4,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
   skipButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 8,
+    paddingHorizontal: 6,
   },
   skipButtonText: {
     fontSize: 12,
-    fontWeight: '700',
     color: '#64748B',
+    fontWeight: '600',
   },
   progressBarContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
     gap: 6,
-    marginBottom: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
   },
   progressSegment: {
     flex: 1,
-    height: 6,
-    borderRadius: 3,
+    height: 4,
+    borderRadius: 2,
   },
   scrollBody: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingTop: 8,
+    paddingBottom: 16,
+    alignItems: 'center',
   },
   visualBadgeWrapper: {
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 12,
+    marginVertical: 10,
   },
   iconBadge3D: {
     width: 72,
     height: 72,
-    borderRadius: 24,
+    borderRadius: 22,
     borderWidth: 2,
     borderBottomWidth: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
   categoryPill: {
     paddingHorizontal: 10,
@@ -660,46 +629,47 @@ const styles = StyleSheet.create({
   },
   categoryPillText: {
     fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 0.8,
+    fontWeight: '800',
+    letterSpacing: 0.6,
   },
   tourTitle: {
     fontSize: 20,
     fontWeight: '900',
     textAlign: 'center',
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
     marginBottom: 4,
   },
   tourSubtitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#8B5CF6',
+    color: '#6366F1',
     textAlign: 'center',
     marginBottom: 10,
   },
   tourDesc: {
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 12,
+    lineHeight: 18,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   featuresList: {
-    gap: 10,
-    marginBottom: 14,
+    width: '100%',
+    gap: 8,
+    marginBottom: 12,
   },
   featureItemBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    gap: 12,
     padding: 12,
-    borderRadius: 16,
+    borderRadius: 14,
     borderWidth: 1.5,
-    borderBottomWidth: 3.5,
-    gap: 10,
+    borderBottomWidth: 3,
   },
   featIconCircle: {
     width: 34,
     height: 34,
-    borderRadius: 12,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
@@ -711,20 +681,21 @@ const styles = StyleSheet.create({
   },
   featItemDesc: {
     fontSize: 11,
-    lineHeight: 16,
+    lineHeight: 15,
   },
   testingGuideCard: {
-    padding: 14,
-    borderRadius: 18,
+    width: '100%',
+    padding: 12,
+    borderRadius: 14,
     borderWidth: 1.5,
-    borderBottomWidth: 4,
-    marginBottom: 14,
+    borderBottomWidth: 3,
+    marginBottom: 10,
   },
   testingGuideHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   testingGuideTitle: {
     fontSize: 12,
@@ -735,18 +706,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 6,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   tipBullet: {
-    fontSize: 13,
-    fontWeight: '800',
+    fontSize: 12,
     color: '#10B981',
-    lineHeight: 16,
+    fontWeight: '900',
   },
   tipText: {
-    fontSize: 12,
-    lineHeight: 17,
     flex: 1,
+    fontSize: 11,
+    lineHeight: 16,
     fontWeight: '500',
   },
   directActionLink: {
@@ -754,53 +724,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
+    width: '100%',
     paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1,
-    marginBottom: 6,
+    marginTop: 4,
   },
   directActionText: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     paddingVertical: 14,
     borderTopWidth: 1,
   },
   prevButton: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    height: 48,
-    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderBottomWidth: 4,
   },
   prevButtonText: {
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   nextButton: {
-    flex: 2,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    height: 48,
-    borderRadius: 16,
+    paddingVertical: 12,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderBottomWidth: 4,
   },
   nextButtonText: {
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
-    color: '#FFFFFF',
   },
 });

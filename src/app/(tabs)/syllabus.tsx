@@ -22,10 +22,12 @@ import {
   isAssignmentUnlocked,
 } from '@/utils/lockEngine';
 import { Lesson, Quiz, Assignment } from '@/types/elearning';
+import { useTranslation } from '@/i18n';
 
 export default function SyllabusScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const { t, language } = useTranslation();
 
   const {
     currentRole,
@@ -560,19 +562,19 @@ export default function SyllabusScreen() {
               styles.screenTitle,
               { color: isDark ? '#F8FAFC' : '#0F172A' },
             ]}>
-            📚 Kurikulum & Silabus Modul
+            📚 {t.syllabus.headerTitle}
           </Text>
           <Text style={styles.screenSubtitle}>
             {isTeacher
-              ? 'Mode Pengajar: Kelola materi & tugas per kelas, serta tentukan batas waktu'
-              : 'Pilih kelas untuk melihat kurikulum & modul silabus pembelajaran'}
+              ? (language === 'en' ? 'Instructor View: Manage lesson units, assignments, and schedule deadlines' : 'Mode Pengajar: Kelola materi & tugas per kelas, serta tentukan batas waktu')
+              : t.syllabus.headerSubtitle}
           </Text>
         </View>
 
         {/* Horizontal Class / Cohort Selector */}
         <View style={styles.classSelectorContainer}>
           <Text style={[styles.selectorLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-            KELAS & COHORT SAYA:
+            {language === 'en' ? 'MY COHORT CLASSES:' : 'KELAS & COHORT SAYA:'}
           </Text>
           <ScrollView
             horizontal

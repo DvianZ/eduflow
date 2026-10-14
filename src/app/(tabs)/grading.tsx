@@ -23,10 +23,12 @@ import {
   downloadCSVFile,
   copyCSVToClipboard,
 } from '@/utils/exportGradebook';
+import { useTranslation } from '@/i18n';
 
 export default function GradingScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const { t, language } = useTranslation();
 
   const {
     currentRole,
@@ -197,12 +199,12 @@ export default function GradingScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.heroHeaderTitle}>
-                {isTeacher ? 'Panel Pemeriksaan Tugas' : 'Status Tugas & Feedback'}
+                {isTeacher ? t.assignment.gradingQueueTitle : (language === 'en' ? 'Project Deliverables & Feedback' : 'Status Tugas & Feedback')}
               </Text>
               <Text style={styles.heroHeaderSubtitle}>
                 {isTeacher
-                  ? 'Periksa hasil pengumpulan tugas proyek siswa dan berikan evaluasi'
-                  : 'Pantau nilai resmi dan ulasan perbaikan dari mentor Anda'}
+                  ? t.assignment.gradingQueueSubtitle
+                  : (language === 'en' ? 'Track your deliverable scores and review mentor feedback' : 'Pantau nilai resmi dan ulasan perbaikan dari mentor Anda')}
               </Text>
             </View>
           </View>
@@ -229,10 +231,10 @@ export default function GradingScreen() {
                     styles.exportCardTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Rekapitulasi Nilai Siswa
+                  {language === 'en' ? 'Cohort Gradebook Export' : 'Rekapitulasi Nilai Siswa'}
                 </Text>
                 <Text style={styles.exportCardSub}>
-                  Ekspor rekap nilai kuis, tugas proyek & status kelulusan ke CSV/Excel
+                  {language === 'en' ? 'Export quiz evaluations, project deliverables, and graduation status to CSV/Excel' : 'Ekspor rekap nilai kuis, tugas proyek & status kelulusan ke CSV/Excel'}
                 </Text>
               </View>
             </View>
@@ -244,7 +246,7 @@ export default function GradingScreen() {
               }}
               style={styles.openExportModalBtn}>
               <Ionicons name="cloud-download-outline" size={15} color="#FFFFFF" />
-              <Text style={styles.openExportModalBtnText}>Unduh Rekap Nilai</Text>
+              <Text style={styles.openExportModalBtnText}>{t.assignment.exportCsvBtn}</Text>
             </TouchableOpacity>
           </View>
         )}

@@ -19,6 +19,7 @@ import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Batch } from '@/types/elearning';
+import { useTranslation } from '@/i18n';
 
 type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
 
@@ -26,6 +27,7 @@ export default function ClassManagerScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t } = useTranslation();
 
   const {
     createBatch,
@@ -219,10 +221,10 @@ export default function ClassManagerScreen() {
           </TouchableOpacity>
           <View style={styles.headerTextCol}>
             <Text style={[styles.headerTitle, { color: textPrimary }]}>
-              Manajemen Kelas
+              {t.classManager.headerTitle}
             </Text>
             <Text style={[styles.headerSubtitle, { color: textSecondary }]}>
-              Buat dan kelola kelas Anda
+              {t.classManager.headerSubtitle}
             </Text>
           </View>
         </View>
@@ -251,7 +253,7 @@ export default function ClassManagerScreen() {
                   color: activeTab === 'myClasses' ? '#FFFFFF' : textSecondary,
                 },
               ]}>
-              Kelas Saya ({teacherBatches.length})
+              {t.classManager.tabMyClasses} ({teacherBatches.length})
             </Text>
           </TouchableOpacity>
 
@@ -273,7 +275,7 @@ export default function ClassManagerScreen() {
                   color: activeTab === 'create' ? '#FFFFFF' : textSecondary,
                 },
               ]}>
-              Buat Kelas Baru
+              {t.classManager.tabCreateClass}
             </Text>
           </TouchableOpacity>
         </View>

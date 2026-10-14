@@ -17,11 +17,13 @@ import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useElearningStore } from '@/store/useElearningStore';
 import { FeatureTourModal } from '@/components/FeatureTourModal';
+import { useTranslation } from '@/i18n';
 
 export default function LoginScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t, language, setLanguage } = useTranslation();
 
   const { login } = useAuthStore();
   const { syncUserFromAuth } = useElearningStore();
@@ -43,7 +45,7 @@ export default function LoginScreen() {
       setIsLoading(false);
 
       if (!result.success) {
-        setError(result.error || 'Login gagal.');
+        setError(result.error || t.common.failed);
         return;
       }
 
@@ -82,6 +84,24 @@ export default function LoginScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled">
+          {/* Language Toggle in Top Right */}
+          <View style={styles.topLangRow}>
+            <TouchableOpacity
+              onPress={() => setLanguage(language === 'en' ? 'id' : 'en')}
+              style={[
+                styles.langTogglePill,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  borderColor: isDark ? '#334155' : '#CBD5E1',
+                },
+              ]}>
+              <Text style={styles.langToggleText}>
+                {language === 'en' ? '🇺🇸 EN (Formal)' : '🇮🇩 ID'}
+              </Text>
+              <Ionicons name="swap-horizontal" size={13} color="#2563EB" />
+            </TouchableOpacity>
+          </View>
+
           {/* Brand */}
           <View style={styles.brandSection}>
             <View style={styles.logoContainer}>
@@ -90,10 +110,12 @@ export default function LoginScreen() {
               </View>
             </View>
             <Text style={[styles.brandTitle, { color: textPrimary }]}>
-              EduFlow <Text style={styles.cohortTag}>Cohort</Text>
+              EduFlow <Text style={styles.cohortTag}>{t.header.cohortTag}</Text>
             </Text>
             <Text style={[styles.brandSubtitle, { color: textSecondary }]}>
-              Platform E-Learning Kolaboratif
+              {language === 'en'
+                ? 'Collaborative Cohort E-Learning'
+                : 'Platform E-Learning Kolaboratif'}
             </Text>
           </View>
 
@@ -107,10 +129,10 @@ export default function LoginScreen() {
               },
             ]}>
             <Text style={[styles.cardTitle, { color: textPrimary }]}>
-              Masuk ke Akun
+              {t.auth.loginTitle}
             </Text>
             <Text style={[styles.cardSubtitle, { color: textSecondary }]}>
-              Silakan masuk dengan email dan password Anda
+              {t.auth.loginSubtitle}
             </Text>
 
             {error !== '' && (
@@ -123,7 +145,7 @@ export default function LoginScreen() {
             {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                Email
+                {t.auth.emailLabel}
               </Text>
               <View
                 style={[
@@ -140,7 +162,7 @@ export default function LoginScreen() {
                 />
                 <TextInput
                   style={[styles.textInput, { color: textPrimary }]}
-                  placeholder="nama@email.com"
+                  placeholder={t.auth.emailPlaceholder}
                   placeholderTextColor={textSecondary}
                   value={email}
                   onChangeText={setEmail}
@@ -154,7 +176,7 @@ export default function LoginScreen() {
             {/* Password */}
             <View style={styles.inputGroup}>
               <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                Password
+                {t.auth.passwordLabel}
               </Text>
               <View
                 style={[
@@ -171,7 +193,7 @@ export default function LoginScreen() {
                 />
                 <TextInput
                   style={[styles.textInput, { color: textPrimary }]}
-                  placeholder="Minimal 6 karakter"
+                  placeholder={t.auth.passwordPlaceholder}
                   placeholderTextColor={textSecondary}
                   value={password}
                   onChangeText={setPassword}
@@ -202,7 +224,7 @@ export default function LoginScreen() {
               ) : (
                 <>
                   <Ionicons name="log-in-outline" size={18} color="#FFFFFF" />
-                  <Text style={styles.primaryButtonText}>Masuk</Text>
+                  <Text style={styles.primaryButtonText}>{t.auth.loginBtn}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -216,7 +238,7 @@ export default function LoginScreen() {
                 ]}
               />
               <Text style={[styles.dividerText, { color: textSecondary }]}>
-                atau
+                {t.common.or}
               </Text>
               <View
                 style={[
@@ -247,7 +269,7 @@ export default function LoginScreen() {
                   styles.secondaryButtonText,
                   { color: isDark ? '#93C5FD' : '#2563EB' },
                 ]}>
-                Buat Akun Baru
+                {t.auth.createAccountBtn}
               </Text>
             </TouchableOpacity>
           </View>
@@ -264,7 +286,7 @@ export default function LoginScreen() {
             <View style={styles.demoHeader}>
               <Ionicons name="flask-outline" size={16} color="#D97706" />
               <Text style={[styles.demoTitle, { color: isDark ? '#FCD34D' : '#92400E' }]}>
-                Login Cepat Demo
+                {t.auth.demoQuickLoginTitle}
               </Text>
             </View>
 
@@ -285,7 +307,7 @@ export default function LoginScreen() {
                   Budi Santoso
                 </Text>
                 <Text style={[styles.demoRole, { color: textSecondary }]}>
-                  Siswa / Learner
+                  {t.auth.demoBudiDesc}
                 </Text>
               </View>
               <Ionicons name="arrow-forward" size={16} color={textSecondary} />
@@ -305,17 +327,17 @@ export default function LoginScreen() {
               </View>
               <View style={styles.demoInfo}>
                 <Text style={[styles.demoName, { color: textPrimary }]}>
-                  Pak Alex Kurniawan
+                  Alex Kurniawan, M.Sc.
                 </Text>
                 <Text style={[styles.demoRole, { color: textSecondary }]}>
-                  Pengajar / Teacher
+                  {t.auth.demoAlexDesc}
                 </Text>
               </View>
               <Ionicons name="arrow-forward" size={16} color={textSecondary} />
             </TouchableOpacity>
 
             <Text style={[styles.demoHint, { color: textSecondary }]}>
-              Tekan nama lalu klik &quot;Masuk&quot; (password: demo123)
+              {t.auth.demoHint}
             </Text>
           </View>
 
@@ -336,13 +358,13 @@ export default function LoginScreen() {
               </View>
               <View style={styles.tourCardTexts}>
                 <View style={styles.tourPill}>
-                  <Text style={styles.tourPillText}>CLIENT TESTING</Text>
+                  <Text style={styles.tourPillText}>{t.auth.tourCardBadge}</Text>
                 </View>
                 <Text style={[styles.tourCardTitle, { color: textPrimary }]}>
-                  Panduan Fitur Aplikasi
+                  {t.auth.tourCardTitle}
                 </Text>
                 <Text style={[styles.tourCardDesc, { color: textSecondary }]}>
-                  Pelajari alur kuis, sequential gate, peran, & sertifikat
+                  {t.auth.tourCardDesc}
                 </Text>
               </View>
             </View>
@@ -605,5 +627,24 @@ const styles = StyleSheet.create({
   tourCardDesc: {
     fontSize: 11,
     lineHeight: 15,
+  },
+  topLangRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 8,
+  },
+  langTogglePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  langToggleText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#2563EB',
   },
 });

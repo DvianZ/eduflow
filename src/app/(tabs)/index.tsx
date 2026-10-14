@@ -17,11 +17,13 @@ import { useRouter } from 'expo-router';
 import { DemoHeader } from '@/components/DemoHeader';
 import { useElearningStore } from '@/store/useElearningStore';
 import { calculateBatchEvaluation } from '@/utils/lockEngine';
+import { useTranslation } from '@/i18n';
 
 export default function DashboardScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t, language } = useTranslation();
 
   const {
     currentRole,
@@ -133,29 +135,29 @@ export default function DashboardScreen() {
 
   const handlePostAnnouncement = () => {
     if (!annTitle.trim() || !annMessage.trim()) {
-      Alert.alert('Form Belum Lengkap', 'Judul dan pesan pengumuman wajib diisi.');
+      Alert.alert(t.dashboard.formIncompleteAlert, t.dashboard.formIncompleteMsg);
       return;
     }
     createAnnouncement(activeBatch.id, annTitle.trim(), annMessage.trim());
     setAnnTitle('');
     setAnnMessage('');
-    Alert.alert('Sukses', 'Pengumuman kelas berhasil diposting!');
+    Alert.alert(t.common.success, t.dashboard.announcementSuccessAlert);
   };
 
   const handleJoinClass = () => {
     setJoinError('');
     if (!joinCode.trim()) {
-      setJoinError('Masukkan kode kelas.');
+      setJoinError(t.dashboard.enterClassCodeError);
       return;
     }
     const result = joinBatchByCode(joinCode.trim(), currentUser.id);
     if (!result.success) {
-      setJoinError(result.error || 'Gagal bergabung.');
+      setJoinError(result.error || t.dashboard.joinFailedError);
       return;
     }
     setShowJoinModal(false);
     setJoinCode('');
-    Alert.alert('Berhasil! 🎉', 'Anda telah bergabung ke kelas baru. Silakan cek silabus.');
+    Alert.alert(t.dashboard.joinSuccessAlert, t.dashboard.joinSuccessMsg);
   };
 
   // Gamified & Tactile 3D Color Tokens
@@ -196,10 +198,10 @@ export default function DashboardScreen() {
                 />
                 <Text style={styles.heroBadgeText}>
                   {activeBatch.id === 'batch-edf-402'
-                    ? 'MISI COHORT AKTIF'
+                    ? t.dashboard.heroBadgeActiveMission
                     : activeBatch.status === 'completed'
-                    ? '🏆 LULUS TERSERTIFIKASI'
-                    : 'KELAS AKTIF'}
+                    ? t.dashboard.heroBadgeGraduated
+                    : t.dashboard.heroBadgeActiveClass}
                 </Text>
               </View>
 
@@ -216,9 +218,9 @@ export default function DashboardScreen() {
                   size={12}
                   color="#FFFFFF"
                 />
-                <Text style={styles.heroCodePillLabel}>KODE:</Text>
+                <Text style={styles.heroCodePillLabel}>{t.dashboard.heroCodeLabel}</Text>
                 <Text style={styles.heroCodePillValue}>
-                  {copiedCode === activeBatch.classCode ? 'TERSALIN!' : activeBatch.classCode}
+                  {copiedCode === activeBatch.classCode ? t.dashboard.heroCodeCopied : activeBatch.classCode}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -233,7 +235,7 @@ export default function DashboardScreen() {
                 <Ionicons name="person" size={13} color="#FFFFFF" />
               </View>
               <Text style={styles.heroMentorText}>
-                Mentor: <Text style={styles.heroMentorName}>{activeBatch.instructorName}</Text>
+                {t.dashboard.heroMentorLabel} <Text style={styles.heroMentorName}>{activeBatch.instructorName}</Text>
               </Text>
             </View>
           </View>
@@ -318,7 +320,7 @@ export default function DashboardScreen() {
                       <Ionicons name="sparkles" size={16} color="#4F46E5" />
                     </View>
                     <Text style={[styles.cardHeaderTitle, { color: textPrimary }]}>
-                      Progres Petualangan
+                      {t.dashboard.adventureProgress}
                     </Text>
                   </View>
                   <View style={styles.progressBadgePill}>
@@ -347,7 +349,7 @@ export default function DashboardScreen() {
                   onPress={() => router.push('/(tabs)/syllabus')}
                   activeOpacity={0.8}
                   style={styles.tactileBtnGreen}>
-                  <Text style={styles.tactileBtnGreenText}>Buka Silabus & Kurikulum</Text>
+                  <Text style={styles.tactileBtnGreenText}>{t.dashboard.openSyllabusBtn}</Text>
                   <Ionicons name="arrow-forward-circle" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
@@ -363,14 +365,14 @@ export default function DashboardScreen() {
                   <View style={[styles.widgetIconSquare, { backgroundColor: '#E0F2FE', borderColor: '#BAE6FD' }]}>
                     <Ionicons name="book" size={18} color="#0284C7" />
                   </View>
-                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>MATERI</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>{t.dashboard.metricLessons}</Text>
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text style={[styles.widgetBigValue, { color: '#0284C7' }]}>
                     {evalResult.completedLessons}/{evalResult.totalLessons}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    Selesai Dibaca
+                    {t.dashboard.metricCompleted}
                   </Text>
                 </View>
               </View>
@@ -386,14 +388,14 @@ export default function DashboardScreen() {
                   <View style={[styles.widgetIconSquare, { backgroundColor: '#D1FAE5', borderColor: '#A7F3D0' }]}>
                     <Ionicons name="checkmark-done" size={18} color="#10B981" />
                   </View>
-                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>KUIS</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>{t.dashboard.metricQuiz}</Text>
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text style={[styles.widgetBigValue, { color: '#10B981' }]}>
                     {userQuizAttempts.filter((q) => q.isPassed).length}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    Evaluasi Lulus
+                    {t.dashboard.metricPassed}
                   </Text>
                 </View>
               </View>
@@ -409,14 +411,14 @@ export default function DashboardScreen() {
                   <View style={[styles.widgetIconSquare, { backgroundColor: '#FEF3C7', borderColor: '#FDE68A' }]}>
                     <Ionicons name="document-text" size={18} color="#F59E0B" />
                   </View>
-                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>TUGAS</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>{t.dashboard.metricAssignment}</Text>
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text style={[styles.widgetBigValue, { color: '#F59E0B' }]}>
                     {userGrades.length > 0 ? `${userGrades[0].score}` : '-'}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    {userGrades.length > 0 ? 'Poin Skor Proyek' : 'Belum Dinilai'}
+                    {userGrades.length > 0 ? t.dashboard.metricProjectScore : t.dashboard.metricNotGraded}
                   </Text>
                 </View>
               </View>
@@ -432,7 +434,7 @@ export default function DashboardScreen() {
                   <View style={[styles.widgetIconSquare, { backgroundColor: '#EDE9FE', borderColor: '#DDD6FE' }]}>
                     <Ionicons name="ribbon" size={18} color="#8B5CF6" />
                   </View>
-                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>STATUS</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>{t.dashboard.metricStatus}</Text>
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text
@@ -443,10 +445,10 @@ export default function DashboardScreen() {
                         color: evalResult.canGraduate ? '#10B981' : '#4F46E5',
                       },
                     ]}>
-                    {evalResult.canGraduate ? 'LULUS 🎓' : 'BERJALAN'}
+                    {evalResult.canGraduate ? t.dashboard.statusPassed : t.dashboard.statusInProgress}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    {evalResult.canGraduate ? 'Sertifikat Siap' : 'Kejar Kelulusan'}
+                    {evalResult.canGraduate ? t.dashboard.statusCertReady : t.dashboard.statusPursue}
                   </Text>
                 </View>
               </View>
@@ -454,10 +456,10 @@ export default function DashboardScreen() {
               {/* SECTION HEADER (SPAN 2): COHORT LIST */}
               <View style={[styles.bentoSpan2, styles.gamifiedSectionHeader]}>
                 <Text style={[styles.gamifiedSectionTitle, { color: textPrimary }]}>
-                  🏫 Kelas & Misi Terdaftar
+                  {t.dashboard.enrolledClassesTitle}
                 </Text>
                 <Text style={[styles.gamifiedSectionSubtitle, { color: textSecondary }]}>
-                  Pilih angkatan cohort yang ingin Anda pelajari
+                  {t.dashboard.enrolledClassesSubtitle}
                 </Text>
               </View>
 
@@ -474,17 +476,17 @@ export default function DashboardScreen() {
                     <Ionicons name="school" size={32} color="#4F46E5" />
                   </View>
                   <Text style={[styles.emptyTitleText, { color: textPrimary }]}>
-                    Belum Ada Kelas Terdaftar
+                    {t.dashboard.noClassesEnrolledTitle}
                   </Text>
                   <Text style={[styles.emptySubtitleText, { color: textSecondary }]}>
-                    Masukkan kode kelas 6 karakter dari pengajar untuk memulai belajar.
+                    {t.dashboard.noClassesEnrolledSubtitle}
                   </Text>
                   <TouchableOpacity
                     onPress={() => setShowJoinModal(true)}
                     activeOpacity={0.8}
                     style={styles.tactileBtnGreen}>
                     <Ionicons name="key" size={16} color="#FFFFFF" />
-                    <Text style={styles.tactileBtnGreenText}>+ Masukkan Kode Kelas</Text>
+                    <Text style={styles.tactileBtnGreenText}>{t.dashboard.enterClassCodeBtn}</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -523,7 +525,7 @@ export default function DashboardScreen() {
                             <View style={[styles.statusPill3D, { backgroundColor: '#EEF2FF', borderColor: '#C7D2FE' }]}>
                               <Ionicons name="sparkles" size={12} color="#4F46E5" />
                               <Text style={[styles.statusPillText, { color: '#4F46E5' }]}>
-                                Cohort Aktif
+                                {t.dashboard.cohortActive}
                               </Text>
                             </View>
                           )}
@@ -531,7 +533,7 @@ export default function DashboardScreen() {
                             <View style={[styles.statusPill3D, { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' }]}>
                               <Ionicons name="ribbon" size={12} color="#10B981" />
                               <Text style={[styles.statusPillText, { color: '#10B981' }]}>
-                                Lulus
+                                {t.dashboard.cohortGraduated}
                               </Text>
                             </View>
                           )}
@@ -539,7 +541,7 @@ export default function DashboardScreen() {
 
                         {isSelected && (
                           <View style={styles.selectedBadgePill3D}>
-                            <Text style={styles.selectedBadgeText}>Sedang Dibuka</Text>
+                            <Text style={styles.selectedBadgeText}>{t.dashboard.cohortSelected}</Text>
                           </View>
                         )}
                       </View>
@@ -554,7 +556,7 @@ export default function DashboardScreen() {
                       {/* Mini Progress Track */}
                       <View style={styles.cohortProgressInfoRow}>
                         <Text style={[styles.cohortProgressLabel, { color: textSecondary }]}>
-                          Progres Kurikulum
+                          {t.dashboard.curriculumProgress}
                         </Text>
                         <Text style={styles.cohortProgressVal}>{pct}%</Text>
                       </View>
@@ -595,7 +597,7 @@ export default function DashboardScreen() {
                               styles.tactileBtnSmallText,
                               { color: isSelected ? '#FFFFFF' : '#4F46E5' },
                             ]}>
-                            Lihat Silabus
+                            {t.dashboard.viewSyllabus}
                           </Text>
                           <Ionicons
                             name="chevron-forward"
@@ -622,9 +624,9 @@ export default function DashboardScreen() {
                   <Ionicons name="add-circle" size={24} color="#4F46E5" />
                 </View>
                 <View style={styles.tactileActionTextCol}>
-                  <Text style={styles.tactileActionTitle}>Gabung Kelas Baru</Text>
+                  <Text style={styles.tactileActionTitle}>{t.dashboard.joinNewClassTitle}</Text>
                   <Text style={[styles.tactileActionSubtitle, { color: textSecondary }]}>
-                    Masukkan kode 6 digit dari pengajar Anda
+                    {t.dashboard.joinNewClassSubtitle}
                   </Text>
                 </View>
                 <Ionicons name="chevron-forward-circle" size={22} color="#4F46E5" />
@@ -646,14 +648,14 @@ export default function DashboardScreen() {
                   <View style={[styles.widgetIconSquare, { backgroundColor: '#EDE9FE', borderColor: '#DDD6FE' }]}>
                     <Ionicons name="people" size={18} color="#8B5CF6" />
                   </View>
-                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>PESERTA</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>{t.dashboard.metricStudents}</Text>
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text style={[styles.widgetBigValue, { color: '#8B5CF6' }]}>
                     {activeBatchEnrolledCount}/{activeBatch.maxStudents}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    Siswa Terdaftar
+                    {t.dashboard.metricRegisteredStudents}
                   </Text>
                 </View>
               </View>
@@ -682,7 +684,7 @@ export default function DashboardScreen() {
                       color={pendingSubmissions.length > 0 ? '#EF4444' : '#10B981'}
                     />
                   </View>
-                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>ANTREAN</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>{t.dashboard.metricQueue}</Text>
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text
@@ -693,7 +695,7 @@ export default function DashboardScreen() {
                     {pendingSubmissions.length}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    Perlu Dinilai
+                    {t.dashboard.metricNeedsGrading}
                   </Text>
                 </View>
               </View>
@@ -709,14 +711,14 @@ export default function DashboardScreen() {
                   <View style={[styles.widgetIconSquare, { backgroundColor: '#E0F2FE', borderColor: '#BAE6FD' }]}>
                     <Ionicons name="analytics" size={18} color="#0284C7" />
                   </View>
-                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>RERATA</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>{t.dashboard.metricAverage}</Text>
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text style={[styles.widgetBigValue, { color: '#0284C7' }]}>
                     {activeBatchAverageGrade > 0 ? activeBatchAverageGrade : '-'}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    Nilai Kelas
+                    {t.dashboard.metricClassAverage}
                   </Text>
                 </View>
               </View>
@@ -738,10 +740,10 @@ export default function DashboardScreen() {
                 </View>
                 <View style={styles.widgetBottomCol}>
                   <Text style={[styles.widgetBigValue, { fontSize: 16, color: '#8B5CF6' }]}>
-                    Kelola Kelas
+                    {t.dashboard.manageClassesShortcut}
                   </Text>
                   <Text style={[styles.widgetDescText, { color: textSecondary }]}>
-                    Atur Kapasitas & Status
+                    {t.dashboard.manageClassesDesc}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -754,7 +756,7 @@ export default function DashboardScreen() {
                 <View style={styles.tactileBtnInnerRow}>
                   <Ionicons name="clipboard" size={20} color="#FFFFFF" />
                   <Text style={styles.tactileBtnPurpleText}>
-                    Buka Panel Pemeriksaan ({pendingSubmissions.length} Menunggu)
+                    {t.dashboard.openGradingPanelBtn} ({pendingSubmissions.length} {t.dashboard.pendingReviewsCount})
                   </Text>
                 </View>
                 <Ionicons name="arrow-forward-circle" size={22} color="#FFFFFF" />
@@ -773,13 +775,13 @@ export default function DashboardScreen() {
                       <Ionicons name="megaphone" size={16} color="#8B5CF6" />
                     </View>
                     <Text style={[styles.cardHeaderTitle, { color: textPrimary }]}>
-                      Buat Pengumuman Baru
+                      {t.dashboard.createAnnouncementTitle}
                     </Text>
                   </View>
                 </View>
 
                 <TextInput
-                  placeholder="Judul pengumuman..."
+                  placeholder={t.dashboard.announcementTitlePlaceholder}
                   placeholderTextColor="#94A3B8"
                   value={annTitle}
                   onChangeText={setAnnTitle}
@@ -790,7 +792,7 @@ export default function DashboardScreen() {
                 />
 
                 <TextInput
-                  placeholder="Tulis pesan untuk semua siswa di batch ini..."
+                  placeholder={t.dashboard.announcementMsgPlaceholder}
                   placeholderTextColor="#94A3B8"
                   value={annMessage}
                   onChangeText={setAnnMessage}
@@ -808,7 +810,7 @@ export default function DashboardScreen() {
                   activeOpacity={0.8}
                   style={styles.tactileBtnPurpleMedium}>
                   <Ionicons name="send" size={16} color="#FFFFFF" />
-                  <Text style={styles.tactileBtnPurpleMediumText}>Kirim Pengumuman</Text>
+                  <Text style={styles.tactileBtnPurpleMediumText}>{t.dashboard.postAnnouncementBtn}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -826,10 +828,10 @@ export default function DashboardScreen() {
                 </View>
                 <View style={styles.tactileActionTextCol}>
                   <Text style={[styles.tactileActionTitle, { color: '#8B5CF6' }]}>
-                    Buat Kelas & Course Baru
+                    {t.dashboard.createNewCourseClassTitle}
                   </Text>
                   <Text style={[styles.tactileActionSubtitle, { color: textSecondary }]}>
-                    Rancang kurikulum dan buka angkatan cohort baru
+                    {t.dashboard.createNewCourseClassSubtitle}
                   </Text>
                 </View>
                 <Ionicons name="chevron-forward-circle" size={22} color="#8B5CF6" />
@@ -842,10 +844,10 @@ export default function DashboardScreen() {
           {/* ============================================================== */}
           <View style={[styles.bentoSpan2, styles.gamifiedSectionHeader]}>
             <Text style={[styles.gamifiedSectionTitle, { color: textPrimary }]}>
-              💬 Pengumuman Kelas (Stream)
+              {t.dashboard.streamTitle}
             </Text>
             <Text style={[styles.gamifiedSectionSubtitle, { color: textSecondary }]}>
-              Informasi langsung dari mentor & pengajar kelas
+              {t.dashboard.streamSubtitle}
             </Text>
           </View>
 
@@ -866,7 +868,7 @@ export default function DashboardScreen() {
                   <Text style={[styles.annAuthorNameText, { color: textPrimary }]}>{ann.authorName}</Text>
                 </View>
                 <Text style={styles.annDateBadge}>
-                  {new Date(ann.createdAt).toLocaleDateString('id-ID', {
+                  {new Date(ann.createdAt).toLocaleDateString(language === 'en' ? 'en-US' : 'id-ID', {
                     day: 'numeric',
                     month: 'short',
                   })}
@@ -891,7 +893,7 @@ export default function DashboardScreen() {
           <View style={[styles.modalCard3D, { backgroundColor: cardBg }]}>
             <View style={styles.modalHeaderRow}>
               <Text style={[styles.modalTitleText, { color: textPrimary }]}>
-                🔑 Gabung Kelas
+                {t.dashboard.joinModalTitle}
               </Text>
               <TouchableOpacity onPress={() => setShowJoinModal(false)}>
                 <Ionicons name="close-circle" size={28} color="#94A3B8" />
@@ -899,7 +901,7 @@ export default function DashboardScreen() {
             </View>
 
             <Text style={[styles.modalDescText, { color: textSecondary }]}>
-              Masukkan kode kelas 6 karakter yang diberikan oleh pengajar untuk mendaftar.
+              {t.dashboard.joinModalDesc}
             </Text>
 
             {joinError !== '' && (
@@ -910,11 +912,11 @@ export default function DashboardScreen() {
             )}
 
             <TextInput
-              placeholder="Contoh: ABC-123"
+              placeholder="e.g. ABC-123"
               placeholderTextColor="#94A3B8"
               value={joinCode}
-              onChangeText={(t) => {
-                setJoinCode(t.toUpperCase());
+              onChangeText={(txt) => {
+                setJoinCode(txt.toUpperCase());
                 setJoinError('');
               }}
               autoCapitalize="characters"
@@ -929,14 +931,14 @@ export default function DashboardScreen() {
               activeOpacity={0.8}
               style={styles.tactileBtnGreen}>
               <Ionicons name="enter" size={18} color="#FFFFFF" />
-              <Text style={styles.tactileBtnGreenText}>Gabung Kelas Sekarang</Text>
+              <Text style={styles.tactileBtnGreenText}>{t.dashboard.joinModalBtn}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShowJoinModal(false)}
               activeOpacity={0.7}
               style={styles.modalCancelBtn}>
-              <Text style={[styles.modalCancelBtnText, { color: textSecondary }]}>Batal</Text>
+              <Text style={[styles.modalCancelBtnText, { color: textSecondary }]}>{t.common.cancel}</Text>
             </TouchableOpacity>
           </View>
         </View>

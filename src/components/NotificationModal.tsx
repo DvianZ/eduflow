@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
 import { InAppNotification, NotificationType } from '@/types/elearning';
+import { useTranslation } from '@/i18n';
 
 interface NotificationModalProps {
   visible: boolean;
@@ -22,6 +23,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { t, language } = useTranslation();
 
   const {
     currentUser,
@@ -65,13 +67,13 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
       const diffHours = Math.floor(diffMinutes / 60);
       const diffDays = Math.floor(diffHours / 24);
 
-      if (diffMinutes < 1) return 'Baru saja';
-      if (diffMinutes < 60) return `${diffMinutes} mnt lalu`;
-      if (diffHours < 24) return `${diffHours} jam lalu`;
-      if (diffDays === 1) return 'Kemarin';
-      if (diffDays < 7) return `${diffDays} hari lalu`;
+      if (diffMinutes < 1) return t.notifications.timeJustNow;
+      if (diffMinutes < 60) return `${diffMinutes} ${t.notifications.timeMinutesAgo}`;
+      if (diffHours < 24) return `${diffHours} ${t.notifications.timeHoursAgo}`;
+      if (diffDays === 1) return t.notifications.timeYesterday;
+      if (diffDays < 7) return `${diffDays} ${t.notifications.timeDaysAgo}`;
 
-      return date.toLocaleDateString('id-ID', {
+      return date.toLocaleDateString(language === 'en' ? 'en-US' : 'id-ID', {
         day: 'numeric',
         month: 'short',
       });
@@ -145,12 +147,12 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                     styles.modalTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Pusat Notifikasi
+                  {t.notifications.modalTitle}
                 </Text>
                 <Text style={styles.modalSubtitle}>
                   {unreadCount > 0
-                    ? `${unreadCount} belum dibaca`
-                    : 'Semua telah dibaca'}
+                    ? `${unreadCount} ${t.notifications.unreadTab.toLowerCase()}`
+                    : t.notifications.modalSubtitle}
                 </Text>
               </View>
             </View>
@@ -164,7 +166,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                     { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
                   ]}>
                   <Ionicons name="checkmark-done" size={16} color="#8B5CF6" />
-                  <Text style={styles.readAllText}>Tandai Dibaca</Text>
+                  <Text style={styles.readAllText}>{t.notifications.markAllRead}</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -204,7 +206,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                     ? styles.activeTabText
                     : { color: isDark ? '#94A3B8' : '#64748B' },
                 ]}>
-                Semua ({userNotifications.length})
+                {t.notifications.allTab} ({userNotifications.length})
               </Text>
             </TouchableOpacity>
 
@@ -224,7 +226,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                     ? styles.activeTabText
                     : { color: isDark ? '#94A3B8' : '#64748B' },
                 ]}>
-                Belum Dibaca ({unreadCount})
+                {t.notifications.unreadTab} ({unreadCount})
               </Text>
             </TouchableOpacity>
           </View>
@@ -252,14 +254,10 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                     styles.emptyTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  {activeTab === 'unread'
-                    ? 'Tidak ada notifikasi yang belum dibaca'
-                    : 'Belum ada notifikasi'}
+                  {t.notifications.noNotifications}
                 </Text>
                 <Text style={styles.emptySubtitle}>
-                  {activeTab === 'unread'
-                    ? 'Semua notifikasi Anda sudah dibaca dan mutakhir.'
-                    : 'Pemberitahuan nilai kuis, review tugas, dan pengumuman kelas akan muncul di sini.'}
+                  {t.notifications.modalSubtitle}
                 </Text>
               </View>
             ) : (
