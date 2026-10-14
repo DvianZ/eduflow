@@ -10,6 +10,7 @@ import {
   useColorScheme,
   Alert,
   Linking,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -546,7 +547,7 @@ export default function SyllabusScreen() {
       edges={['top']}
       style={[
         styles.safeArea,
-        { backgroundColor: isDark ? '#090D16' : '#F8FAFC' },
+        { backgroundColor: isDark ? '#0B0F19' : '#F4F6FA' },
       ]}>
       <DemoHeader />
 
@@ -593,17 +594,24 @@ export default function SyllabusScreen() {
                       backgroundColor: isSelected
                         ? isTeacher
                           ? '#8B5CF6'
-                          : '#2563EB'
+                          : '#4F46E5'
                         : isDark
                         ? '#1E293B'
                         : '#FFFFFF',
                       borderColor: isSelected
                         ? isTeacher
                           ? '#7C3AED'
-                          : '#1D4ED8'
+                          : '#4338CA'
                         : isDark
                         ? '#334155'
                         : '#E2E8F0',
+                      borderBottomColor: isSelected
+                        ? isTeacher
+                          ? '#6D28D9'
+                          : '#312E81'
+                        : isDark
+                        ? '#0F172A'
+                        : '#CBD5E1',
                     },
                   ]}>
                   <View style={styles.classChipTop}>
@@ -680,39 +688,19 @@ export default function SyllabusScreen() {
             })}
           </ScrollView>
         </View>
-
-        {/* Active Class Hero Banner */}
+        {/* Active Class Hero Banner (Gamified Bento 3D Hero) */}
         <View
           style={[
             styles.courseBannerCard,
             {
-              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-              borderColor: isDark ? '#334155' : '#E2E8F0',
+              backgroundColor: '#4F46E5',
+              borderColor: '#4338CA',
+              borderBottomColor: '#312E81',
             },
           ]}>
           <View style={styles.courseBannerHeader}>
-            <View
-              style={[
-                styles.categoryBadge,
-                {
-                  backgroundColor: isDynamicTestingBatch
-                    ? '#DBEAFE'
-                    : activeBatch.status === 'completed'
-                    ? '#DCFCE7'
-                    : '#EDE9FE',
-                },
-              ]}>
-              <Text
-                style={[
-                  styles.categoryBadgeText,
-                  {
-                    color: isDynamicTestingBatch
-                      ? '#1E40AF'
-                      : activeBatch.status === 'completed'
-                      ? '#15803D'
-                      : '#7C3AED',
-                  },
-                ]}>
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryBadgeText}>
                 {activeCourse?.category || 'Program Sertifikasi'}
               </Text>
             </View>
@@ -722,11 +710,7 @@ export default function SyllabusScreen() {
             </View>
           </View>
 
-          <Text
-            style={[
-              styles.courseBannerTitle,
-              { color: isDark ? '#F8FAFC' : '#0F172A' },
-            ]}>
+          <Text style={styles.courseBannerTitle}>
             {activeCourse?.title}
           </Text>
           <Text style={styles.courseBannerDesc}>{activeCourse?.description}</Text>
@@ -734,24 +718,13 @@ export default function SyllabusScreen() {
           <View style={styles.courseBannerMetaRow}>
             <View style={styles.metaCol}>
               <Text style={styles.metaLabel}>Instruktur:</Text>
-              <Text
-                style={[
-                  styles.metaValue,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
-                ]}>
+              <Text style={styles.metaValue}>
                 {activeBatch.instructorName}
               </Text>
             </View>
             <View style={styles.metaCol}>
               <Text style={styles.metaLabel}>Status Kelas:</Text>
-              <Text
-                style={[
-                  styles.metaValue,
-                  {
-                    color:
-                      activeBatch.status === 'completed' ? '#10B981' : '#2563EB',
-                  },
-                ]}>
+              <Text style={[styles.metaValue, { color: '#A7F3D0' }]}>
                 {activeBatch.status === 'completed' ? 'Selesai (Graduated)' : 'Aktif Berjalan'}
               </Text>
             </View>
@@ -760,9 +733,9 @@ export default function SyllabusScreen() {
           {/* Dynamic Interactive Hint */}
           {isDynamicTestingBatch ? (
             <View style={styles.dynamicNoticeBox}>
-              <Ionicons name="sparkles" size={16} color="#2563EB" />
+              <Ionicons name="sparkles" size={16} color="#FDE047" />
               <Text style={styles.dynamicNoticeText}>
-                Kelas ini menerapkan <Text style={{ fontWeight: '700' }}>kurikulum terstruktur & interaktif</Text> (pembelajaran bertahap, evaluasi kuis, pengumpulan proyek, penilaian mentor & penerbitan sertifikat resmi).
+                Kelas ini menerapkan <Text style={{ fontWeight: '800', color: '#FDE047' }}>kurikulum terstruktur & interaktif</Text> (pembelajaran bertahap, evaluasi kuis, pengumpulan proyek, penilaian mentor & penerbitan sertifikat resmi).
               </Text>
             </View>
           ) : (
@@ -770,16 +743,9 @@ export default function SyllabusScreen() {
               <Ionicons
                 name={activeBatch.status === 'completed' ? 'ribbon' : 'information-circle'}
                 size={16}
-                color={activeBatch.status === 'completed' ? '#15803D' : '#64748B'}
+                color="#FDE047"
               />
-              <Text
-                style={[
-                  styles.referenceNoticeText,
-                  {
-                    color:
-                      activeBatch.status === 'completed' ? '#15803D' : '#64748B',
-                  },
-                ]}>
+              <Text style={styles.referenceNoticeText}>
                 {activeBatch.status === 'completed'
                   ? 'Siswa telah menuntaskan kurikulum ini dan sertifikat digital telah diterbitkan di Profil.'
                   : 'Kurikulum & modul silabus dapat dibaca dan dieksplorasi.'}
@@ -846,6 +812,7 @@ export default function SyllabusScreen() {
                 {
                   backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                   borderColor: isDark ? '#334155' : '#E2E8F0',
+                  borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
                 },
               ]}>
               {/* Module Header with Teacher Action Buttons */}
@@ -897,15 +864,24 @@ export default function SyllabusScreen() {
                       style={[
                         styles.itemRow,
                         {
-                          backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                          backgroundColor: isDone
+                            ? isDark ? '#064E3B' : '#F0FDF4'
+                            : isDark ? '#0F172A' : '#FFFFFF',
                           borderColor: isDone
                             ? '#10B981'
                             : unlocked || isTeacher
                             ? '#3B82F6'
                             : isDark
-                            ? '#1E293B'
+                            ? '#334155'
                             : '#E2E8F0',
-                          opacity: unlocked || isTeacher ? 1 : 0.6,
+                          borderBottomColor: isDone
+                            ? '#047857'
+                            : unlocked || isTeacher
+                            ? '#1D4ED8'
+                            : isDark
+                            ? '#1E293B'
+                            : '#CBD5E1',
+                          opacity: unlocked || isTeacher ? 1 : 0.65,
                         },
                       ]}>
                       <TouchableOpacity
@@ -1010,15 +986,24 @@ export default function SyllabusScreen() {
                       style={[
                         styles.itemRow,
                         {
-                          backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                          backgroundColor: isPassed
+                            ? isDark ? '#064E3B' : '#F0FDF4'
+                            : isDark ? '#0F172A' : '#FFFFFF',
                           borderColor: isPassed
                             ? '#10B981'
                             : unlocked || isTeacher
                             ? '#F59E0B'
                             : isDark
-                            ? '#1E293B'
+                            ? '#334155'
                             : '#E2E8F0',
-                          opacity: unlocked || isTeacher ? 1 : 0.6,
+                          borderBottomColor: isPassed
+                            ? '#047857'
+                            : unlocked || isTeacher
+                            ? '#B45309'
+                            : isDark
+                            ? '#1E293B'
+                            : '#CBD5E1',
+                          opacity: unlocked || isTeacher ? 1 : 0.65,
                         },
                       ]}>
                       <View style={styles.itemLeft}>
@@ -1109,7 +1094,9 @@ export default function SyllabusScreen() {
                       style={[
                         styles.itemRow,
                         {
-                          backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                          backgroundColor: grade && grade.score >= 75
+                            ? isDark ? '#064E3B' : '#F0FDF4'
+                            : isDark ? '#0F172A' : '#FFFFFF',
                           borderColor:
                             grade && grade.score >= 75
                               ? '#10B981'
@@ -1118,9 +1105,19 @@ export default function SyllabusScreen() {
                               : unlocked || isTeacher
                               ? '#6366F1'
                               : isDark
-                              ? '#1E293B'
+                              ? '#334155'
                               : '#E2E8F0',
-                          opacity: unlocked || isTeacher ? 1 : 0.6,
+                          borderBottomColor:
+                            grade && grade.score >= 75
+                              ? '#047857'
+                              : sub
+                              ? '#6D28D9'
+                              : unlocked || isTeacher
+                              ? '#4338CA'
+                              : isDark
+                              ? '#1E293B'
+                              : '#CBD5E1',
+                          opacity: unlocked || isTeacher ? 1 : 0.65,
                         },
                       ]}>
                       <TouchableOpacity
@@ -1560,20 +1557,19 @@ export default function SyllabusScreen() {
                           }
                           style={[
                             styles.optionRow,
-                            {
-                              backgroundColor: isSelected
-                                ? isDark
-                                  ? '#1E3A8A'
-                                  : '#EFF6FF'
-                                : isDark
-                                ? '#0F172A'
-                                : '#FFFFFF',
-                              borderColor: isSelected
-                                ? '#2563EB'
-                                : isDark
-                                ? '#334155'
-                                : '#E2E8F0',
-                            },
+                            isSelected
+                              ? {
+                                  backgroundColor: isDark ? '#064E3B' : '#ECFDF5',
+                                  borderColor: '#10B981',
+                                  borderBottomWidth: 5,
+                                  borderBottomColor: '#047857',
+                                }
+                              : {
+                                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                                  borderColor: isDark ? '#334155' : '#E2E8F0',
+                                  borderBottomWidth: 4,
+                                  borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
+                                },
                           ]}>
                           <View
                             style={[
@@ -1586,8 +1582,14 @@ export default function SyllabusScreen() {
                             style={[
                               styles.optionText,
                               {
-                                color: isDark ? '#F8FAFC' : '#0F172A',
-                                fontWeight: isSelected ? '700' : '400',
+                                color: isSelected
+                                  ? isDark
+                                    ? '#A7F3D0'
+                                    : '#065F46'
+                                  : isDark
+                                  ? '#F8FAFC'
+                                  : '#0F172A',
+                                fontWeight: isSelected ? '800' : '600',
                               },
                             ]}>
                             {opt}
@@ -1610,9 +1612,9 @@ export default function SyllabusScreen() {
           <View style={styles.modalFooter}>
             <TouchableOpacity
               onPress={handleSubmitQuizPress}
-              style={[styles.modalPrimaryBtn, { backgroundColor: '#F59E0B' }]}>
+              style={styles.tactileBtnGreen}>
               <Ionicons name="send" size={18} color="#FFFFFF" />
-              <Text style={styles.modalPrimaryBtnText}>Kirim Jawaban Kuis</Text>
+              <Text style={styles.tactileBtnGreenText}>Kirim Jawaban Kuis</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -1734,9 +1736,9 @@ export default function SyllabusScreen() {
           <View style={styles.modalFooter}>
             <TouchableOpacity
               onPress={handleSubmitAssignmentPress}
-              style={[styles.modalPrimaryBtn, { backgroundColor: '#6366F1' }]}>
+              style={styles.tactileBtnGreen}>
               <Ionicons name="cloud-upload" size={18} color="#FFFFFF" />
-              <Text style={styles.modalPrimaryBtnText}>
+              <Text style={styles.tactileBtnGreenText}>
                 Kumpulkan Tugas ke Pengajar (+75 XP)
               </Text>
             </TouchableOpacity>
@@ -2020,9 +2022,9 @@ export default function SyllabusScreen() {
           <View style={styles.modalFooter}>
             <TouchableOpacity
               onPress={handleSaveLesson}
-              style={[styles.modalPrimaryBtn, { backgroundColor: '#8B5CF6' }]}>
+              style={styles.tactileBtnPurple}>
               <Ionicons name="add-circle" size={18} color="#FFFFFF" />
-              <Text style={styles.modalPrimaryBtnText}>Simpan Materi Baru</Text>
+              <Text style={styles.tactileBtnPurpleText}>Simpan Materi Baru</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -2207,9 +2209,9 @@ export default function SyllabusScreen() {
           <View style={styles.modalFooter}>
             <TouchableOpacity
               onPress={handleSaveAssignment}
-              style={[styles.modalPrimaryBtn, { backgroundColor: '#6366F1' }]}>
+              style={styles.tactileBtnPurple}>
               <Ionicons name="save-outline" size={18} color="#FFFFFF" />
-              <Text style={styles.modalPrimaryBtnText}>Simpan Tugas Baru</Text>
+              <Text style={styles.tactileBtnPurpleText}>Simpan Tugas Baru</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -2383,16 +2385,24 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   moduleCard: {
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
+    borderRadius: 24,
+    padding: 18,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 5,
+    borderBottomColor: '#CBD5E1',
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 3,
   },
   moduleHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   moduleTitleContainer: {
     flexDirection: 'row',
@@ -2401,8 +2411,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   moduleTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.2,
     flex: 1,
   },
   teacherActionBtnGroup: {
@@ -2414,54 +2425,61 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#8B5CF6',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    borderBottomWidth: 3,
+    borderBottomColor: '#6D28D9',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
     backgroundColor: '#F5F3FF',
   },
   addMiniBtnText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#8B5CF6',
   },
   itemsList: {
-    gap: 10,
+    gap: 12,
   },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1.5,
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderBottomWidth: 4,
   },
   itemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     flex: 1,
   },
   statusIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: 'rgba(0, 0, 0, 0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   itemTitle: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     marginBottom: 2,
+    letterSpacing: -0.2,
   },
   itemMeta: {
     fontSize: 11,
+    fontWeight: '600',
     color: '#64748B',
   },
   dueDateLabel: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#D97706',
     marginTop: 2,
   },
@@ -2477,13 +2495,15 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   badgePill: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   deleteIconBtn: {
     padding: 6,
@@ -2541,18 +2561,79 @@ const styles = StyleSheet.create({
     borderTopColor: '#E2E8F0',
   },
   modalPrimaryBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#10B981',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#059669',
+    borderBottomWidth: 5,
+    borderBottomColor: '#047857',
+    minHeight: 48,
     gap: 8,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
   modalPrimaryBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 15,
+    letterSpacing: 0.2,
+  },
+  tactileBtnGreen: {
+    backgroundColor: '#10B981',
+    borderWidth: 1,
+    borderColor: '#059669',
+    borderBottomWidth: 5,
+    borderBottomColor: '#047857',
+    borderRadius: 16,
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  tactileBtnGreenText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 15,
+    letterSpacing: 0.2,
+  },
+  tactileBtnPurple: {
+    backgroundColor: '#8B5CF6',
+    borderWidth: 1,
+    borderColor: '#7C3AED',
+    borderBottomWidth: 5,
+    borderBottomColor: '#6D28D9',
+    borderRadius: 16,
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  tactileBtnPurpleText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 15,
+    letterSpacing: 0.2,
   },
   quizInstructions: {
     fontSize: 13,
@@ -2560,45 +2641,51 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   quizQuestionCard: {
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 4,
+    borderBottomColor: '#CBD5E1',
     marginBottom: 16,
   },
   questionText: {
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 12,
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 14,
+    letterSpacing: -0.2,
   },
   optionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginBottom: 8,
-    gap: 10,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 2,
+    marginBottom: 10,
+    gap: 12,
+    minHeight: 48,
   },
   radioCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2.5,
     borderColor: '#94A3B8',
     alignItems: 'center',
     justifyContent: 'center',
   },
   radioCircleSelected: {
-    borderColor: '#2563EB',
+    borderColor: '#10B981',
+    backgroundColor: '#10B981',
   },
   radioDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#2563EB',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#FFFFFF',
   },
   optionText: {
-    fontSize: 13,
+    fontSize: 14,
     flex: 1,
   },
   resultBox: {
@@ -2697,14 +2784,18 @@ const styles = StyleSheet.create({
   },
   promptSaveBtn: {
     backgroundColor: '#8B5CF6',
+    borderWidth: 1,
+    borderColor: '#7C3AED',
+    borderBottomWidth: 4,
+    borderBottomColor: '#6D28D9',
     paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    borderRadius: 12,
   },
   promptSaveText: {
     fontSize: 13,
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   classSelectorContainer: {
     marginBottom: 16,
@@ -2722,9 +2813,10 @@ const styles = StyleSheet.create({
   },
   classChip: {
     paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1.5,
+    paddingVertical: 12,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderBottomWidth: 4,
     minWidth: 160,
     maxWidth: 220,
   },
@@ -2751,99 +2843,123 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   courseBannerCard: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    padding: 20,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: '#4338CA',
+    borderBottomWidth: 6,
+    borderBottomColor: '#312E81',
+    backgroundColor: '#4F46E5',
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowColor: '#312E81',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 5,
+    ...(Platform.OS === 'web' && ({
+      backgroundImage: 'linear-gradient(135deg, #6366F1, #4F46E5)',
+    } as any)),
   },
   courseBannerHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   categoryBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   categoryBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.4,
   },
   cohortCodeBadge: {
-    backgroundColor: 'rgba(100, 116, 139, 0.12)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   cohortCodeText: {
     fontSize: 11,
-    fontWeight: '800',
-    color: '#64748B',
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 0.6,
   },
   courseBannerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFFFFF',
     marginBottom: 6,
+    letterSpacing: -0.3,
   },
   courseBannerDesc: {
     fontSize: 13,
-    color: '#64748B',
-    lineHeight: 18,
-    marginBottom: 12,
+    color: 'rgba(255, 255, 255, 0.88)',
+    lineHeight: 19,
+    marginBottom: 14,
   },
   courseBannerMetaRow: {
     flexDirection: 'row',
     gap: 20,
-    marginBottom: 12,
-    paddingTop: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
+    marginBottom: 14,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.2)',
   },
   metaCol: {
     flex: 1,
   },
   metaLabel: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: 'rgba(255, 255, 255, 0.75)',
     marginBottom: 2,
+    fontWeight: '600',
   },
   metaValue: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
   dynamicNoticeBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    padding: 10,
-    borderRadius: 10,
-    gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    padding: 12,
+    borderRadius: 14,
+    gap: 10,
   },
   dynamicNoticeText: {
     fontSize: 12,
-    color: '#1D4ED8',
+    color: '#FFFFFF',
     flex: 1,
-    lineHeight: 16,
+    lineHeight: 17,
   },
   referenceNoticeBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: 10,
-    borderRadius: 10,
-    gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    padding: 12,
+    borderRadius: 14,
+    gap: 10,
   },
   referenceNoticeText: {
     fontSize: 12,
+    color: '#FFFFFF',
     flex: 1,
-    lineHeight: 16,
+    lineHeight: 17,
   },
   emptyStateCard: {
     padding: 30,

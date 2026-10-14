@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, Platform } from 'react-native';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -14,6 +14,20 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      {Platform.OS === 'web' && (
+        <style
+          // @ts-ignore
+          dangerouslySetInnerHTML={{
+            __html: `
+              [role="button"]:active,
+              button:active {
+                transform: translateY(3px) !important;
+                border-bottom-width: 2px !important;
+              }
+            `,
+          }}
+        />
+      )}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />

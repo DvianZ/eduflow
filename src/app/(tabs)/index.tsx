@@ -158,14 +158,12 @@ export default function DashboardScreen() {
     Alert.alert('Berhasil! 🎉', 'Anda telah bergabung ke kelas baru. Silakan cek silabus.');
   };
 
-  // iOS Theme Tokens
-  const pageBg = isDark ? '#000000' : '#F2F2F7';
-  const cardBg = isDark ? '#1C1C1E' : '#FFFFFF';
-  const secondaryCardBg = isDark ? '#2C2C2E' : '#FFFFFF';
-  const cardBorder = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
-  const textPrimary = isDark ? '#FFFFFF' : '#000000';
-  const textSecondary = isDark ? 'rgba(235, 235, 245, 0.65)' : 'rgba(60, 60, 67, 0.65)';
-  const inputBg = isDark ? '#2C2C2E' : '#F2F2F7';
+  // Gamified & Tactile 3D Color Tokens
+  const pageBg = isDark ? '#0B0F19' : '#F4F6FA';
+  const cardBg = isDark ? '#1E293B' : '#FFFFFF';
+  const textPrimary = isDark ? '#F8FAFC' : '#1E293B';
+  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const inputBg = isDark ? '#0F172A' : '#F8FAFC';
 
   return (
     <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: pageBg }]}>
@@ -174,39 +172,17 @@ export default function DashboardScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {/* iOS BENTO GRID CONTAINER */}
+        {/* ============================================================== */}
+        {/* GAMIFIED BENTO GRID (2-COLUMN DUOLINGO x iOS WIDGET) */}
+        {/* ============================================================== */}
         <View style={styles.bentoGrid}>
           {/* ============================================================== */}
-          {/* CELL 1 (SPAN 2): ACTIVE BATCH HERO CARD */}
+          {/* HERO CARD / MISI UTAMA (SPAN 2): 3D TACTILE GRADIENT */}
           {/* ============================================================== */}
-          <View
-            style={[
-              styles.bentoSpan2,
-              styles.heroBatchCard,
-              {
-                backgroundColor: cardBg,
-                borderColor: cardBorder,
-              },
-            ]}>
-            <View style={styles.batchHeader}>
-              <View
-                style={[
-                  styles.batchBadge,
-                  {
-                    backgroundColor:
-                      activeBatch.id === 'batch-edf-402'
-                        ? isDark
-                          ? 'rgba(59, 130, 246, 0.2)'
-                          : '#EBF5FF'
-                        : activeBatch.status === 'completed'
-                        ? isDark
-                          ? 'rgba(16, 185, 129, 0.2)'
-                          : '#ECFDF5'
-                        : isDark
-                        ? 'rgba(139, 92, 246, 0.2)'
-                        : '#F5F3FF',
-                  },
-                ]}>
+          <View style={[styles.bentoSpan2, styles.heroCard3D]}>
+            <View style={styles.heroTopRow}>
+              {/* Status Pill */}
+              <View style={styles.heroBadgePill}>
                 <Ionicons
                   name={
                     activeBatch.status === 'completed'
@@ -215,87 +191,49 @@ export default function DashboardScreen() {
                       ? 'flash'
                       : 'school'
                   }
-                  size={12}
-                  color={
-                    activeBatch.id === 'batch-edf-402'
-                      ? '#2563EB'
-                      : activeBatch.status === 'completed'
-                      ? '#10B981'
-                      : '#8B5CF6'
-                  }
+                  size={13}
+                  color="#FBBF24"
                 />
-                <Text
-                  style={[
-                    styles.batchBadgeText,
-                    {
-                      color:
-                        activeBatch.id === 'batch-edf-402'
-                          ? '#2563EB'
-                          : activeBatch.status === 'completed'
-                          ? '#10B981'
-                          : '#8B5CF6',
-                    },
-                  ]}>
+                <Text style={styles.heroBadgeText}>
                   {activeBatch.id === 'batch-edf-402'
-                    ? 'COHORT AKTIF'
+                    ? 'MISI COHORT AKTIF'
                     : activeBatch.status === 'completed'
-                    ? 'LULUS & TERSERTIFIKASI'
+                    ? '🏆 LULUS TERSERTIFIKASI'
                     : 'KELAS AKTIF'}
                 </Text>
               </View>
 
+              {/* Class Code Tactile Pill */}
               <TouchableOpacity
                 onPress={() => handleCopyCode(activeBatch.classCode)}
-                activeOpacity={0.7}
+                activeOpacity={0.8}
                 style={[
-                  styles.codeBadge,
-                  {
-                    backgroundColor:
-                      copiedCode === activeBatch.classCode
-                        ? isDark
-                          ? 'rgba(16, 185, 129, 0.25)'
-                          : '#DCFCE7'
-                        : isDark
-                        ? '#2C2C2E'
-                        : '#F2F2F7',
-                  },
+                  styles.heroCodePill,
+                  copiedCode === activeBatch.classCode && styles.heroCodePillCopied,
                 ]}>
                 <Ionicons
-                  name={copiedCode === activeBatch.classCode ? 'checkmark' : 'copy-outline'}
-                  size={13}
-                  color={copiedCode === activeBatch.classCode ? '#10B981' : isTeacher ? '#8B5CF6' : '#007AFF'}
+                  name={copiedCode === activeBatch.classCode ? 'checkmark' : 'copy'}
+                  size={12}
+                  color="#FFFFFF"
                 />
-                <Text style={styles.codeBadgeLabel}>Kode:</Text>
-                <Text
-                  style={[
-                    styles.codeBadgeValue,
-                    {
-                      color:
-                        copiedCode === activeBatch.classCode
-                          ? '#10B981'
-                          : isTeacher
-                          ? '#8B5CF6'
-                          : '#007AFF',
-                    },
-                  ]}>
-                  {copiedCode === activeBatch.classCode ? 'Tersalin!' : activeBatch.classCode}
+                <Text style={styles.heroCodePillLabel}>KODE:</Text>
+                <Text style={styles.heroCodePillValue}>
+                  {copiedCode === activeBatch.classCode ? 'TERSALIN!' : activeBatch.classCode}
                 </Text>
               </TouchableOpacity>
             </View>
 
-            <Text style={[styles.batchTitle, { color: textPrimary }]}>
+            <Text style={styles.heroCourseTitle}>
               {activeCourse?.title || activeBatch.batchName}
             </Text>
-            <Text style={[styles.batchSubtitle, { color: textSecondary }]}>
-              {activeBatch.batchName}
-            </Text>
+            <Text style={styles.heroBatchSubtitle}>{activeBatch.batchName}</Text>
 
-            <View style={styles.mentorRow}>
-              <View style={[styles.mentorAvatarIcon, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
-                <Ionicons name="person" size={14} color={isTeacher ? '#8B5CF6' : '#007AFF'} />
+            <View style={styles.heroMentorRow}>
+              <View style={styles.heroMentorAvatar}>
+                <Ionicons name="person" size={13} color="#FFFFFF" />
               </View>
-              <Text style={[styles.mentorText, { color: textSecondary }]}>
-                Mentor: <Text style={[styles.mentorName, { color: textPrimary }]}>{activeBatch.instructorName}</Text>
+              <Text style={styles.heroMentorText}>
+                Mentor: <Text style={styles.heroMentorName}>{activeBatch.instructorName}</Text>
               </Text>
             </View>
           </View>
@@ -305,228 +243,221 @@ export default function DashboardScreen() {
           {/* ============================================================== */}
           {!isTeacher ? (
             <>
-              {/* CELL (SPAN 2): URGENT NOTIFICATION BANNER (IF ANY) */}
+              {/* URGENT NOTIFICATION BANNER (SPAN 2, IF ANY) */}
               {unreadAlertNotif && (
                 <TouchableOpacity
                   activeOpacity={0.85}
                   onPress={() => router.push('/(tabs)/grading')}
                   style={[
                     styles.bentoSpan2,
-                    styles.urgentNotifBanner,
+                    styles.urgentBanner3D,
                     {
                       backgroundColor:
-                        unreadAlertNotif.type === 'revision'
-                          ? isDark
-                            ? 'rgba(245, 158, 11, 0.15)'
-                            : '#FFFBEB'
-                          : isDark
-                          ? 'rgba(16, 185, 129, 0.15)'
-                          : '#ECFDF5',
+                        unreadAlertNotif.type === 'revision' ? '#FEF3C7' : '#ECFDF5',
                       borderColor:
                         unreadAlertNotif.type === 'revision' ? '#F59E0B' : '#10B981',
+                      borderBottomColor:
+                        unreadAlertNotif.type === 'revision' ? '#D97706' : '#059669',
                     },
                   ]}>
                   <View
                     style={[
-                      styles.urgentNotifIconBox,
+                      styles.urgentIconCircle,
                       {
                         backgroundColor:
-                          unreadAlertNotif.type === 'revision' ? '#FEF3C7' : '#D1FAE5',
+                          unreadAlertNotif.type === 'revision' ? '#F59E0B' : '#10B981',
                       },
                     ]}>
                     <Ionicons
-                      name={unreadAlertNotif.type === 'revision' ? 'alert-circle' : 'trophy'}
-                      size={20}
-                      color={unreadAlertNotif.type === 'revision' ? '#D97706' : '#059669'}
+                      name={unreadAlertNotif.type === 'revision' ? 'alert' : 'trophy'}
+                      size={18}
+                      color="#FFFFFF"
                     />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text
                       style={[
-                        styles.urgentNotifTitle,
+                        styles.urgentTitleText,
                         {
                           color:
-                            unreadAlertNotif.type === 'revision' ? '#D97706' : '#059669',
+                            unreadAlertNotif.type === 'revision' ? '#92400E' : '#065F46',
                         },
                       ]}>
                       {unreadAlertNotif.title}
                     </Text>
                     <Text
-                      style={[styles.urgentNotifMessage, { color: textSecondary }]}
+                      style={[
+                        styles.urgentMessageText,
+                        {
+                          color:
+                            unreadAlertNotif.type === 'revision' ? '#78350F' : '#047857',
+                        },
+                      ]}
                       numberOfLines={2}>
                       {unreadAlertNotif.message}
                     </Text>
                   </View>
                   <Ionicons
                     name="chevron-forward"
-                    size={18}
-                    color={unreadAlertNotif.type === 'revision' ? '#D97706' : '#059669'}
+                    size={20}
+                    color={unreadAlertNotif.type === 'revision' ? '#B45309' : '#047857'}
                   />
                 </TouchableOpacity>
               )}
 
-              {/* CELL (SPAN 2): LEARNER PROGRESS HERO */}
+              {/* PROGRESS HERO (SPAN 2): CHUNKY 3D GAMIFIED PROGRESS */}
               <View
                 style={[
                   styles.bentoSpan2,
-                  styles.bentoCard,
-                  {
-                    backgroundColor: cardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoCard3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.cardHeader}>
-                  <View style={styles.bentoCardHeaderLeft}>
-                    <View style={[styles.bentoHeaderIcon, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
-                      <Ionicons name="bar-chart" size={16} color="#007AFF" />
+                <View style={styles.cardHeaderRow}>
+                  <View style={styles.cardHeaderLeft}>
+                    <View style={[styles.headerIconBox, { backgroundColor: '#EEF2FF', borderColor: '#C7D2FE' }]}>
+                      <Ionicons name="sparkles" size={16} color="#4F46E5" />
                     </View>
-                    <Text style={[styles.cardTitle, { color: textPrimary }]}>
-                      Progres Pembelajaran
+                    <Text style={[styles.cardHeaderTitle, { color: textPrimary }]}>
+                      Progres Petualangan
                     </Text>
                   </View>
-                  <Text style={styles.progressPctText}>{evalResult.lessonProgressPct}%</Text>
+                  <View style={styles.progressBadgePill}>
+                    <Text style={styles.progressBadgeText}>{evalResult.lessonProgressPct}%</Text>
+                  </View>
                 </View>
 
-                {/* Progress Bar Track */}
-                <View style={[styles.progressBarTrack, { backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA' }]}>
+                {/* Chunky 3D Progress Bar */}
+                <View style={styles.progressBarTrack3D}>
                   <View
                     style={[
-                      styles.progressBarFill,
+                      styles.progressBarFill3D,
                       {
-                        width: `${evalResult.lessonProgressPct}%`,
-                        backgroundColor: evalResult.lessonProgressPct === 100 ? '#34C759' : '#007AFF',
+                        width: `${Math.max(evalResult.lessonProgressPct, 6)}%`,
+                        backgroundColor:
+                          evalResult.lessonProgressPct === 100 ? '#10B981' : '#4F46E5',
+                        borderBottomColor:
+                          evalResult.lessonProgressPct === 100 ? '#047857' : '#312E81',
                       },
                     ]}
                   />
                 </View>
 
+                {/* Tactile 3D Green CTA Button (Duolingo Style) */}
                 <TouchableOpacity
                   onPress={() => router.push('/(tabs)/syllabus')}
                   activeOpacity={0.8}
-                  style={styles.primaryBtn}>
-                  <Text style={styles.primaryBtnText}>Buka Silabus & Kurikulum</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+                  style={styles.tactileBtnGreen}>
+                  <Text style={styles.tactileBtnGreenText}>Buka Silabus & Kurikulum</Text>
+                  <Ionicons name="arrow-forward-circle" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
 
-              {/* CELL (SPAN 1): METRIC MATERI SELESAI */}
+              {/* METRIC 1 (SPAN 1): MATERI SELESAI */}
               <View
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
-                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
-                    <Ionicons name="book-outline" size={18} color="#007AFF" />
+                <View style={styles.widgetTopRow}>
+                  <View style={[styles.widgetIconSquare, { backgroundColor: '#E0F2FE', borderColor: '#BAE6FD' }]}>
+                    <Ionicons name="book" size={18} color="#0284C7" />
                   </View>
-                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Materi</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>MATERI</Text>
                 </View>
-                <View style={styles.widgetBody}>
-                  <Text style={[styles.widgetValue, { color: textPrimary }]}>
+                <View style={styles.widgetBottomCol}>
+                  <Text style={[styles.widgetBigValue, { color: '#0284C7' }]}>
                     {evalResult.completedLessons}/{evalResult.totalLessons}
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
-                    Selesai Dipelajari
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
+                    Selesai Dibaca
                   </Text>
                 </View>
               </View>
 
-              {/* CELL (SPAN 1): METRIC KUIS LULUS */}
+              {/* METRIC 2 (SPAN 1): KUIS LULUS */}
               <View
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
-                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(52,199,89,0.2)' : '#EAFBF0' }]}>
-                    <Ionicons name="checkmark-done" size={18} color="#34C759" />
+                <View style={styles.widgetTopRow}>
+                  <View style={[styles.widgetIconSquare, { backgroundColor: '#D1FAE5', borderColor: '#A7F3D0' }]}>
+                    <Ionicons name="checkmark-done" size={18} color="#10B981" />
                   </View>
-                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Kuis</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>KUIS</Text>
                 </View>
-                <View style={styles.widgetBody}>
-                  <Text style={[styles.widgetValue, { color: '#34C759' }]}>
+                <View style={styles.widgetBottomCol}>
+                  <Text style={[styles.widgetBigValue, { color: '#10B981' }]}>
                     {userQuizAttempts.filter((q) => q.isPassed).length}
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
                     Evaluasi Lulus
                   </Text>
                 </View>
               </View>
 
-              {/* CELL (SPAN 1): METRIC NILAI TUGAS */}
+              {/* METRIC 3 (SPAN 1): NILAI TUGAS */}
               <View
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
-                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(255,149,0,0.2)' : '#FFF7EB' }]}>
-                    <Ionicons name="document-text-outline" size={18} color="#FF9500" />
+                <View style={styles.widgetTopRow}>
+                  <View style={[styles.widgetIconSquare, { backgroundColor: '#FEF3C7', borderColor: '#FDE68A' }]}>
+                    <Ionicons name="document-text" size={18} color="#F59E0B" />
                   </View>
-                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Tugas</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>TUGAS</Text>
                 </View>
-                <View style={styles.widgetBody}>
-                  <Text style={[styles.widgetValue, { color: textPrimary }]}>
-                    {userGrades.length > 0 ? `${userGrades[0].score}/100` : '-'}
+                <View style={styles.widgetBottomCol}>
+                  <Text style={[styles.widgetBigValue, { color: '#F59E0B' }]}>
+                    {userGrades.length > 0 ? `${userGrades[0].score}` : '-'}
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
-                    {userGrades.length > 0 ? 'Sudah Dinilai' : 'Belum Ada Nilai'}
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
+                    {userGrades.length > 0 ? 'Poin Skor Proyek' : 'Belum Dinilai'}
                   </Text>
                 </View>
               </View>
 
-              {/* CELL (SPAN 1): METRIC KELULUSAN */}
+              {/* METRIC 4 (SPAN 1): STATUS KELULUSAN */}
               <View
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
-                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(175,82,222,0.2)' : '#F9F0FF' }]}>
-                    <Ionicons name="ribbon-outline" size={18} color="#AF52DE" />
+                <View style={styles.widgetTopRow}>
+                  <View style={[styles.widgetIconSquare, { backgroundColor: '#EDE9FE', borderColor: '#DDD6FE' }]}>
+                    <Ionicons name="ribbon" size={18} color="#8B5CF6" />
                   </View>
-                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Status</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>STATUS</Text>
                 </View>
-                <View style={styles.widgetBody}>
+                <View style={styles.widgetBottomCol}>
                   <Text
                     style={[
-                      styles.widgetValue,
+                      styles.widgetBigValue,
                       {
-                        fontSize: 18,
-                        color: evalResult.canGraduate ? '#34C759' : '#007AFF',
+                        fontSize: 17,
+                        color: evalResult.canGraduate ? '#10B981' : '#4F46E5',
                       },
                     ]}>
                     {evalResult.canGraduate ? 'LULUS 🎓' : 'BERJALAN'}
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
-                    {evalResult.canGraduate ? 'Sertifikat Terbit' : 'Lengkapi Syarat'}
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
+                    {evalResult.canGraduate ? 'Sertifikat Siap' : 'Kejar Kelulusan'}
                   </Text>
                 </View>
               </View>
 
-              {/* CELL (SPAN 2): SECTION TITLE COHORTS */}
-              <View style={[styles.bentoSpan2, styles.sectionHeader]}>
-                <Text style={[styles.sectionTitle, { color: textPrimary }]}>
-                  🏫 Kelas & Program Terdaftar
+              {/* SECTION HEADER (SPAN 2): COHORT LIST */}
+              <View style={[styles.bentoSpan2, styles.gamifiedSectionHeader]}>
+                <Text style={[styles.gamifiedSectionTitle, { color: textPrimary }]}>
+                  🏫 Kelas & Misi Terdaftar
                 </Text>
-                <Text style={[styles.sectionSubtitle, { color: textSecondary }]}>
-                  Daftar kurikulum yang sedang dan telah Anda ikuti
+                <Text style={[styles.gamifiedSectionSubtitle, { color: textSecondary }]}>
+                  Pilih angkatan cohort yang ingin Anda pelajari
                 </Text>
               </View>
 
@@ -535,27 +466,25 @@ export default function DashboardScreen() {
                 <View
                   style={[
                     styles.bentoSpan2,
-                    styles.emptyEnrolledCard,
-                    {
-                      backgroundColor: cardBg,
-                      borderColor: cardBorder,
-                    },
+                    styles.bentoCard3D,
+                    styles.emptyEnrolledBox,
+                    { backgroundColor: cardBg },
                   ]}>
-                  <View style={[styles.emptyEnrolledIconCircle, { backgroundColor: isDark ? '#2C2C2E' : '#EBF5FF' }]}>
-                    <Ionicons name="school-outline" size={36} color="#007AFF" />
+                  <View style={styles.emptyIconCircle3D}>
+                    <Ionicons name="school" size={32} color="#4F46E5" />
                   </View>
-                  <Text style={[styles.emptyEnrolledTitle, { color: textPrimary }]}>
+                  <Text style={[styles.emptyTitleText, { color: textPrimary }]}>
                     Belum Ada Kelas Terdaftar
                   </Text>
-                  <Text style={[styles.emptyEnrolledDesc, { color: textSecondary }]}>
-                    Anda belum bergabung dengan kelas manapun. Masukkan kode kelas yang diberikan oleh pengajar untuk mulai belajar.
+                  <Text style={[styles.emptySubtitleText, { color: textSecondary }]}>
+                    Masukkan kode kelas 6 karakter dari pengajar untuk memulai belajar.
                   </Text>
                   <TouchableOpacity
                     onPress={() => setShowJoinModal(true)}
                     activeOpacity={0.8}
-                    style={styles.emptyEnrolledBtn}>
-                    <Ionicons name="key-outline" size={16} color="#FFFFFF" />
-                    <Text style={styles.emptyEnrolledBtnText}>+ Masukkan Kode Kelas</Text>
+                    style={styles.tactileBtnGreen}>
+                    <Ionicons name="key" size={16} color="#FFFFFF" />
+                    <Text style={styles.tactileBtnGreenText}>+ Masukkan Kode Kelas</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -577,76 +506,76 @@ export default function DashboardScreen() {
                       key={b.id}
                       style={[
                         styles.bentoSpan2,
-                        styles.enrolledClassCard,
+                        styles.bentoCard3D,
+                        styles.cohortCard3D,
                         {
                           backgroundColor: cardBg,
-                          borderColor: isSelected
-                            ? '#007AFF'
-                            : cardBorder,
-                          borderWidth: isSelected ? 2 : 1,
+                          borderColor: isSelected ? '#4F46E5' : '#E2E8F0',
+                          borderBottomColor: isSelected ? '#312E81' : '#CBD5E1',
                         },
                       ]}>
-                      <View style={styles.enrolledHeaderRow}>
-                        <View style={styles.codeAndBadgeRow}>
-                          <View style={[styles.codeTag, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
-                            <Text style={[styles.codeTagText, { color: textPrimary }]}>{b.classCode}</Text>
+                      <View style={styles.cohortCardTopRow}>
+                        <View style={styles.cohortCodeAndStatus}>
+                          <View style={styles.cohortCodeTag3D}>
+                            <Text style={styles.cohortCodeTagText}>{b.classCode}</Text>
                           </View>
                           {isDynamic && (
-                            <View style={[styles.statusPill, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
-                              <Ionicons name="sparkles" size={11} color="#007AFF" />
-                              <Text style={[styles.statusPillText, { color: '#007AFF' }]}>
+                            <View style={[styles.statusPill3D, { backgroundColor: '#EEF2FF', borderColor: '#C7D2FE' }]}>
+                              <Ionicons name="sparkles" size={12} color="#4F46E5" />
+                              <Text style={[styles.statusPillText, { color: '#4F46E5' }]}>
                                 Cohort Aktif
                               </Text>
                             </View>
                           )}
                           {isCompleted && (
-                            <View style={[styles.statusPill, { backgroundColor: isDark ? 'rgba(52,199,89,0.2)' : '#EAFBF0' }]}>
-                              <Ionicons name="ribbon" size={11} color="#34C759" />
-                              <Text style={[styles.statusPillText, { color: '#34C759' }]}>
-                                Tersertifikasi
+                            <View style={[styles.statusPill3D, { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' }]}>
+                              <Ionicons name="ribbon" size={12} color="#10B981" />
+                              <Text style={[styles.statusPillText, { color: '#10B981' }]}>
+                                Lulus
                               </Text>
                             </View>
                           )}
                         </View>
 
                         {isSelected && (
-                          <View style={[styles.selectedIndicatorBadge, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
-                            <Text style={styles.selectedIndicatorText}>Sedang Aktif</Text>
+                          <View style={styles.selectedBadgePill3D}>
+                            <Text style={styles.selectedBadgeText}>Sedang Dibuka</Text>
                           </View>
                         )}
                       </View>
 
-                      <Text style={[styles.enrolledCourseTitle, { color: textPrimary }]}>
+                      <Text style={[styles.cohortCourseTitle, { color: textPrimary }]}>
                         {c?.title || b.batchName}
                       </Text>
-                      <Text style={[styles.enrolledBatchName, { color: textSecondary }]}>
+                      <Text style={[styles.cohortBatchName, { color: textSecondary }]}>
                         {b.batchName}
                       </Text>
 
-                      {/* Progress Line */}
-                      <View style={styles.enrolledProgressRow}>
-                        <Text style={[styles.enrolledProgressLabel, { color: textSecondary }]}>
-                          Progres Pembelajaran
+                      {/* Mini Progress Track */}
+                      <View style={styles.cohortProgressInfoRow}>
+                        <Text style={[styles.cohortProgressLabel, { color: textSecondary }]}>
+                          Progres Kurikulum
                         </Text>
-                        <Text style={styles.enrolledProgressValue}>{pct}%</Text>
+                        <Text style={styles.cohortProgressVal}>{pct}%</Text>
                       </View>
-                      <View style={[styles.progressBarTrackMini, { backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA' }]}>
+                      <View style={styles.progressBarMiniTrack3D}>
                         <View
                           style={[
-                            styles.progressBarFillMini,
+                            styles.progressBarMiniFill3D,
                             {
-                              width: `${pct}%`,
-                              backgroundColor: isCompleted ? '#34C759' : '#007AFF',
+                              width: `${Math.max(pct, 4)}%`,
+                              backgroundColor: isCompleted ? '#10B981' : '#4F46E5',
+                              borderBottomColor: isCompleted ? '#047857' : '#312E81',
                             },
                           ]}
                         />
                       </View>
 
-                      {/* Footer Action */}
-                      <View style={[styles.enrolledFooter, { borderTopColor: isDark ? '#2C2C2E' : '#E5E5EA' }]}>
-                        <View style={styles.mentorMiniRow}>
-                          <Ionicons name="person-circle-outline" size={16} color={textSecondary} />
-                          <Text style={[styles.mentorMiniText, { color: textSecondary }]} numberOfLines={1}>
+                      {/* Card Footer */}
+                      <View style={styles.cohortCardFooter}>
+                        <View style={styles.cohortMentorRow}>
+                          <Ionicons name="person-circle" size={16} color={textSecondary} />
+                          <Text style={[styles.cohortMentorName, { color: textSecondary }]} numberOfLines={1}>
                             {b.instructorName}
                           </Text>
                         </View>
@@ -658,22 +587,20 @@ export default function DashboardScreen() {
                           }}
                           activeOpacity={0.8}
                           style={[
-                            styles.enterSyllabusBtn,
-                            {
-                              backgroundColor: isSelected ? '#007AFF' : isDark ? '#2C2C2E' : '#F2F2F7',
-                            },
+                            styles.tactileBtnSmall,
+                            isSelected ? styles.tactileBtnSmallPrimary : styles.tactileBtnSmallSecondary,
                           ]}>
                           <Text
                             style={[
-                              styles.enterSyllabusBtnText,
-                              { color: isSelected ? '#FFFFFF' : textPrimary },
+                              styles.tactileBtnSmallText,
+                              { color: isSelected ? '#FFFFFF' : '#4F46E5' },
                             ]}>
                             Lihat Silabus
                           </Text>
                           <Ionicons
                             name="chevron-forward"
                             size={14}
-                            color={isSelected ? '#FFFFFF' : textPrimary}
+                            color={isSelected ? '#FFFFFF' : '#4F46E5'}
                           />
                         </TouchableOpacity>
                       </View>
@@ -682,28 +609,25 @@ export default function DashboardScreen() {
                 })
               )}
 
-              {/* CELL (SPAN 2): GABUNG KELAS BUTTON */}
+              {/* GABUNG KELAS BUTTON (SPAN 2, TACTILE DASHED 3D) */}
               <TouchableOpacity
                 onPress={() => setShowJoinModal(true)}
                 activeOpacity={0.8}
                 style={[
                   styles.bentoSpan2,
-                  styles.joinClassBtn,
-                  {
-                    backgroundColor: cardBg,
-                    borderColor: '#007AFF',
-                  },
+                  styles.tactileDashedActionBtn,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={[styles.joinClassIconBox, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
-                  <Ionicons name="add" size={22} color="#007AFF" />
+                <View style={styles.tactileActionIconBox}>
+                  <Ionicons name="add-circle" size={24} color="#4F46E5" />
                 </View>
-                <View style={styles.joinClassTextCol}>
-                  <Text style={styles.joinClassTitle}>Gabung Kelas Baru</Text>
-                  <Text style={[styles.joinClassSubtitle, { color: textSecondary }]}>
-                    Masukkan kode unik dari pengajar untuk masuk
+                <View style={styles.tactileActionTextCol}>
+                  <Text style={styles.tactileActionTitle}>Gabung Kelas Baru</Text>
+                  <Text style={[styles.tactileActionSubtitle, { color: textSecondary }]}>
+                    Masukkan kode 6 digit dari pengajar Anda
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#007AFF" />
+                <Ionicons name="chevron-forward-circle" size={22} color="#4F46E5" />
               </TouchableOpacity>
             </>
           ) : (
@@ -711,236 +635,204 @@ export default function DashboardScreen() {
             /* TEACHER SPECIFIC VIEW */
             /* ============================================================== */
             <>
-              {/* CELL (SPAN 1): TOTAL PESERTA */}
+              {/* METRIC 1 (SPAN 1): TOTAL SISWA */}
               <View
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
-                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
+                <View style={styles.widgetTopRow}>
+                  <View style={[styles.widgetIconSquare, { backgroundColor: '#EDE9FE', borderColor: '#DDD6FE' }]}>
                     <Ionicons name="people" size={18} color="#8B5CF6" />
                   </View>
-                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Peserta</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>PESERTA</Text>
                 </View>
-                <View style={styles.widgetBody}>
-                  <Text style={[styles.widgetValue, { color: '#8B5CF6' }]}>
+                <View style={styles.widgetBottomCol}>
+                  <Text style={[styles.widgetBigValue, { color: '#8B5CF6' }]}>
                     {activeBatchEnrolledCount}/{activeBatch.maxStudents}
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
                     Siswa Terdaftar
                   </Text>
                 </View>
               </View>
 
-              {/* CELL (SPAN 1): PERLU DINILAI */}
+              {/* METRIC 2 (SPAN 1): ANTREAN TUGAS */}
               <View
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
+                <View style={styles.widgetTopRow}>
                   <View
                     style={[
-                      styles.widgetIconBox,
+                      styles.widgetIconSquare,
                       {
                         backgroundColor:
-                          pendingSubmissions.length > 0
-                            ? isDark
-                              ? 'rgba(255,59,48,0.2)'
-                              : '#FEE2E2'
-                            : isDark
-                            ? 'rgba(52,199,89,0.2)'
-                            : '#EAFBF0',
+                          pendingSubmissions.length > 0 ? '#FEE2E2' : '#D1FAE5',
+                        borderColor:
+                          pendingSubmissions.length > 0 ? '#FECACA' : '#A7F3D0',
                       },
                     ]}>
                     <Ionicons
                       name="clipboard"
                       size={18}
-                      color={pendingSubmissions.length > 0 ? '#FF3B30' : '#34C759'}
+                      color={pendingSubmissions.length > 0 ? '#EF4444' : '#10B981'}
                     />
                   </View>
-                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Antrean</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>ANTREAN</Text>
                 </View>
-                <View style={styles.widgetBody}>
+                <View style={styles.widgetBottomCol}>
                   <Text
                     style={[
-                      styles.widgetValue,
-                      { color: pendingSubmissions.length > 0 ? '#FF3B30' : '#34C759' },
+                      styles.widgetBigValue,
+                      { color: pendingSubmissions.length > 0 ? '#EF4444' : '#10B981' },
                     ]}>
                     {pendingSubmissions.length}
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
                     Perlu Dinilai
                   </Text>
                 </View>
               </View>
 
-              {/* CELL (SPAN 1): RERATA TUGAS */}
+              {/* METRIC 3 (SPAN 1): RATA-RATA TUGAS */}
               <View
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
-                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(0,122,255,0.2)' : '#EBF5FF' }]}>
-                    <Ionicons name="analytics" size={18} color="#007AFF" />
+                <View style={styles.widgetTopRow}>
+                  <View style={[styles.widgetIconSquare, { backgroundColor: '#E0F2FE', borderColor: '#BAE6FD' }]}>
+                    <Ionicons name="analytics" size={18} color="#0284C7" />
                   </View>
-                  <Text style={[styles.widgetLabel, { color: textSecondary }]}>Rata-rata</Text>
+                  <Text style={[styles.widgetCategoryLabel, { color: textSecondary }]}>RERATA</Text>
                 </View>
-                <View style={styles.widgetBody}>
-                  <Text style={[styles.widgetValue, { color: textPrimary }]}>
+                <View style={styles.widgetBottomCol}>
+                  <Text style={[styles.widgetBigValue, { color: '#0284C7' }]}>
                     {activeBatchAverageGrade > 0 ? activeBatchAverageGrade : '-'}
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
                     Nilai Kelas
                   </Text>
                 </View>
               </View>
 
-              {/* CELL (SPAN 1): PINTASAN KELOLA KELAS */}
+              {/* METRIC 4 (SPAN 1): KELOLA KELAS SHORTCUT */}
               <TouchableOpacity
                 onPress={() => router.push('/class-manager' as any)}
                 activeOpacity={0.8}
                 style={[
                   styles.bentoSpan1,
-                  styles.bentoWidget,
-                  {
-                    backgroundColor: secondaryCardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoWidget3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.widgetHeader}>
-                  <View style={[styles.widgetIconBox, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
-                    <Ionicons name="settings-outline" size={18} color="#8B5CF6" />
+                <View style={styles.widgetTopRow}>
+                  <View style={[styles.widgetIconSquare, { backgroundColor: '#EDE9FE', borderColor: '#DDD6FE' }]}>
+                    <Ionicons name="settings" size={18} color="#8B5CF6" />
                   </View>
                   <Ionicons name="arrow-forward" size={16} color="#8B5CF6" />
                 </View>
-                <View style={styles.widgetBody}>
-                  <Text style={[styles.widgetValue, { fontSize: 16, color: '#8B5CF6' }]}>
+                <View style={styles.widgetBottomCol}>
+                  <Text style={[styles.widgetBigValue, { fontSize: 16, color: '#8B5CF6' }]}>
                     Kelola Kelas
                   </Text>
-                  <Text style={[styles.widgetSubLabel, { color: textSecondary }]}>
+                  <Text style={[styles.widgetDescText, { color: textSecondary }]}>
                     Atur Kapasitas & Status
                   </Text>
                 </View>
               </TouchableOpacity>
 
-              {/* CELL (SPAN 2): PRIMARY TEACHER ACTION */}
+              {/* PRIMARY TEACHER HERO ACTION (SPAN 2, TACTILE PURPLE) */}
               <TouchableOpacity
                 onPress={() => router.push('/(tabs)/grading')}
                 activeOpacity={0.8}
-                style={[styles.bentoSpan2, styles.teacherActionHeroBtn]}>
-                <View style={styles.teacherActionBtnContent}>
+                style={[styles.bentoSpan2, styles.tactileBtnPurple]}>
+                <View style={styles.tactileBtnInnerRow}>
                   <Ionicons name="clipboard" size={20} color="#FFFFFF" />
-                  <Text style={styles.teacherActionHeroBtnText}>
+                  <Text style={styles.tactileBtnPurpleText}>
                     Buka Panel Pemeriksaan ({pendingSubmissions.length} Menunggu)
                   </Text>
                 </View>
-                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                <Ionicons name="arrow-forward-circle" size={22} color="#FFFFFF" />
               </TouchableOpacity>
 
-              {/* CELL (SPAN 2): POST ANNOUNCEMENT CARD */}
+              {/* BUAT PENGUMUMAN FORM (SPAN 2, 3D CARD) */}
               <View
                 style={[
                   styles.bentoSpan2,
-                  styles.bentoCard,
-                  {
-                    backgroundColor: cardBg,
-                    borderColor: cardBorder,
-                  },
+                  styles.bentoCard3D,
+                  { backgroundColor: cardBg },
                 ]}>
-                <View style={styles.bentoCardHeaderLeft}>
-                  <View style={[styles.bentoHeaderIcon, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
-                    <Ionicons name="megaphone" size={16} color="#8B5CF6" />
+                <View style={styles.cardHeaderRow}>
+                  <View style={styles.cardHeaderLeft}>
+                    <View style={[styles.headerIconBox, { backgroundColor: '#EDE9FE', borderColor: '#DDD6FE' }]}>
+                      <Ionicons name="megaphone" size={16} color="#8B5CF6" />
+                    </View>
+                    <Text style={[styles.cardHeaderTitle, { color: textPrimary }]}>
+                      Buat Pengumuman Baru
+                    </Text>
                   </View>
-                  <Text style={[styles.cardTitle, { color: textPrimary }]}>
-                    Buat Pengumuman Baru ke Kelas
-                  </Text>
                 </View>
 
                 <TextInput
                   placeholder="Judul pengumuman..."
-                  placeholderTextColor="#8E8E93"
+                  placeholderTextColor="#94A3B8"
                   value={annTitle}
                   onChangeText={setAnnTitle}
                   style={[
-                    styles.input,
-                    {
-                      backgroundColor: inputBg,
-                      color: textPrimary,
-                    },
+                    styles.tactileInput3D,
+                    { backgroundColor: inputBg, color: textPrimary },
                   ]}
                 />
 
                 <TextInput
                   placeholder="Tulis pesan untuk semua siswa di batch ini..."
-                  placeholderTextColor="#8E8E93"
+                  placeholderTextColor="#94A3B8"
                   value={annMessage}
                   onChangeText={setAnnMessage}
                   multiline
                   numberOfLines={3}
                   style={[
-                    styles.input,
-                    styles.textArea,
-                    {
-                      backgroundColor: inputBg,
-                      color: textPrimary,
-                    },
+                    styles.tactileInput3D,
+                    styles.tactileTextArea3D,
+                    { backgroundColor: inputBg, color: textPrimary },
                   ]}
                 />
 
                 <TouchableOpacity
                   onPress={handlePostAnnouncement}
                   activeOpacity={0.8}
-                  style={[styles.secondaryBtn, { borderColor: '#8B5CF6' }]}>
-                  <Ionicons name="send" size={14} color="#8B5CF6" />
-                  <Text style={[styles.secondaryBtnText, { color: '#8B5CF6' }]}>
-                    Kirim Pengumuman
-                  </Text>
+                  style={styles.tactileBtnPurpleMedium}>
+                  <Ionicons name="send" size={16} color="#FFFFFF" />
+                  <Text style={styles.tactileBtnPurpleMediumText}>Kirim Pengumuman</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* CELL (SPAN 2): BUAT KELAS BARU */}
+              {/* BUAT KELAS & COURSE BARU (SPAN 2, TACTILE DASHED 3D) */}
               <TouchableOpacity
                 onPress={() => router.push('/class-manager' as any)}
                 activeOpacity={0.8}
                 style={[
                   styles.bentoSpan2,
-                  styles.createClassBtn,
-                  {
-                    backgroundColor: cardBg,
-                    borderColor: '#8B5CF6',
-                  },
+                  styles.tactileDashedActionBtn,
+                  { backgroundColor: cardBg, borderColor: '#8B5CF6', borderBottomColor: '#6D28D9' },
                 ]}>
-                <View
-                  style={[
-                    styles.createClassIcon,
-                    { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' },
-                  ]}>
-                  <Ionicons name="add" size={22} color="#8B5CF6" />
+                <View style={[styles.tactileActionIconBox, { backgroundColor: '#EDE9FE' }]}>
+                  <Ionicons name="add-circle" size={24} color="#8B5CF6" />
                 </View>
-                <View style={styles.joinClassTextCol}>
-                  <Text style={[styles.joinClassTitle, { color: '#8B5CF6' }]}>
+                <View style={styles.tactileActionTextCol}>
+                  <Text style={[styles.tactileActionTitle, { color: '#8B5CF6' }]}>
                     Buat Kelas & Course Baru
                   </Text>
-                  <Text style={[styles.joinClassSubtitle, { color: textSecondary }]}>
+                  <Text style={[styles.tactileActionSubtitle, { color: textSecondary }]}>
                     Rancang kurikulum dan buka angkatan cohort baru
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#8B5CF6" />
+                <Ionicons name="chevron-forward-circle" size={22} color="#8B5CF6" />
               </TouchableOpacity>
             </>
           )}
@@ -948,12 +840,12 @@ export default function DashboardScreen() {
           {/* ============================================================== */}
           {/* SECTION HEADER (SPAN 2): ANNOUNCEMENTS STREAM */}
           {/* ============================================================== */}
-          <View style={[styles.bentoSpan2, styles.sectionHeader]}>
-            <Text style={[styles.sectionTitle, { color: textPrimary }]}>
+          <View style={[styles.bentoSpan2, styles.gamifiedSectionHeader]}>
+            <Text style={[styles.gamifiedSectionTitle, { color: textPrimary }]}>
               💬 Pengumuman Kelas (Stream)
             </Text>
-            <Text style={[styles.sectionSubtitle, { color: textSecondary }]}>
-              Informasi terkini dari instruktur kelas
+            <Text style={[styles.gamifiedSectionSubtitle, { color: textSecondary }]}>
+              Informasi langsung dari mentor & pengajar kelas
             </Text>
           </View>
 
@@ -962,28 +854,26 @@ export default function DashboardScreen() {
               key={ann.id}
               style={[
                 styles.bentoSpan2,
-                styles.announcementCard,
-                {
-                  backgroundColor: cardBg,
-                  borderColor: cardBorder,
-                },
+                styles.bentoCard3D,
+                styles.announcementCard3D,
+                { backgroundColor: cardBg },
               ]}>
-              <View style={styles.annHeader}>
-                <View style={styles.annAuthor}>
-                  <View style={[styles.annAuthorIconBox, { backgroundColor: isDark ? 'rgba(139,92,246,0.2)' : '#F5F3FF' }]}>
-                    <Ionicons name="person" size={14} color="#8B5CF6" />
+              <View style={styles.annHeaderRow}>
+                <View style={styles.annAuthorRow}>
+                  <View style={styles.annAvatarCircle}>
+                    <Ionicons name="person" size={13} color="#8B5CF6" />
                   </View>
-                  <Text style={[styles.annAuthorName, { color: textPrimary }]}>{ann.authorName}</Text>
+                  <Text style={[styles.annAuthorNameText, { color: textPrimary }]}>{ann.authorName}</Text>
                 </View>
-                <Text style={styles.annTime}>
+                <Text style={styles.annDateBadge}>
                   {new Date(ann.createdAt).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'short',
                   })}
                 </Text>
               </View>
-              <Text style={[styles.annTitle, { color: textPrimary }]}>{ann.title}</Text>
-              <Text style={[styles.annMessage, { color: textSecondary }]}>{ann.message}</Text>
+              <Text style={[styles.annTitleText, { color: textPrimary }]}>{ann.title}</Text>
+              <Text style={[styles.annBodyText, { color: textSecondary }]}>{ann.message}</Text>
             </View>
           ))}
         </View>
@@ -998,40 +888,30 @@ export default function DashboardScreen() {
         transparent
         onRequestClose={() => setShowJoinModal(false)}>
         <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalCard,
-              {
-                backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-              },
-            ]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: textPrimary }]}>
+          <View style={[styles.modalCard3D, { backgroundColor: cardBg }]}>
+            <View style={styles.modalHeaderRow}>
+              <Text style={[styles.modalTitleText, { color: textPrimary }]}>
                 🔑 Gabung Kelas
               </Text>
               <TouchableOpacity onPress={() => setShowJoinModal(false)}>
-                <Ionicons
-                  name="close-circle"
-                  size={28}
-                  color={isDark ? '#8E8E93' : '#AEAEB2'}
-                />
+                <Ionicons name="close-circle" size={28} color="#94A3B8" />
               </TouchableOpacity>
             </View>
 
-            <Text style={[styles.modalDesc, { color: textSecondary }]}>
-              Masukkan kode kelas 6 karakter yang diberikan oleh pengajar untuk bergabung.
+            <Text style={[styles.modalDescText, { color: textSecondary }]}>
+              Masukkan kode kelas 6 karakter yang diberikan oleh pengajar untuk mendaftar.
             </Text>
 
             {joinError !== '' && (
-              <View style={styles.modalErrorBox}>
-                <Ionicons name="alert-circle" size={16} color="#FF3B30" />
-                <Text style={styles.modalErrorText}>{joinError}</Text>
+              <View style={styles.modalErrorBox3D}>
+                <Ionicons name="alert-circle" size={16} color="#DC2626" />
+                <Text style={styles.modalErrorMsg}>{joinError}</Text>
               </View>
             )}
 
             <TextInput
               placeholder="Contoh: ABC-123"
-              placeholderTextColor="#8E8E93"
+              placeholderTextColor="#94A3B8"
               value={joinCode}
               onChangeText={(t) => {
                 setJoinCode(t.toUpperCase());
@@ -1039,35 +919,24 @@ export default function DashboardScreen() {
               }}
               autoCapitalize="characters"
               style={[
-                styles.modalInput,
-                {
-                  backgroundColor: inputBg,
-                  color: textPrimary,
-                  borderColor: joinError ? '#FF3B30' : cardBorder,
-                },
+                styles.modalInput3D,
+                { backgroundColor: inputBg, color: textPrimary },
               ]}
             />
 
             <TouchableOpacity
               onPress={handleJoinClass}
               activeOpacity={0.8}
-              style={styles.modalPrimaryBtn}>
-              <Ionicons name="enter-outline" size={18} color="#FFFFFF" />
-              <Text style={styles.modalPrimaryBtnText}>Gabung Kelas</Text>
+              style={styles.tactileBtnGreen}>
+              <Ionicons name="enter" size={18} color="#FFFFFF" />
+              <Text style={styles.tactileBtnGreenText}>Gabung Kelas Sekarang</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShowJoinModal(false)}
               activeOpacity={0.7}
-              style={[
-                styles.modalSecondaryBtn,
-                {
-                  borderColor: isDark ? '#3A3A3C' : '#E5E5EA',
-                },
-              ]}>
-              <Text style={[styles.modalSecondaryBtnText, { color: textSecondary }]}>
-                Batal
-              </Text>
+              style={styles.modalCancelBtn}>
+              <Text style={[styles.modalCancelBtnText, { color: textSecondary }]}>Batal</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1085,7 +954,7 @@ const styles = StyleSheet.create({
   },
 
   /* ============================================================== */
-  /* iOS BENTO GRID CONTAINER & CELL SPANS */
+  /* BENTO GRID 2-COLUMN LAYOUT */
   /* ============================================================== */
   bentoGrid: {
     padding: 16,
@@ -1114,656 +983,716 @@ const styles = StyleSheet.create({
   },
 
   /* ============================================================== */
-  /* BENTO CARD & CELLS (SQUIRCLE 22PX) */
+  /* HERO CARD / MISI UTAMA (SPAN 2): 3D TACTILE GRADIENT */
   /* ============================================================== */
-  bentoCard: {
-    borderRadius: 22,
-    padding: 16,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 14,
-    elevation: 2,
-  },
-  heroBatchCard: {
-    borderRadius: 22,
-    padding: 18,
-    borderWidth: 1,
-    shadowColor: '#000',
+  heroCard3D: {
+    borderRadius: 26,
+    padding: 20,
+    backgroundColor: '#4F46E5',
+    borderWidth: 2,
+    borderColor: '#4338CA',
+    borderBottomWidth: 6,
+    borderBottomColor: '#312E81',
+    shadowColor: '#4F46E5',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.04,
-    shadowRadius: 16,
-    elevation: 3,
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    elevation: 6,
+    ...(Platform.OS === 'web' && {
+      backgroundImage: 'linear-gradient(135deg, #6366F1, #4F46E5)' as any,
+    }),
   },
-  bentoWidget: {
-    borderRadius: 22,
-    padding: 16,
-    borderWidth: 1,
-    minHeight: 110,
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 12,
-    elevation: 2,
-  },
-  widgetHeader: {
+  heroTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  widgetIconBox: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  widgetLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: -0.2,
-  },
-  widgetBody: {
-    justifyContent: 'flex-end',
-  },
-  widgetValue: {
-    fontSize: 22,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-    marginBottom: 2,
-  },
-  widgetSubLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-  },
-
-  /* ============================================================== */
-  /* HERO BATCH CARD CONTENT */
-  /* ============================================================== */
-  batchHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  batchBadge: {
+  heroBadgePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
-  batchBadgeText: {
+  heroBadgeText: {
     fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 0.2,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
-  codeBadge: {
+  heroCodePill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
-    minHeight: 32,
+    backgroundColor: 'rgba(0, 0, 0, 0.22)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
   },
-  codeBadgeLabel: {
-    fontSize: 11,
-    color: '#8E8E93',
-    fontWeight: '500',
+  heroCodePillCopied: {
+    backgroundColor: '#10B981',
+    borderColor: '#059669',
   },
-  codeBadgeValue: {
+  heroCodePillLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: 'rgba(255, 255, 255, 0.75)',
+  },
+  heroCodePillValue: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '900',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
-  batchTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+  heroCourseTitle: {
+    fontSize: 21,
+    fontWeight: '900',
+    color: '#FFFFFF',
     marginBottom: 4,
     letterSpacing: -0.4,
   },
-  batchSubtitle: {
+  heroBatchSubtitle: {
     fontSize: 13,
-    fontWeight: '500',
-    marginBottom: 12,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.85)',
+    marginBottom: 14,
   },
-  mentorRow: {
+  heroMentorRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
   },
-  mentorAvatarIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  heroMentorAvatar: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  mentorText: {
+  heroMentorText: {
     fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.85)',
   },
-  mentorName: {
+  heroMentorName: {
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+
+  /* ============================================================== */
+  /* BENTO CELL CARDS (TACTILE 3D LIP) */
+  /* ============================================================== */
+  bentoCard3D: {
+    borderRadius: 24,
+    padding: 18,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 5,
+    borderBottomColor: '#CBD5E1',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  bentoWidget3D: {
+    borderRadius: 24,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 5,
+    borderBottomColor: '#CBD5E1',
+    minHeight: 120,
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  widgetTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  widgetIconSquare: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  widgetCategoryLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  widgetBottomCol: {
+    marginTop: 8,
+  },
+  widgetBigValue: {
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+    marginBottom: 2,
+  },
+  widgetDescText: {
+    fontSize: 11,
     fontWeight: '600',
   },
 
   /* ============================================================== */
-  /* PROGRESS HERO */
+  /* CHUNKY PROGRESS HERO */
   /* ============================================================== */
-  cardHeader: {
+  cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  bentoCardHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 10,
-  },
-  bentoHeaderIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-  },
-  progressPctText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#007AFF',
-  },
-  progressBarTrack: {
-    height: 8,
-    borderRadius: 4,
-    overflow: 'hidden',
     marginBottom: 14,
   },
-  progressBarFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-
-  /* ============================================================== */
-  /* INTERACTIVE BUTTONS (APPLE HIG 44PX TARGET) */
-  /* ============================================================== */
-  primaryBtn: {
-    backgroundColor: '#007AFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 44,
-    borderRadius: 12,
-    gap: 8,
-    paddingHorizontal: 16,
-  },
-  primaryBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-    letterSpacing: -0.2,
-  },
-  teacherActionHeroBtn: {
-    backgroundColor: '#8B5CF6',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 48,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    shadowColor: '#8B5CF6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 3,
-  },
-  teacherActionBtnContent: {
+  cardHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  teacherActionHeroBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-    letterSpacing: -0.2,
-  },
-  secondaryBtn: {
+  headerIconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     borderWidth: 1.5,
-    borderRadius: 12,
-    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardHeaderTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  progressBadgePill: {
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
+  },
+  progressBadgeText: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#4F46E5',
+  },
+  progressBarTrack3D: {
+    height: 14,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  progressBarFill3D: {
+    height: '100%',
+    borderRadius: 10,
+    borderBottomWidth: 3,
+  },
+
+  /* ============================================================== */
+  /* TACTILE 3D BUTTONS (DUOLINGO STYLE) */
+  /* ============================================================== */
+  tactileBtnGreen: {
+    backgroundColor: '#10B981',
+    borderWidth: 1,
+    borderColor: '#059669',
+    borderBottomWidth: 5,
+    borderBottomColor: '#047857',
+    borderRadius: 16,
+    minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingHorizontal: 14,
-    marginTop: 4,
+    paddingHorizontal: 16,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  secondaryBtnText: {
-    fontWeight: '700',
-    fontSize: 13,
+  tactileBtnGreenText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 15,
+    letterSpacing: 0.2,
+  },
+  tactileBtnPurple: {
+    backgroundColor: '#8B5CF6',
+    borderWidth: 1,
+    borderColor: '#7C3AED',
+    borderBottomWidth: 5,
+    borderBottomColor: '#6D28D9',
+    borderRadius: 16,
+    minHeight: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  tactileBtnInnerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  tactileBtnPurpleText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 14,
+    letterSpacing: 0.2,
+  },
+  tactileBtnPurpleMedium: {
+    backgroundColor: '#8B5CF6',
+    borderWidth: 1,
+    borderColor: '#7C3AED',
+    borderBottomWidth: 4,
+    borderBottomColor: '#6D28D9',
+    borderRadius: 14,
+    minHeight: 46,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 6,
+  },
+  tactileBtnPurpleMediumText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  tactileBtnSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 14,
+    minHeight: 38,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderBottomWidth: 3,
+  },
+  tactileBtnSmallPrimary: {
+    backgroundColor: '#4F46E5',
+    borderColor: '#4338CA',
+    borderBottomColor: '#312E81',
+  },
+  tactileBtnSmallSecondary: {
+    backgroundColor: '#F8FAFC',
+    borderColor: '#E2E8F0',
+    borderBottomColor: '#CBD5E1',
+  },
+  tactileBtnSmallText: {
+    fontSize: 12,
+    fontWeight: '800',
   },
 
   /* ============================================================== */
-  /* FORMS & INPUTS (SQUIRCLE 12PX) */
+  /* FORM INPUTS (TACTILE 3D) */
   /* ============================================================== */
-  input: {
-    borderRadius: 12,
+  tactileInput3D: {
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 3,
+    borderBottomColor: '#CBD5E1',
+    borderRadius: 14,
     paddingHorizontal: 14,
-    minHeight: 44,
+    minHeight: 46,
     fontSize: 14,
     marginBottom: 10,
   },
-  textArea: {
-    minHeight: 70,
+  tactileTextArea3D: {
+    minHeight: 75,
     paddingTop: 12,
     textAlignVertical: 'top',
   },
 
   /* ============================================================== */
-  /* SECTIONS & ENROLLED COHORTS */
+  /* URGENT NOTIFICATION BANNER */
   /* ============================================================== */
-  sectionHeader: {
-    marginTop: 10,
+  urgentBanner3D: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderBottomWidth: 5,
+    gap: 12,
+  },
+  urgentIconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  urgentTitleText: {
+    fontSize: 13,
+    fontWeight: '900',
+    marginBottom: 2,
+  },
+  urgentMessageText: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '600',
+  },
+
+  /* ============================================================== */
+  /* SECTION HEADERS */
+  /* ============================================================== */
+  gamifiedSectionHeader: {
+    marginTop: 8,
     marginBottom: 4,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+  gamifiedSectionTitle: {
+    fontSize: 17,
+    fontWeight: '900',
     letterSpacing: -0.3,
   },
-  sectionSubtitle: {
+  gamifiedSectionSubtitle: {
     fontSize: 12,
+    fontWeight: '500',
     marginTop: 2,
   },
-  enrolledClassCard: {
-    borderRadius: 22,
+
+  /* ============================================================== */
+  /* ENROLLED COHORTS CARDS */
+  /* ============================================================== */
+  cohortCard3D: {
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 10,
-    elevation: 2,
   },
-  enrolledHeaderRow: {
+  cohortCardTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  codeAndBadgeRow: {
+  cohortCodeAndStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  codeTag: {
+  cohortCodeTag3D: {
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
   },
-  codeTagText: {
+  cohortCodeTagText: {
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '900',
+    color: '#334155',
   },
-  statusPill: {
+  statusPill3D: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
+    borderWidth: 1,
   },
   statusPillText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
-  selectedIndicatorBadge: {
+  selectedBadgePill3D: {
+    backgroundColor: '#EEF2FF',
+    borderWidth: 1,
+    borderColor: '#A5B4FC',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
   },
-  selectedIndicatorText: {
+  selectedBadgeText: {
     fontSize: 10,
-    fontWeight: '800',
-    color: '#007AFF',
+    fontWeight: '900',
+    color: '#4F46E5',
   },
-  enrolledCourseTitle: {
+  cohortCourseTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
     marginBottom: 2,
     letterSpacing: -0.3,
   },
-  enrolledBatchName: {
+  cohortBatchName: {
     fontSize: 12,
-    marginBottom: 12,
+    fontWeight: '500',
+    marginBottom: 10,
   },
-  enrolledProgressRow: {
+  cohortProgressInfoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 6,
   },
-  enrolledProgressLabel: {
+  cohortProgressLabel: {
     fontSize: 11,
+    fontWeight: '600',
   },
-  enrolledProgressValue: {
+  cohortProgressVal: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#007AFF',
+    fontWeight: '900',
+    color: '#4F46E5',
   },
-  progressBarTrackMini: {
-    height: 6,
-    borderRadius: 3,
+  progressBarMiniTrack3D: {
+    height: 8,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 6,
     overflow: 'hidden',
     marginBottom: 12,
   },
-  progressBarFillMini: {
+  progressBarMiniFill3D: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 6,
+    borderBottomWidth: 2,
   },
-  enrolledFooter: {
+  cohortCardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
   },
-  mentorMiniRow: {
+  cohortMentorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
     flex: 1,
   },
-  mentorMiniText: {
+  cohortMentorName: {
     fontSize: 12,
-  },
-  enterSyllabusBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    minHeight: 36,
-    borderRadius: 10,
-  },
-  enterSyllabusBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
   },
 
   /* ============================================================== */
-  /* ACTION CARDS (GABUNG & BUAT KELAS) */
+  /* TACTILE ACTION BUTTONS (GABUNG & BUAT KELAS) */
   /* ============================================================== */
-  joinClassBtn: {
+  tactileDashedActionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     padding: 16,
     borderRadius: 22,
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    minHeight: 64,
+    borderWidth: 2,
+    borderColor: '#4F46E5',
+    borderBottomWidth: 5,
+    borderBottomColor: '#312E81',
+    minHeight: 66,
   },
-  joinClassIconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+  tactileActionIconBox: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: '#EEF2FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  joinClassTextCol: {
+  tactileActionTextCol: {
     flex: 1,
   },
-  joinClassTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#007AFF',
+  tactileActionTitle: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#4F46E5',
     marginBottom: 2,
-    letterSpacing: -0.2,
   },
-  joinClassSubtitle: {
+  tactileActionSubtitle: {
     fontSize: 11,
-  },
-  createClassBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 16,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    minHeight: 64,
-  },
-  createClassIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    fontWeight: '500',
   },
 
   /* ============================================================== */
-  /* ANNOUNCEMENTS STREAM */
+  /* ANNOUNCEMENTS STREAM (3D CARDS) */
   /* ============================================================== */
-  announcementCard: {
-    borderRadius: 22,
+  announcementCard3D: {
     padding: 16,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.02,
-    shadowRadius: 8,
-    elevation: 1,
+    marginBottom: 6,
   },
-  annHeader: {
+  annHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  annAuthor: {
+  annAuthorRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  annAuthorIconBox: {
+  annAvatarCircle: {
     width: 26,
     height: 26,
-    borderRadius: 8,
+    borderRadius: 13,
+    backgroundColor: '#EDE9FE',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  annAuthorName: {
+  annAuthorNameText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
-  annTime: {
+  annDateBadge: {
     fontSize: 11,
-    color: '#8E8E93',
+    fontWeight: '600',
+    color: '#94A3B8',
   },
-  annTitle: {
+  annTitleText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
     marginBottom: 4,
     letterSpacing: -0.2,
   },
-  annMessage: {
+  annBodyText: {
     fontSize: 13,
     lineHeight: 18,
+    fontWeight: '500',
   },
 
   /* ============================================================== */
-  /* URGENT NOTIFICATION BANNER */
+  /* EMPTY ENROLLED STATE */
   /* ============================================================== */
-  urgentNotifBanner: {
-    flexDirection: 'row',
+  emptyEnrolledBox: {
     alignItems: 'center',
-    padding: 14,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    gap: 12,
-  },
-  urgentNotifIconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  urgentNotifTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  urgentNotifMessage: {
-    fontSize: 12,
-    lineHeight: 16,
-  },
-
-  /* ============================================================== */
-  /* EMPTY STATE */
-  /* ============================================================== */
-  emptyEnrolledCard: {
     padding: 24,
-    borderRadius: 22,
-    borderWidth: 1,
-    alignItems: 'center',
   },
-  emptyEnrolledIconCircle: {
+  emptyIconCircle3D: {
     width: 64,
     height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: '#EEF2FF',
+    borderWidth: 2,
+    borderColor: '#C7D2FE',
+    borderBottomWidth: 4,
+    borderBottomColor: '#A5B4FC',
     justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 12,
   },
-  emptyEnrolledTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    marginBottom: 6,
+  emptyTitleText: {
+    fontSize: 17,
+    fontWeight: '900',
+    marginBottom: 4,
     textAlign: 'center',
   },
-  emptyEnrolledDesc: {
+  emptySubtitleText: {
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 16,
     maxWidth: 280,
-  },
-  emptyEnrolledBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#007AFF',
-    minHeight: 44,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    gap: 8,
-  },
-  emptyEnrolledBtnText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '500',
   },
 
   /* ============================================================== */
-  /* MODAL */
+  /* MODAL (3D TACTILE) */
   /* ============================================================== */
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.55)',
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  modalCard: {
-    borderRadius: 24,
+  modalCard3D: {
+    borderRadius: 26,
     padding: 24,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 6,
+    borderBottomColor: '#CBD5E1',
     shadowColor: '#000',
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.2,
     shadowRadius: 20,
     elevation: 10,
   },
-  modalHeader: {
+  modalHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  modalTitle: {
+  modalTitleText: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: -0.4,
   },
-  modalDesc: {
+  modalDescText: {
     fontSize: 13,
     lineHeight: 18,
     marginBottom: 16,
+    fontWeight: '500',
   },
-  modalErrorBox: {
+  modalErrorBox3D: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#FEE2E2',
-    borderColor: '#FECACA',
-    borderWidth: 1,
-    borderRadius: 10,
+    borderColor: '#FCA5A5',
+    borderWidth: 1.5,
+    borderBottomWidth: 3,
+    borderBottomColor: '#EF4444',
+    borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginBottom: 12,
   },
-  modalErrorText: {
+  modalErrorMsg: {
     fontSize: 13,
-    color: '#FF3B30',
-    fontWeight: '600',
+    color: '#DC2626',
+    fontWeight: '700',
     flex: 1,
   },
-  modalInput: {
-    borderWidth: 1.5,
-    borderRadius: 12,
+  modalInput3D: {
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 4,
+    borderBottomColor: '#CBD5E1',
+    borderRadius: 14,
     paddingHorizontal: 16,
-    minHeight: 48,
+    minHeight: 50,
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '900',
     textAlign: 'center',
     letterSpacing: 2,
     marginBottom: 16,
   },
-  modalPrimaryBtn: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginBottom: 10,
-    shadowColor: '#007AFF',
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  modalPrimaryBtnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  modalSecondaryBtn: {
-    borderWidth: 1.5,
-    borderRadius: 12,
+  modalCancelBtn: {
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderBottomWidth: 3,
+    borderBottomColor: '#CBD5E1',
+    borderRadius: 14,
     minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 8,
   },
-  modalSecondaryBtnText: {
+  modalCancelBtnText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '800',
   },
 });
