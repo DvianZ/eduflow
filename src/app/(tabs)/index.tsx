@@ -1389,11 +1389,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    flexWrap: 'wrap',
+    gap: 6,
   },
   cohortCodeAndStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    flexWrap: 'wrap',
+    flex: 1,
   },
   cohortCodeTag3D: {
     backgroundColor: '#F1F5F9',

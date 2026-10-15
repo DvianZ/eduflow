@@ -19,6 +19,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { calculateBatchEvaluation } from '@/utils/lockEngine';
 import { useTranslation } from '@/i18n';
 import { triggerMilestoneFeedback } from '@/utils/feedback';
+import { getCertificatePdfFilename, printCertificatePDF } from '@/utils/certificatePdf';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -66,6 +67,8 @@ export default function ProfileScreen() {
     selectedBatchId || availableBatches[0]?.id || batches[0].id
   );
 
+  // Certificate modal state
+  const [showCertificateModal, setShowCertificateModal] = useState(false);
   // Certificate name modal state
   const [showCertNameModal, setShowCertNameModal] = useState(false);
   const [certNameInput, setCertNameInput] = useState(
@@ -138,9 +141,10 @@ export default function ProfileScreen() {
     if (cert) {
       triggerMilestoneFeedback();
       setSelectedCertId(cert.id);
+      setShowCertificateModal(true);
       Alert.alert(
         '🎉 Congratulations! Official Credential Issued',
-        `Credential ID: ${cert.certificateNumber}\nProgram: ${cert.courseTitle}\nFinal Score: ${cert.finalScore}/100\n+200 XP earned!\n\nYour certificate is now permanently active in your Portfolio!`
+        `Credential ID: ${cert.certificateNumber}\nProgram: ${cert.courseTitle}\nFinal Score: ${cert.finalScore}/100\n+200 XP earned!\n\nYou can now view and print your official certificate.`
       );
     }
   };
@@ -424,449 +428,361 @@ export default function ProfileScreen() {
               style={styles.teacherManageClassBtn}>
               <Ionicons name="settings-outline" size={18} color="#FFFFFF" />
               <Text style={styles.teacherManageClassBtnText}>
-                Buka Panel Manajemen Kelas & Siswa
+                Open Class & Student Management Panel
               </Text>
               <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         ) : (
-          /* LEARNER VIEW: MULTI-CERTIFICATE GALLERY & WEIGHTED GRADUATION EVALUATOR */
-          <>
-            {/* SECTION 1: MULTI-CERTIFICATE CREDENTIALS GALLERY */}
-            <View
-              style={[
-                styles.galleryCard,
-                {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: isDark ? '#334155' : '#E2E8F0',
-                  borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
-                },
-              ]}>
-              <View style={styles.galleryHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.galleryTitle,
-                      { color: isDark ? '#F8FAFC' : '#0F172A' },
-                    ]}>
-                    🏅 Portofolio Sertifikat Digital ({userCertificates.length})
-                  </Text>
-                  <Text style={styles.gallerySubtitle}>
-                    Koleksi sertifikat resmi terakreditasi milik Anda
-                  </Text>
-                </View>
-                <View style={styles.certCountBadge}>
-                  <Ionicons name="ribbon" size={14} color="#D97706" />
-                  <Text style={styles.certCountBadgeText}>{userCertificates.length} Sah</Text>
-                </View>
-              </View>
-
-              {/* Certificate Selector Pills if multi-certificate */}
-              {userCertificates.length > 1 && (
-                <View style={styles.certSelectorRow}>
-                  <Text style={[styles.certSelectorLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-                    PILIH SERTIFIKAT UNTUK DITAMPILKAN:
-                  </Text>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.certPillsScroll}>
-                    {userCertificates.map((cert) => {
-                      const isSelected = cert.id === certToDisplay?.id;
-                      return (
-                        <TouchableOpacity
-                          key={cert.id}
-                          onPress={() => setSelectedCertId(cert.id)}
-                          style={[
-                            styles.certChip,
-                            {
-                              backgroundColor: isSelected
-                                ? '#FEF3C7'
-                                : isDark
-                                ? '#0F172A'
-                                : '#F8FAFC',
-                              borderColor: isSelected
-                                ? '#D97706'
-                                : isDark
-                                ? '#334155'
-                                : '#E2E8F0',
-                              borderBottomColor: isSelected
-                                ? '#B45309'
-                                : isDark
-                                ? '#0B0F19'
-                                : '#CBD5E1',
-                            },
-                          ]}>
-                          <Ionicons
-                            name="shield-checkmark"
-                            size={14}
-                            color={isSelected ? '#D97706' : '#94A3B8'}
-                          />
-                          <Text
-                            numberOfLines={1}
-                            style={[
-                              styles.certChipTitle,
-                              {
-                                color: isSelected
-                                    ? '#92400E'
-                                    : isDark
-                                    ? '#F8FAFC'
-                                    : '#0F172A',
-                                fontWeight: isSelected ? '800' : '600',
-                              },
-                            ]}>
-                            {cert.courseTitle}
-                          </Text>
-                          <View style={styles.certChipScore}>
-                            <Text style={styles.certChipScoreText}>
-                              {cert.finalScore}/100
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-              )}
-
-              {/* EMPTY PORTFOLIO OR ACTIVE DIPLOMA CERTIFICATE CARD */}
-              {userCertificates.length === 0 ? (
-                <View style={styles.emptyCertPortfolio}>
-                  <View style={styles.emptyCertIconCircle}>
-                    <Ionicons name="ribbon-outline" size={36} color="#D97706" />
-                  </View>
-                  <Text
-                    style={[
-                      styles.emptyCertTitle,
-                      { color: isDark ? '#F8FAFC' : '#0F172A' },
-                    ]}>
-                    Belum Memiliki Sertifikat Resmi
-                  </Text>
-                  <Text style={styles.emptyCertDesc}>
-                    Selesaikan seluruh materi (100%), lulus kuis evaluasi, dan tuntaskan tugas proyek pada kelas Anda untuk menerbitkan sertifikat digital resmi.
-                  </Text>
-                </View>
-              ) : certToDisplay ? (
-                <View style={styles.certificateCard}>
-                  <View style={styles.certInnerBorder}>
-                    <View style={styles.certHeader}>
-                      <Ionicons name="ribbon" size={32} color="#D97706" />
-                      <Text style={styles.certTitle}>CERTIFICATE OF COMPLETION</Text>
-                      <Text style={styles.certNumber}>
-                        {certToDisplay.certificateNumber}
-                      </Text>
-                    </View>
-
-                    <Text style={styles.certLead}>
-                      This is to officially certify that:
-                    </Text>
-                    <Text style={styles.certStudentName}>
-                      {certToDisplay.studentName}
-                    </Text>
-
-                    <Text style={styles.certBody}>
-                      has successfully completed all required modules, assessments, and project deliverables for the accredited program:
-                    </Text>
-                    <Text style={styles.certCourseName}>
-                      {certToDisplay.courseTitle}
-                    </Text>
-                    <Text style={styles.certBatchName}>
-                      {certToDisplay.batchName}
-                    </Text>
-
-                    <View style={styles.certFooter}>
-                      <View style={styles.certScoreBox}>
-                        <Text style={styles.certScoreLabel}>
-                          FINAL SCORE
-                        </Text>
-                        <Text style={styles.certScoreValue}>
-                          {certToDisplay.finalScore} / 100
-                        </Text>
-                      </View>
-
-                      <View style={styles.certSignBox}>
-                        <Text style={styles.certSignName}>
-                          {certToDisplay.instructorName}
-                        </Text>
-                        <Text style={styles.certSignTitle}>
-                          Lead Instructor & Academic Mentor
-                        </Text>
-                      </View>
-                    </View>
-
-                    {/* Certificate Action Buttons */}
-                    <View style={styles.certActionRow}>
-                      <TouchableOpacity
-                        onPress={() =>
-                          Alert.alert(
-                            'Credential ID',
-                            `Certificate ID: ${certToDisplay.certificateNumber}\n\nID copied for your professional portfolio verification.`
-                          )
-                        }
-                        style={styles.certActionBtn}>
-                        <Ionicons name="copy-outline" size={14} color="#D97706" />
-                        <Text style={styles.certActionBtnText}>
-                          Copy Credential ID
-                        </Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() =>
-                          Alert.alert(
-                            'Credential Status',
-                            `✅ Credential ${certToDisplay.certificateNumber} is OFFICIALLY VERIFIED on the EduFlow ledger & aligned with Wadhwani Cohort standards.`
-                          )
-                        }
-                        style={[styles.certActionBtn, { backgroundColor: '#DCFCE7', borderColor: '#86EFAC' }]}>
-                        <Ionicons name="checkmark-done" size={14} color="#15803D" />
-                        <Text style={[styles.certActionBtnText, { color: '#15803D' }]}>
-                          Verified Official
-                        </Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (typeof window !== 'undefined' && window.print) {
-                            window.print();
-                          } else {
-                            Alert.alert(
-                              'Print Certificate',
-                              `Certificate ${certToDisplay.certificateNumber} ready for printing.`
-                            );
-                          }
-                        }}
-                        style={[styles.certActionBtn, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]}>
-                        <Ionicons name="print-outline" size={14} color="#2563EB" />
-                        <Text style={[styles.certActionBtnText, { color: '#2563EB' }]}>
-                          Print / Save PDF
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              ) : null}
+          /* LEARNER VIEW: SINGLE-SOURCE GRADUATION EVALUATOR & CERTIFICATE CLAIM */
+          <View
+            style={[
+              styles.evalCard,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                borderColor: isDark ? '#334155' : '#E2E8F0',
+                borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
+              },
+            ]}>
+            <View style={styles.evalHeader}>
+              <Text
+                style={[
+                  styles.evalTitle,
+                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                ]}>
+                🎓 Graduation Evaluator & Certificate Claim
+              </Text>
+              <Text style={styles.finalScoreBadge}>
+                Score: {evalResult.finalScore}/100
+              </Text>
             </View>
 
-            {/* SECTION 2: WEIGHTED GRADUATION EVALUATION PER COHORT */}
-            <View
-              style={[
-                styles.evalCard,
-                {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: isDark ? '#334155' : '#E2E8F0',
-                  borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
-                },
-              ]}>
-              <View style={styles.evalHeader}>
-                <Text
-                  style={[
-                    styles.evalTitle,
-                    { color: isDark ? '#F8FAFC' : '#0F172A' },
-                  ]}>
-                  🎓 Graduation Evaluator & Certificate Claim
-                </Text>
-                <Text style={styles.finalScoreBadge}>
-                  Score: {evalResult.finalScore}/100
-                </Text>
-              </View>
+            {/* Cohort Switcher for Evaluation */}
+            <View style={styles.evalCohortSelector}>
+              <Text style={[styles.evalCohortLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+                SELECT COHORT TO EVALUATE:
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.evalCohortPills}>
+                {availableBatches.map((b) => {
+                  const isSelected = b.id === activeBatch.id;
+                  const isDynamic = b.id === 'batch-edf-402';
+                  const isCertExists = userCertificates.some((c) => c.batchId === b.id);
 
-              {/* Cohort Switcher for Evaluation */}
-              <View style={styles.evalCohortSelector}>
-                <Text style={[styles.evalCohortLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-                  SELECT COHORT TO EVALUATE:
-                </Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.evalCohortPills}>
-                  {availableBatches.map((b) => {
-                    const isSelected = b.id === activeBatch.id;
-                    const isDynamic = b.id === 'batch-edf-402';
-                    const isCertExists = userCertificates.some((c) => c.batchId === b.id);
-
-                    return (
-                      <TouchableOpacity
-                        key={b.id}
-                        onPress={() => setEvalBatchId(b.id)}
+                  return (
+                    <TouchableOpacity
+                      key={b.id}
+                      onPress={() => setEvalBatchId(b.id)}
+                      style={[
+                        styles.evalCohortPill,
+                        {
+                          backgroundColor: isSelected ? '#2563EB' : isDark ? '#0F172A' : '#F1F5F9',
+                          borderColor: isSelected ? '#1D4ED8' : isDark ? '#334155' : '#E2E8F0',
+                          borderBottomColor: isSelected ? '#1E40AF' : isDark ? '#0B0F19' : '#CBD5E1',
+                        },
+                      ]}>
+                      <Text
                         style={[
-                          styles.evalCohortPill,
-                          {
-                            backgroundColor: isSelected ? '#2563EB' : isDark ? '#0F172A' : '#F1F5F9',
-                            borderColor: isSelected ? '#1D4ED8' : isDark ? '#334155' : '#E2E8F0',
-                            borderBottomColor: isSelected ? '#1E40AF' : isDark ? '#0B0F19' : '#CBD5E1',
-                          },
+                          styles.evalCohortPillText,
+                          { color: isSelected ? '#FFFFFF' : isDark ? '#CBD5E1' : '#475569' },
                         ]}>
-                        <Text
-                          style={[
-                            styles.evalCohortPillText,
-                            { color: isSelected ? '#FFFFFF' : isDark ? '#CBD5E1' : '#475569' },
-                          ]}>
-                          {b.classCode} {isDynamic ? '(Active)' : isCertExists ? '(Graduated)' : ''}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
+                        {b.classCode} {isDynamic ? '(Active)' : isCertExists ? '(Graduated)' : ''}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
 
-              {/* Status Notice if Already Certified */}
-              {existingCert ? (
-                <View style={styles.alreadyCertifiedBox}>
-                  <Ionicons name="checkmark-circle" size={20} color="#15803D" />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.alreadyCertifiedTitle}>
-                      Cohort Officially Certified!
+            {/* Status Notice if Already Certified */}
+            {existingCert ? (
+              <View
+                style={[
+                  styles.certifiedShowcaseCard,
+                  {
+                    backgroundColor: isDark ? '#022C22' : '#F0FDF4',
+                    borderColor: '#10B981',
+                    borderBottomColor: '#059669',
+                  },
+                ]}>
+                <View style={styles.showcaseTopRow}>
+                  <View style={styles.showcaseBadgeIcon}>
+                    <Ionicons name="ribbon" size={24} color="#059669" />
+                  </View>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text
+                      style={[
+                        styles.showcaseTitle,
+                        { color: isDark ? '#A7F3D0' : '#065F46' },
+                      ]}>
+                      Cohort Officially Certified! 🎓
                     </Text>
-                    <Text style={styles.alreadyCertifiedDesc}>
-                      Certificate #{existingCert.certificateNumber} for &quot;{existingCert.courseTitle}&quot; issued with composite score {existingCert.finalScore}/100.
+                    <Text
+                      style={[
+                        styles.showcaseSubtitle,
+                        { color: isDark ? '#6EE7B7' : '#047857' },
+                      ]}>
+                      Accredited Certificate #{existingCert.certificateNumber}
+                    </Text>
+                  </View>
+                  <View style={styles.verifiedBadge}>
+                    <Ionicons name="checkmark-done" size={13} color="#15803D" />
+                    <Text style={styles.verifiedBadgeText}>Verified</Text>
+                  </View>
+                </View>
+
+                <View
+                  style={[
+                    styles.showcaseDetailsBox,
+                    {
+                      backgroundColor: isDark ? '#064E3B' : '#FFFFFF',
+                      borderColor: isDark ? '#047857' : '#DCFCE7',
+                    },
+                  ]}>
+                  <View style={styles.showcaseDetailCol}>
+                    <Text style={styles.showcaseDetailLabel}>PROGRAM</Text>
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        styles.showcaseDetailVal,
+                        { color: isDark ? '#F8FAFC' : '#0F172A' },
+                      ]}>
+                      {existingCert.courseTitle}
+                    </Text>
+                  </View>
+                  <View style={styles.showcaseDetailCol}>
+                    <Text style={styles.showcaseDetailLabel}>RECIPIENT</Text>
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        styles.showcaseDetailVal,
+                        { color: isDark ? '#F8FAFC' : '#0F172A' },
+                      ]}>
+                      {existingCert.studentName}
+                    </Text>
+                  </View>
+                  <View style={styles.showcaseDetailCol}>
+                    <Text style={styles.showcaseDetailLabel}>COMPOSITE SCORE</Text>
+                    <Text
+                      style={[
+                        styles.showcaseDetailVal,
+                        { color: '#10B981', fontWeight: '900' },
+                      ]}>
+                      {existingCert.finalScore} / 100
                     </Text>
                   </View>
                 </View>
-              ) : (
-                <>
-                  <Text style={styles.formulaDesc}>
-                    {t.profile.weightedFormula}
-                  </Text>
 
-                  {/* Metric 1 */}
-                  <View style={styles.metricRow}>
-                    <View style={styles.metricRowLeft}>
-                      <Ionicons
-                        name={
-                          evalResult.completedLessons >= evalResult.totalLessons && evalResult.totalLessons > 0
-                            ? 'checkmark-circle'
-                            : 'ellipse-outline'
-                        }
-                        size={18}
-                        color={
-                          evalResult.completedLessons >= evalResult.totalLessons && evalResult.totalLessons > 0
-                            ? '#10B981'
-                            : '#94A3B8'
-                        }
-                      />
-                      <Text
-                        style={[
-                          styles.metricRowText,
-                          { color: isDark ? '#F8FAFC' : '#0F172A' },
-                        ]}>
-                        Curriculum Progress ({evalResult.completedLessons}/{evalResult.totalLessons} • 30% Weight)
-                      </Text>
-                    </View>
-                    <Text style={styles.metricRowValue}>
-                      {evalResult.lessonProgressPct}%
-                    </Text>
-                  </View>
-                  {/* Metric 2 */}
-                  <View style={styles.metricRow}>
-                    <View style={styles.metricRowLeft}>
-                      <Ionicons
-                        name={
-                          evalResult.quizAvg >= 80
-                            ? 'checkmark-circle'
-                            : 'ellipse-outline'
-                        }
-                        size={18}
-                        color={evalResult.quizAvg >= 80 ? '#10B981' : '#94A3B8'}
-                      />
-                      <Text
-                        style={[
-                          styles.metricRowText,
-                          { color: isDark ? '#F8FAFC' : '#0F172A' },
-                        ]}>
-                        Quiz Assessment Average (30% Weight)
-                      </Text>
-                    </View>
-                    <Text style={styles.metricRowValue}>{evalResult.quizAvg}%</Text>
-                  </View>
-
-                  {/* Metric 3 */}
-                  <View style={styles.metricRow}>
-                    <View style={styles.metricRowLeft}>
-                      <Ionicons
-                        name={
-                          evalResult.assignmentGrade >= 75
-                            ? 'checkmark-circle'
-                            : 'ellipse-outline'
-                        }
-                        size={18}
-                        color={evalResult.assignmentGrade >= 75 ? '#10B981' : '#94A3B8'}
-                      />
-                      <Text
-                        style={[
-                          styles.metricRowText,
-                          { color: isDark ? '#F8FAFC' : '#0F172A' },
-                        ]}>
-                        Instructor Project Score (40% Weight)
-                      </Text>
-                    </View>
-                    <Text style={styles.metricRowValue}>
-                      {evalResult.assignmentGrade > 0
-                        ? `${evalResult.assignmentGrade}/100`
-                        : 'Pending Review'}
-                    </Text>
-                  </View>
-
-                  {/* Graduation Requirement Note */}
-                  <View
+                {/* Responsive Action Grid: 100% Mobile Optimized */}
+                <View style={styles.showcaseActionGrid}>
+                  <TouchableOpacity
+                    onPress={() => setShowCertificateModal(true)}
                     style={[
-                      styles.statusNoteBox,
+                      styles.showcaseActionBtn,
                       {
-                        backgroundColor: evalResult.canGraduate
-                          ? '#DCFCE7'
-                          : isDark
-                          ? '#0F172A'
-                          : '#F1F5F9',
+                        backgroundColor: '#2563EB',
+                        borderColor: '#1D4ED8',
+                        borderBottomColor: '#1E40AF',
+                      },
+                    ]}>
+                    <Ionicons name="eye-outline" size={16} color="#FFFFFF" />
+                    <Text style={[styles.showcaseActionBtnText, { color: '#FFFFFF' }]}>
+                      View Certificate
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => printCertificatePDF(existingCert)}
+                    style={[
+                      styles.showcaseActionBtn,
+                      {
+                        backgroundColor: '#10B981',
+                        borderColor: '#059669',
+                        borderBottomColor: '#047857',
+                      },
+                    ]}>
+                    <Ionicons name="print-outline" size={16} color="#FFFFFF" />
+                    <Text style={[styles.showcaseActionBtnText, { color: '#FFFFFF' }]}>
+                      Print / Save PDF
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert(
+                        'Credential Copied',
+                        `Certificate ID: ${existingCert.certificateNumber}\nClass: ${existingCert.batchName}\nRecipient: ${existingCert.studentName}\n\nID copied for your professional portfolio verification.`
+                      );
+                    }}
+                    style={[
+                      styles.showcaseActionBtn,
+                      {
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        borderColor: isDark ? '#334155' : '#E2E8F0',
+                        borderBottomColor: isDark ? '#0B0F19' : '#CBD5E1',
                       },
                     ]}>
                     <Ionicons
-                      name={
-                        evalResult.canGraduate
-                          ? 'trophy'
-                          : 'information-circle-outline'
-                      }
-                      size={18}
-                      color={evalResult.canGraduate ? '#15803D' : '#64748B'}
+                      name="copy-outline"
+                      size={15}
+                      color={isDark ? '#CBD5E1' : '#475569'}
                     />
                     <Text
                       style={[
-                        styles.statusNoteText,
-                        {
-                          color: evalResult.canGraduate ? '#15803D' : '#64748B',
-                        },
+                        styles.showcaseActionBtnText,
+                        { color: isDark ? '#CBD5E1' : '#475569' },
                       ]}>
-                      {evalResult.canGraduate
-                        ? 'All graduation criteria satisfied! You are eligible to claim your official credential.'
-                        : 'Graduation standard: 100% lessons, all quizzes passed (≥80%), and project deliverable graded ≥75.'}
-                    </Text>
-                  </View>
-
-                  {/* Claim Button */}
-                  <TouchableOpacity
-                    onPress={handleClaimCertificatePress}
-                    disabled={!evalResult.canGraduate}
-                    style={[
-                      styles.claimBtn,
-                      {
-                        backgroundColor: evalResult.canGraduate
-                          ? '#10B981'
-                          : '#94A3B8',
-                        borderColor: evalResult.canGraduate
-                          ? '#059669'
-                          : '#64748B',
-                        borderBottomColor: evalResult.canGraduate
-                          ? '#047857'
-                          : '#475569',
-                        opacity: evalResult.canGraduate ? 1 : 0.6,
-                      },
-                    ]}>
-                    <Ionicons name="ribbon-outline" size={18} color="#FFFFFF" />
-                    <Text style={styles.claimBtnText}>
-                      {evalResult.canGraduate
-                        ? 'Claim Official Certificate (+200 XP)'
-                        : 'Certificate Locked'}
+                      Copy ID
                     </Text>
                   </TouchableOpacity>
-                </>
-              )}
-            </View>
-          </>
+                </View>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.formulaDesc}>
+                  {t.profile.weightedFormula}
+                </Text>
+
+                {/* Metric 1 */}
+                <View style={styles.metricRow}>
+                  <View style={styles.metricRowLeft}>
+                    <Ionicons
+                      name={
+                        evalResult.completedLessons >= evalResult.totalLessons && evalResult.totalLessons > 0
+                          ? 'checkmark-circle'
+                          : 'ellipse-outline'
+                      }
+                      size={18}
+                      color={
+                        evalResult.completedLessons >= evalResult.totalLessons && evalResult.totalLessons > 0
+                          ? '#10B981'
+                          : '#94A3B8'
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.metricRowText,
+                        { color: isDark ? '#F8FAFC' : '#0F172A' },
+                      ]}>
+                      Curriculum Progress ({evalResult.completedLessons}/{evalResult.totalLessons} • 30% Weight)
+                    </Text>
+                  </View>
+                  <Text style={styles.metricRowValue}>
+                    {evalResult.lessonProgressPct}%
+                  </Text>
+                </View>
+                {/* Metric 2 */}
+                <View style={styles.metricRow}>
+                  <View style={styles.metricRowLeft}>
+                    <Ionicons
+                      name={
+                        evalResult.quizAvg >= 80
+                          ? 'checkmark-circle'
+                          : 'ellipse-outline'
+                      }
+                      size={18}
+                      color={evalResult.quizAvg >= 80 ? '#10B981' : '#94A3B8'}
+                    />
+                    <Text
+                      style={[
+                        styles.metricRowText,
+                        { color: isDark ? '#F8FAFC' : '#0F172A' },
+                      ]}>
+                      Quiz Assessment Average (30% Weight)
+                    </Text>
+                  </View>
+                  <Text style={styles.metricRowValue}>{evalResult.quizAvg}%</Text>
+                </View>
+
+                {/* Metric 3 */}
+                <View style={styles.metricRow}>
+                  <View style={styles.metricRowLeft}>
+                    <Ionicons
+                      name={
+                        evalResult.assignmentGrade >= 75
+                          ? 'checkmark-circle'
+                          : 'ellipse-outline'
+                      }
+                      size={18}
+                      color={evalResult.assignmentGrade >= 75 ? '#10B981' : '#94A3B8'}
+                    />
+                    <Text
+                      style={[
+                        styles.metricRowText,
+                        { color: isDark ? '#F8FAFC' : '#0F172A' },
+                      ]}>
+                      Instructor Project Score (40% Weight)
+                    </Text>
+                  </View>
+                  <Text style={styles.metricRowValue}>
+                    {evalResult.assignmentGrade > 0
+                      ? `${evalResult.assignmentGrade}/100`
+                      : 'Pending Review'}
+                  </Text>
+                </View>
+
+                {/* Graduation Requirement Note */}
+                <View
+                  style={[
+                    styles.statusNoteBox,
+                    {
+                      backgroundColor: evalResult.canGraduate
+                        ? '#DCFCE7'
+                        : isDark
+                        ? '#0F172A'
+                        : '#F1F5F9',
+                    },
+                  ]}>
+                  <Ionicons
+                    name={
+                      evalResult.canGraduate
+                        ? 'trophy'
+                        : 'information-circle-outline'
+                    }
+                    size={18}
+                    color={evalResult.canGraduate ? '#15803D' : '#64748B'}
+                  />
+                  <Text
+                    style={[
+                      styles.statusNoteText,
+                      {
+                        color: evalResult.canGraduate ? '#15803D' : '#64748B',
+                      },
+                    ]}>
+                    {evalResult.canGraduate
+                      ? 'All graduation criteria satisfied! You are eligible to claim your official credential.'
+                      : 'Graduation standard: 100% lessons, all quizzes passed (≥80%), and project deliverable graded ≥75.'}
+                  </Text>
+                </View>
+
+                {/* Claim Button */}
+                <TouchableOpacity
+                  onPress={handleClaimCertificatePress}
+                  disabled={!evalResult.canGraduate}
+                  style={[
+                    styles.claimBtn,
+                    {
+                      backgroundColor: evalResult.canGraduate
+                        ? '#10B981'
+                        : '#94A3B8',
+                      borderColor: evalResult.canGraduate
+                        ? '#059669'
+                        : '#64748B',
+                      borderBottomColor: evalResult.canGraduate
+                        ? '#047857'
+                        : '#475569',
+                      opacity: evalResult.canGraduate ? 1 : 0.6,
+                    },
+                  ]}>
+                  <Ionicons name="ribbon-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.claimBtnText}>
+                    {evalResult.canGraduate
+                      ? 'Claim Official Certificate (+200 XP)'
+                      : 'Certificate Locked'}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         )}
 
         {/* Logout Button */}
@@ -978,6 +894,162 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+      </Modal>
+
+      {/* MODAL: VIEW ACCREDITED CERTIFICATE */}
+      <Modal
+        visible={showCertificateModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowCertificateModal(false)}>
+        <SafeAreaView
+          style={[
+            styles.certModalContainer,
+            { backgroundColor: isDark ? '#0F172A' : '#F1F5F9' },
+          ]}>
+          <View
+            style={[
+              styles.certModalHeader,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                borderBottomColor: isDark ? '#334155' : '#E2E8F0',
+              },
+            ]}>
+            <TouchableOpacity
+              onPress={() => setShowCertificateModal(false)}
+              style={styles.certModalCloseBtn}>
+              <Ionicons name="close" size={24} color={isDark ? '#F8FAFC' : '#0F172A'} />
+            </TouchableOpacity>
+
+            <View style={{ flex: 1, alignItems: 'center', paddingHorizontal: 8 }}>
+              <Text
+                style={[
+                  styles.certModalHeaderTitle,
+                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                ]}>
+                Official Accredited Certificate
+              </Text>
+              {(existingCert || certToDisplay) && (
+                <Text style={styles.certModalHeaderSub} numberOfLines={1}>
+                  {getCertificatePdfFilename(
+                    (existingCert || certToDisplay).batchName ||
+                      (existingCert || certToDisplay).courseTitle,
+                    (existingCert || certToDisplay).studentName
+                  )}
+                </Text>
+              )}
+            </View>
+
+            {(existingCert || certToDisplay) && (
+              <TouchableOpacity
+                onPress={() => printCertificatePDF(existingCert || certToDisplay)}
+                style={styles.certModalHeaderPrintBtn}>
+                <Ionicons name="print-outline" size={18} color="#2563EB" />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <ScrollView
+            contentContainerStyle={styles.certModalScrollContent}
+            showsVerticalScrollIndicator={false}>
+            {(existingCert || certToDisplay) ? (
+              <View style={styles.certModalFrame}>
+                <View style={styles.certModalInnerBorder}>
+                  <View style={styles.certModalBadgeCircle}>
+                    <Ionicons name="ribbon" size={36} color="#D97706" />
+                  </View>
+
+                  <Text style={styles.certModalTitle}>CERTIFICATE OF COMPLETION</Text>
+                  <Text style={styles.certModalNumber}>
+                    CREDENTIAL #{(existingCert || certToDisplay).certificateNumber}
+                  </Text>
+
+                  <View style={styles.certModalDivider} />
+
+                  <Text style={styles.certModalLead}>
+                    This is to officially certify that
+                  </Text>
+                  <Text style={styles.certModalRecipient}>
+                    {(existingCert || certToDisplay).studentName}
+                  </Text>
+
+                  <Text style={styles.certModalDesc}>
+                    has successfully completed all required curriculum modules, rigorous assessments, and capstone project deliverables for the accredited collaborative learning program:
+                  </Text>
+
+                  <Text style={styles.certModalProgram}>
+                    {(existingCert || certToDisplay).courseTitle}
+                  </Text>
+                  <Text style={styles.certModalCohort}>
+                    {(existingCert || certToDisplay).batchName}
+                  </Text>
+
+                  <View style={styles.certModalFooter}>
+                    <View style={styles.certModalScoreBox}>
+                      <Text style={styles.certModalScoreLabel}>COMPOSITE SCORE</Text>
+                      <Text style={styles.certModalScoreVal}>
+                        {(existingCert || certToDisplay).finalScore} / 100
+                      </Text>
+                    </View>
+
+                    <View style={styles.certModalSealBox}>
+                      <Ionicons name="shield-checkmark" size={16} color="#059669" />
+                      <Text style={styles.certModalSealText}>VERIFIED CREDENTIAL</Text>
+                    </View>
+
+                    <View style={styles.certModalSigBox}>
+                      <Text style={styles.certModalSigName}>
+                        {(existingCert || certToDisplay).instructorName}
+                      </Text>
+                      <Text style={styles.certModalSigTitle}>
+                        Lead Instructor & Academic Mentor
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ) : null}
+          </ScrollView>
+
+          {/* Modal Action Bar */}
+          {(existingCert || certToDisplay) && (
+            <View
+              style={[
+                styles.certModalActionBar,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  borderTopColor: isDark ? '#334155' : '#E2E8F0',
+                },
+              ]}>
+              <TouchableOpacity
+                onPress={() => printCertificatePDF(existingCert || certToDisplay)}
+                style={styles.certModalPrintActionBtn}>
+                <Ionicons name="print-outline" size={18} color="#FFFFFF" />
+                <Text style={styles.certModalPrintActionText}>
+                  Print / Save PDF
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setShowCertificateModal(false)}
+                style={[
+                  styles.certModalCloseActionBtn,
+                  {
+                    backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
+                    borderColor: isDark ? '#334155' : '#CBD5E1',
+                  },
+                ]}>
+                <Text
+                  style={[
+                    styles.certModalCloseActionText,
+                    { color: isDark ? '#CBD5E1' : '#475569' },
+                  ]}>
+                  Close
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
@@ -1165,23 +1237,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
+    gap: 8,
   },
   metricRowLeft: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginRight: 8,
   },
   metricRowText: {
+    flex: 1,
     fontSize: 13,
     fontWeight: '700',
+    flexWrap: 'wrap',
   },
   metricRowValue: {
     fontSize: 13,
     fontWeight: '800',
     color: '#2563EB',
+    flexShrink: 0,
   },
   statusNoteBox: {
     flexDirection: 'row',
@@ -1213,124 +1291,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 14,
   },
-  // CERTIFICATE STYLES
-  certificateCard: {
-    backgroundColor: '#FFFBEB',
-    borderRadius: 20,
-    padding: 10,
-    borderWidth: 3,
-    borderColor: '#D97706',
-    borderBottomWidth: 6,
-    borderBottomColor: '#B45309',
-    marginBottom: 20,
-    shadowColor: '#D97706',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  certInnerBorder: {
-    borderWidth: 1.5,
-    borderColor: '#F59E0B',
-    borderRadius: 14,
-    padding: 16,
-    alignItems: 'center',
-  },
-  certHeader: {
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  certTitle: {
-    fontSize: 14,
-    fontWeight: '900',
-    letterSpacing: 1.5,
-    color: '#92400E',
-    marginTop: 6,
-  },
-  certNumber: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#B45309',
-    marginTop: 2,
-  },
-  certLead: {
-    fontSize: 11,
-    color: '#78350F',
-    marginBottom: 4,
-  },
-  certStudentName: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#1E3A8A',
-    marginBottom: 8,
-  },
-  certBody: {
-    fontSize: 11,
-    color: '#78350F',
-    textAlign: 'center',
-    lineHeight: 16,
-    marginBottom: 6,
-  },
-  certCourseName: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#0F172A',
-    textAlign: 'center',
-  },
-  certBatchName: {
-    fontSize: 11,
-    color: '#2563EB',
-    fontWeight: '700',
-    marginBottom: 16,
-  },
-  certFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#FDE68A',
-  },
-  certScoreBox: {
-    alignItems: 'flex-start',
-  },
-  certScoreLabel: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#92400E',
-  },
-  certScoreValue: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#15803D',
-  },
-  certSignBox: {
-    alignItems: 'flex-end',
-  },
-  certSignName: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  certSignTitle: {
-    fontSize: 9,
-    color: '#64748B',
-  },
-  resetContainerBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderBottomWidth: 4,
-    gap: 8,
-    minHeight: 48,
-  },
-  resetContainerText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#EF4444',
-  },
   cohortSelectorBox: {
     marginBottom: 14,
   },
@@ -1357,118 +1317,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
   },
-  galleryCard: {
-    padding: 18,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderBottomWidth: 5,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  galleryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  galleryTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  gallerySubtitle: {
-    fontSize: 12,
-    color: '#64748B',
-  },
-  certCountBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: '#FDE68A',
-    borderBottomColor: '#D97706',
-    borderBottomWidth: 3,
-  },
-  certCountBadgeText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#B45309',
-  },
-  certSelectorRow: {
-    marginBottom: 14,
-  },
-  certSelectorLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-    marginBottom: 6,
-  },
-  certPillsScroll: {
-    gap: 8,
-  },
-  certChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderBottomWidth: 3.5,
-    maxWidth: 240,
-    minHeight: 40,
-  },
-  certChipTitle: {
-    fontSize: 12,
-    maxWidth: 140,
-  },
-  certChipScore: {
-    backgroundColor: 'rgba(217, 119, 6, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  certChipScoreText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#B45309',
-  },
-  certActionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
-    marginTop: 14,
-    width: '100%',
-  },
-  certActionBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderBottomWidth: 3.5,
-    borderColor: '#FDE68A',
-    borderBottomColor: '#D97706',
-    backgroundColor: '#FEF3C7',
-    minHeight: 42,
-  },
-  certActionBtnText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#B45309',
-  },
   evalCohortSelector: {
     marginBottom: 14,
   },
@@ -1494,28 +1342,349 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
   },
-  alreadyCertifiedBox: {
+  resetContainerBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DCFCE7',
-    padding: 14,
-    borderRadius: 14,
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
+    gap: 8,
+    minHeight: 48,
+  },
+  resetContainerText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#EF4444',
+  },
+  // CERTIFIED SHOWCASE CARD (NEW SINGLE SOURCE OF TRUTH)
+  certifiedShowcaseCard: {
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 2,
+    borderBottomWidth: 5,
+    marginBottom: 8,
+  },
+  showcaseTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
+    marginBottom: 14,
+    flexWrap: 'wrap',
+  },
+  showcaseBadgeIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#DCFCE7',
     borderWidth: 1.5,
     borderColor: '#86EFAC',
-    borderBottomColor: '#4ADE80',
-    borderBottomWidth: 3.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
-  alreadyCertifiedTitle: {
-    fontSize: 14,
+  showcaseTitle: {
+    fontSize: 15,
     fontWeight: '800',
-    color: '#15803D',
     marginBottom: 2,
   },
-  alreadyCertifiedDesc: {
+  showcaseSubtitle: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#86EFAC',
+    flexShrink: 0,
+  },
+  verifiedBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#15803D',
+  },
+  showcaseDetailsBox: {
+    flexDirection: 'row',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    marginBottom: 14,
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  showcaseDetailCol: {
+    flex: 1,
+    minWidth: 80,
+  },
+  showcaseDetailLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#64748B',
+    letterSpacing: 0.8,
+    marginBottom: 3,
+    textTransform: 'uppercase',
+  },
+  showcaseDetailVal: {
     fontSize: 12,
-    color: '#166534',
+    fontWeight: '700',
+  },
+  showcaseActionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  showcaseActionBtn: {
+    flex: 1,
+    minWidth: 100,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
+    minHeight: 44,
+  },
+  showcaseActionBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  // CERTIFICATE PREVIEW MODAL STYLES
+  certModalContainer: {
+    flex: 1,
+  },
+  certModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  certModalCloseBtn: {
+    padding: 4,
+  },
+  certModalHeaderTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  certModalHeaderSub: {
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  certModalHeaderPrintBtn: {
+    padding: 6,
+    borderRadius: 10,
+    backgroundColor: '#EFF6FF',
+  },
+  certModalScrollContent: {
+    padding: 16,
+    paddingBottom: 24,
+    alignItems: 'center',
+  },
+  certModalFrame: {
+    width: '100%',
+    maxWidth: 600,
+    backgroundColor: '#FFFDF7',
+    borderRadius: 22,
+    padding: 14,
+    borderWidth: 6,
+    borderColor: '#D97706',
+    borderBottomWidth: 8,
+    borderBottomColor: '#B45309',
+    shadowColor: '#D97706',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  certModalInnerBorder: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#B45309',
+    borderRadius: 14,
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  certModalBadgeCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FEF3C7',
+    borderWidth: 2,
+    borderColor: '#D97706',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  certModalTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 2,
+    color: '#92400E',
+    textAlign: 'center',
+  },
+  certModalNumber: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#D97706',
+    letterSpacing: 0.8,
+    marginTop: 2,
+    marginBottom: 12,
+  },
+  certModalDivider: {
+    width: 80,
+    height: 2,
+    backgroundColor: '#FDE68A',
+    marginBottom: 12,
+  },
+  certModalLead: {
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    color: '#78350F',
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  certModalRecipient: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#1E3A8A',
+    textAlign: 'center',
+    marginBottom: 12,
+    textDecorationLine: 'underline',
+    textDecorationColor: '#FBBF24',
+  },
+  certModalDesc: {
+    fontSize: 11,
+    color: '#475569',
+    textAlign: 'center',
     lineHeight: 16,
+    marginBottom: 10,
+    maxWidth: 440,
+  },
+  certModalProgram: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0F172A',
+    textAlign: 'center',
+  },
+  certModalCohort: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#2563EB',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  certModalFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    width: '100%',
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+    marginTop: 6,
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  certModalScoreBox: {
+    alignItems: 'flex-start',
+  },
+  certModalScoreLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#64748B',
+    letterSpacing: 0.5,
+  },
+  certModalScoreVal: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#10B981',
+  },
+  certModalSealBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+  },
+  certModalSealText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#059669',
+  },
+  certModalSigBox: {
+    alignItems: 'flex-end',
+  },
+  certModalSigName: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#0F172A',
+    borderBottomWidth: 1,
+    borderBottomColor: '#0F172A',
+    paddingBottom: 2,
+  },
+  certModalSigTitle: {
+    fontSize: 9,
+    color: '#64748B',
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  certModalActionBar: {
+    padding: 14,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  certModalPrintActionBtn: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#2563EB',
+    borderColor: '#1D4ED8',
+    borderWidth: 1.5,
+    borderBottomColor: '#1E40AF',
+    borderBottomWidth: 4,
+    borderRadius: 14,
+    paddingVertical: 12,
+    minHeight: 48,
+  },
+  certModalPrintActionText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  certModalCloseActionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderBottomWidth: 4,
+    paddingVertical: 12,
+    minHeight: 48,
+  },
+  certModalCloseActionText: {
+    fontSize: 13,
+    fontWeight: '800',
   },
   // OFFICIAL CERTIFICATE NAME CARD
   certNameCard: {
@@ -1564,11 +1733,15 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   certNameValueText: {
     fontSize: 14,
     fontWeight: '800',
     flex: 1,
+    minWidth: 120,
+    marginRight: 8,
   },
   editCertNameBtn: {
     flexDirection: 'row',
@@ -1582,47 +1755,12 @@ const styles = StyleSheet.create({
     borderColor: '#BFDBFE',
     borderBottomColor: '#93C5FD',
     borderBottomWidth: 3.5,
+    flexShrink: 0,
   },
   editCertNameBtnText: {
     color: '#2563EB',
     fontSize: 12,
     fontWeight: '800',
-  },
-  // EMPTY CERTIFICATE PORTFOLIO
-  emptyCertPortfolio: {
-    padding: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFBEB',
-    borderRadius: 20,
-    borderWidth: 2,
-    borderBottomWidth: 5,
-    borderColor: '#FDE68A',
-    borderBottomColor: '#F59E0B',
-  },
-  emptyCertIconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 20,
-    backgroundColor: '#FEF3C7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    borderWidth: 1.5,
-    borderColor: '#FDE68A',
-  },
-  emptyCertTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  emptyCertDesc: {
-    fontSize: 12,
-    color: '#92400E',
-    textAlign: 'center',
-    lineHeight: 18,
-    maxWidth: 290,
   },
   emptyMonitoringBox: {
     padding: 16,

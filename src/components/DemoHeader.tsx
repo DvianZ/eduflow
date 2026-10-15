@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native';
 import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -20,6 +21,8 @@ export function DemoHeader() {
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { t } = useTranslation();
+  const { width: screenWidth } = useWindowDimensions();
+  const isCompactMobile = screenWidth < 430;
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showFeatureTour, setShowFeatureTour] = useState(false);
@@ -113,12 +116,13 @@ export function DemoHeader() {
             ]}>
             <Ionicons name="school" size={16} color="#FFFFFF" />
           </View>
-          <View>
+          <View style={styles.brandTextWrapper}>
             <Text
               style={[
                 styles.brandTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
-              ]}>
+              ]}
+              numberOfLines={1}>
               EduFlow <Text style={styles.cohortTag}>{t.header.cohortTag}</Text>
             </Text>
             <Text style={styles.userSubtitle} numberOfLines={1}>
@@ -134,28 +138,21 @@ export function DemoHeader() {
               { backgroundColor: isDark ? '#1E293B' : '#FEF3C7' },
             ]}>
             <Text style={styles.streakText}>🔥 {userStreak.currentStreak}d</Text>
-            <Text style={styles.xpText}>{userStreak.totalXp} XP</Text>
           </View>
 
           {/* Feature Tour Guide Button */}
           <TouchableOpacity
             onPress={() => setShowFeatureTour(true)}
             style={[
-              styles.tourBtn,
+              styles.iconBtn,
               {
                 backgroundColor: isDark ? '#1E293B' : '#EFF6FF',
+                borderWidth: 1,
                 borderColor: isDark ? '#334155' : '#BFDBFE',
               },
             ]}
             accessibilityLabel={t.header.guideBtn}>
-            <Ionicons name="sparkles" size={13} color="#2563EB" />
-            <Text
-              style={[
-                styles.tourBtnText,
-                { color: isDark ? '#93C5FD' : '#1D4ED8' },
-              ]}>
-              {t.header.guideBtn}
-            </Text>
+            <Ionicons name="sparkles" size={15} color="#2563EB" />
           </TouchableOpacity>
 
           {/* In-App Notification Bell */}
@@ -198,29 +195,34 @@ export function DemoHeader() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleReset}
-            style={[
-              styles.iconBtn,
-              { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
-            ]}
-            accessibilityLabel={t.common.reset}>
-            <Ionicons
-              name="refresh-outline"
-              size={16}
-              color={isDark ? '#94A3B8' : '#64748B'}
-            />
-          </TouchableOpacity>
+          {/* Quick testing actions (shown on wider screens / tablets / web) */}
+          {!isCompactMobile && (
+            <>
+              <TouchableOpacity
+                onPress={handleReset}
+                style={[
+                  styles.iconBtn,
+                  { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
+                ]}
+                accessibilityLabel={t.common.reset}>
+                <Ionicons
+                  name="refresh-outline"
+                  size={16}
+                  color={isDark ? '#94A3B8' : '#64748B'}
+                />
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleLogout}
-            style={[
-              styles.iconBtn,
-              { backgroundColor: isDark ? '#371520' : '#FEE2E2' },
-            ]}
-            accessibilityLabel={t.common.logout}>
-            <Ionicons name="log-out-outline" size={16} color="#DC2626" />
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleLogout}
+                style={[
+                  styles.iconBtn,
+                  { backgroundColor: isDark ? '#371520' : '#FEE2E2' },
+                ]}
+                accessibilityLabel={t.common.logout}>
+                <Ionicons name="log-out-outline" size={16} color="#DC2626" />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
 
@@ -333,6 +335,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     flex: 1,
+    minWidth: 0,
+    marginRight: 6,
+  },
+  brandTextWrapper: {
+    flex: 1,
+    minWidth: 0,
   },
   logoIcon: {
     width: 32,
@@ -340,9 +348,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   brandTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     letterSpacing: -0.3,
   },
@@ -355,20 +364,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#64748B',
     fontWeight: '500',
-    maxWidth: 160,
+    flexShrink: 1,
   },
   rightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
+    flexShrink: 0,
   },
   streakBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 4,
     borderRadius: 12,
-    gap: 6,
   },
   streakText: {
     fontSize: 11,

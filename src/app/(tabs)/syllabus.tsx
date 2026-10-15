@@ -665,7 +665,7 @@ export default function SyllabusScreen() {
                             styles.chipTagText,
                             { color: isSelected ? '#FFFFFF' : '#2563EB' },
                           ]}>
-                          Aktif
+                          Active
                         </Text>
                       </View>
                     )}
@@ -684,7 +684,7 @@ export default function SyllabusScreen() {
                             styles.chipTagText,
                             { color: isSelected ? '#FFFFFF' : '#15803D' },
                           ]}>
-                          Lulus
+                          Graduated
                         </Text>
                       </View>
                     )}
@@ -715,7 +715,7 @@ export default function SyllabusScreen() {
           <View style={styles.courseBannerHeader}>
             <View style={styles.categoryBadge}>
               <Text style={styles.categoryBadgeText}>
-                {activeCourse?.category || 'Program Sertifikasi'}
+                {activeCourse?.category || 'Accredited Certification'}
               </Text>
             </View>
 
@@ -731,15 +731,15 @@ export default function SyllabusScreen() {
 
           <View style={styles.courseBannerMetaRow}>
             <View style={styles.metaCol}>
-              <Text style={styles.metaLabel}>Instruktur:</Text>
+              <Text style={styles.metaLabel}>Instructor:</Text>
               <Text style={styles.metaValue}>
                 {activeBatch.instructorName}
               </Text>
             </View>
             <View style={styles.metaCol}>
-              <Text style={styles.metaLabel}>Status Kelas:</Text>
+              <Text style={styles.metaLabel}>Cohort Status:</Text>
               <Text style={[styles.metaValue, { color: '#A7F3D0' }]}>
-                {activeBatch.status === 'completed' ? 'Selesai (Graduated)' : 'Aktif Berjalan'}
+                {activeBatch.status === 'completed' ? 'Completed (Graduated)' : 'Active Cohort'}
               </Text>
             </View>
           </View>
@@ -749,7 +749,7 @@ export default function SyllabusScreen() {
             <View style={styles.dynamicNoticeBox}>
               <Ionicons name="sparkles" size={16} color="#FDE047" />
               <Text style={styles.dynamicNoticeText}>
-                Kelas ini menerapkan <Text style={{ fontWeight: '800', color: '#FDE047' }}>kurikulum terstruktur & interaktif</Text> (pembelajaran bertahap, evaluasi kuis, pengumpulan proyek, penilaian mentor & penerbitan sertifikat resmi).
+                This cohort applies an <Text style={{ fontWeight: '800', color: '#FDE047' }}>interactive & structured curriculum</Text> (step-by-step units, quiz evaluations, project deliverables, mentor reviews & accredited certificate issuance).
               </Text>
             </View>
           ) : (
@@ -785,7 +785,7 @@ export default function SyllabusScreen() {
               }}
               style={styles.addModuleHeaderBtn}>
               <Ionicons name="add-circle" size={16} color="#8B5CF6" />
-              <Text style={styles.addModuleHeaderBtnText}>+ Modul Baru</Text>
+              <Text style={styles.addModuleHeaderBtnText}>+ New Module</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -805,10 +805,10 @@ export default function SyllabusScreen() {
                 styles.emptyStateTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Belum Ada Modul
+              No Modules Yet
             </Text>
             <Text style={styles.emptyStateDesc}>
-              Kurikulum untuk kelas ini sedang dipersiapkan oleh tim akademik.
+              Curriculum for this cohort is currently being prepared by the academic team.
             </Text>
           </View>
         )}
@@ -848,14 +848,14 @@ export default function SyllabusScreen() {
                       onPress={() => handleOpenAddLesson(mod.id)}
                       style={styles.addMiniBtn}>
                       <Ionicons name="add-circle" size={14} color="#8B5CF6" />
-                      <Text style={styles.addMiniBtnText}>+ Materi</Text>
+                      <Text style={styles.addMiniBtnText}>+ Lesson</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={() => handleOpenAddAssignment(mod.id)}
                       style={[styles.addMiniBtn, { borderColor: '#6366F1' }]}>
                       <Ionicons name="add-circle" size={14} color="#6366F1" />
-                      <Text style={[styles.addMiniBtnText, { color: '#6366F1' }]}>+ Tugas</Text>
+                      <Text style={[styles.addMiniBtnText, { color: '#6366F1' }]}>+ Assignment</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -939,7 +939,7 @@ export default function SyllabusScreen() {
                             {lesson.title}
                           </Text>
                           <Text style={styles.itemMeta}>
-                            Materi Bacaan • {lesson.durationMinutes} menit
+                            Reading Material • {lesson.durationMinutes} min
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -967,7 +967,7 @@ export default function SyllabusScreen() {
                                   : '#94A3B8',
                               },
                             ]}>
-                            {isDone ? 'Selesai' : unlocked || isTeacher ? 'Buka' : 'Terkunci'}
+                            {isDone ? 'Completed' : unlocked || isTeacher ? 'Open' : 'Locked'}
                           </Text>
                         </View>
 
@@ -976,7 +976,7 @@ export default function SyllabusScreen() {
                           <TouchableOpacity
                             onPress={() => handleDeleteLesson(lesson)}
                             style={styles.deleteIconBtn}
-                            accessibilityLabel="Hapus materi">
+                            accessibilityLabel="Delete lesson">
                             <Ionicons name="trash-outline" size={16} color="#EF4444" />
                           </TouchableOpacity>
                         )}
@@ -1053,7 +1053,7 @@ export default function SyllabusScreen() {
                             {modQuiz.title}
                           </Text>
                           <Text style={styles.itemMeta}>
-                            Kuis Evaluasi • Min {modQuiz.passingScorePercentage}%
+                            Module Assessment Quiz • Min {modQuiz.passingScorePercentage}%
                           </Text>
                         </View>
                       </View>
@@ -1081,10 +1081,10 @@ export default function SyllabusScreen() {
                             },
                           ]}>
                           {isPassed
-                            ? `Lulus (${quizAttempt?.scorePercentage}%)`
+                            ? `Passed (${quizAttempt?.scorePercentage}%)`
                             : unlocked || isTeacher
-                            ? 'Mulai Kuis'
-                            : 'Terkunci'}
+                            ? 'Start Quiz'
+                            : 'Locked'}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -1182,14 +1182,14 @@ export default function SyllabusScreen() {
                             {assignment.title}
                           </Text>
                           <Text style={styles.itemMeta}>
-                            Tugas Proyek • Max {assignment.maxScore} Poin
+                            Project Assignment • Max {assignment.maxScore} Pts
                           </Text>
                           <Text style={styles.dueDateLabel}>
-                            ⏰ Batas Waktu: {assignment.dueDate}
+                            ⏰ Deadline: {assignment.dueDate}
                           </Text>
                           {!unlocked && !isTeacher && (
                             <Text style={styles.lockHintText}>
-                              🔒 Terkunci (Selesaikan materi Modul 1 & Kuis Modul 1 dahulu)
+                              🔒 Locked (Complete Module 1 lessons & quiz first)
                             </Text>
                           )}
                         </View>
@@ -1225,12 +1225,12 @@ export default function SyllabusScreen() {
                               },
                             ]}>
                             {grade
-                              ? `Nilai: ${grade.score}`
+                              ? `Score: ${grade.score}`
                               : sub
-                              ? 'Menunggu Nilai'
+                              ? 'Pending Review'
                               : unlocked || isTeacher
-                              ? 'Kumpulkan'
-                              : 'Terkunci'}
+                              ? 'Submit'
+                              : 'Locked'}
                           </Text>
                         </View>
 
@@ -1240,14 +1240,14 @@ export default function SyllabusScreen() {
                             <TouchableOpacity
                               onPress={() => handleOpenEditDueDate(assignment)}
                               style={styles.editDateBtn}
-                              accessibilityLabel="Ubah batas waktu">
+                              accessibilityLabel="Edit deadline">
                               <Ionicons name="calendar-outline" size={16} color="#8B5CF6" />
                             </TouchableOpacity>
 
                             <TouchableOpacity
                               onPress={() => handleDeleteAssignment(assignment)}
                               style={styles.deleteIconBtn}
-                              accessibilityLabel="Hapus tugas">
+                              accessibilityLabel="Delete assignment">
                               <Ionicons name="trash-outline" size={16} color="#EF4444" />
                             </TouchableOpacity>
                           </View>
@@ -1283,7 +1283,7 @@ export default function SyllabusScreen() {
                   styles.modalHeaderTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                Materi Pembelajaran
+                Learning Material
               </Text>
               {currentLessonModule && (
                 <Text style={styles.modalHeaderSub} numberOfLines={1}>
@@ -1333,8 +1333,8 @@ export default function SyllabusScreen() {
                         },
                       ]}>
                       {selectedLesson.contentType === 'video'
-                        ? 'Video Pelajaran'
-                        : 'Materi Bacaan'}
+                        ? 'Video Lesson'
+                        : 'Reading Material'}
                     </Text>
                   </View>
 
@@ -1345,14 +1345,14 @@ export default function SyllabusScreen() {
                     ]}>
                     <Ionicons name="time-outline" size={13} color="#64748B" />
                     <Text style={styles.lessonDurationText}>
-                      {selectedLesson.durationMinutes} Menit
+                      {selectedLesson.durationMinutes} Min
                     </Text>
                   </View>
 
                   {completedLessonIds.includes(selectedLesson.id) && (
                     <View style={styles.completedBadgePill}>
                       <Ionicons name="checkmark-circle" size={13} color="#10B981" />
-                      <Text style={styles.completedBadgePillText}>Selesai</Text>
+                      <Text style={styles.completedBadgePillText}>Completed</Text>
                     </View>
                   )}
                 </View>
@@ -1379,11 +1379,11 @@ export default function SyllabusScreen() {
                       <View style={styles.videoIconCircle}>
                         <Ionicons name="play" size={28} color="#FFFFFF" />
                       </View>
-                      <Text style={styles.videoPlayerTitle}>Pemutar Video Interaktif</Text>
+                      <Text style={styles.videoPlayerTitle}>Interactive Video Player</Text>
                       <Text style={styles.videoPlayerSub} numberOfLines={1}>
                         {selectedLesson.videoUrl
                           ? selectedLesson.videoUrl
-                          : 'Tautan video pembelajaran modul'}
+                          : 'Module video lesson URL'}
                       </Text>
                       {selectedLesson.videoUrl && (
                         <TouchableOpacity
@@ -1519,7 +1519,7 @@ export default function SyllabusScreen() {
                 styles.modalHeaderTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Kuis Evaluasi Modul
+              Module Assessment Quiz
             </Text>
             <View style={{ width: 24 }} />
           </View>
@@ -1535,7 +1535,7 @@ export default function SyllabusScreen() {
                   {selectedQuiz.title}
                 </Text>
                 <Text style={styles.quizInstructions}>
-                  Pilih jawaban yang paling tepat. Minimal kelulusan adalah{' '}
+                  Select the most accurate response. Passing threshold is{' '}
                   {selectedQuiz.passingScorePercentage}%.
                 </Text>
 
@@ -1628,7 +1628,7 @@ export default function SyllabusScreen() {
               onPress={handleSubmitQuizPress}
               style={styles.tactileBtnGreen}>
               <Ionicons name="send" size={18} color="#FFFFFF" />
-              <Text style={styles.tactileBtnGreenText}>Kirim Jawaban Kuis</Text>
+              <Text style={styles.tactileBtnGreenText}>Submit Quiz Answers</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -1654,7 +1654,7 @@ export default function SyllabusScreen() {
                 styles.modalHeaderTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Pengumpulan Tugas Proyek
+              Project Deliverable Submission
             </Text>
             <View style={{ width: 24 }} />
           </View>
@@ -2417,12 +2417,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 14,
+    flexWrap: 'wrap',
+    gap: 8,
   },
   moduleTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     flex: 1,
+    minWidth: 140,
   },
   moduleTitle: {
     fontSize: 16,
@@ -2434,6 +2437,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    flexWrap: 'wrap',
   },
   addMiniBtn: {
     flexDirection: 'row',
@@ -2470,6 +2474,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     flex: 1,
+    minWidth: 0,
+    marginRight: 8,
   },
   statusIcon: {
     width: 38,
@@ -2507,6 +2513,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    flexShrink: 0,
   },
   badgePill: {
     paddingHorizontal: 10,
