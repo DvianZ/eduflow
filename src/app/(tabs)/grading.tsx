@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  useColorScheme,
   Alert,
 } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { DemoHeader } from '@/components/DemoHeader';
@@ -28,7 +28,7 @@ import { useTranslation } from '@/i18n';
 export default function GradingScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
 
   const {
     currentRole,
@@ -199,12 +199,12 @@ export default function GradingScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.heroHeaderTitle}>
-                {isTeacher ? t.assignment.gradingQueueTitle : (language === 'en' ? 'Project Deliverables & Feedback' : 'Status Tugas & Feedback')}
+                {isTeacher ? t.assignment.gradingQueueTitle : 'Project Deliverables & Feedback'}
               </Text>
               <Text style={styles.heroHeaderSubtitle}>
                 {isTeacher
                   ? t.assignment.gradingQueueSubtitle
-                  : (language === 'en' ? 'Track your deliverable scores and review mentor feedback' : 'Pantau nilai resmi dan ulasan perbaikan dari mentor Anda')}
+                  : 'Track your deliverable scores and review mentor feedback'}
               </Text>
             </View>
           </View>
@@ -231,10 +231,10 @@ export default function GradingScreen() {
                     styles.exportCardTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  {language === 'en' ? 'Cohort Gradebook Export' : 'Rekapitulasi Nilai Siswa'}
+                  Cohort Gradebook Export
                 </Text>
                 <Text style={styles.exportCardSub}>
-                  {language === 'en' ? 'Export quiz evaluations, project deliverables, and graduation status to CSV/Excel' : 'Ekspor rekap nilai kuis, tugas proyek & status kelulusan ke CSV/Excel'}
+                  Export quiz evaluations, project deliverables, and graduation status to CSV/Excel
                 </Text>
               </View>
             </View>

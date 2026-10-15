@@ -158,7 +158,8 @@ export type NotificationType =
   | 'revision'
   | 'announcement'
   | 'system'
-  | 'enrollment';
+  | 'enrollment'
+  | 'deadline';
 
 export interface InAppNotification {
   id: string;

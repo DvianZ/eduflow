@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  useColorScheme,
   Alert,
   Modal,
   TextInput,
 } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -18,12 +18,13 @@ import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { calculateBatchEvaluation } from '@/utils/lockEngine';
 import { useTranslation } from '@/i18n';
+import { triggerMilestoneFeedback } from '@/utils/feedback';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
   const { logout, registeredUsers, updateCertificateName: authUpdateCertName } =
     useAuthStore();
 
@@ -135,6 +136,7 @@ export default function ProfileScreen() {
 
     const cert = claimCertificate(activeBatch.id);
     if (cert) {
+      triggerMilestoneFeedback();
       setSelectedCertId(cert.id);
       Alert.alert(
         '🎉 Congratulations! Official Credential Issued',
@@ -556,7 +558,7 @@ export default function ProfileScreen() {
                     </View>
 
                     <Text style={styles.certLead}>
-                      {language === 'en' ? 'This is to officially certify that:' : 'Dengan ini menyatakan bahwa:'}
+                      This is to officially certify that:
                     </Text>
                     <Text style={styles.certStudentName}>
                       {certToDisplay.studentName}
@@ -696,7 +698,7 @@ export default function ProfileScreen() {
                             styles.evalCohortPillText,
                             { color: isSelected ? '#FFFFFF' : isDark ? '#CBD5E1' : '#475569' },
                           ]}>
-                          {b.classCode} {isDynamic ? (language === 'en' ? '(Active)' : '(Aktif)') : isCertExists ? (language === 'en' ? '(Graduated)' : '(Lulus)') : ''}
+                          {b.classCode} {isDynamic ? '(Active)' : isCertExists ? '(Graduated)' : ''}
                         </Text>
                       </TouchableOpacity>
                     );
@@ -710,12 +712,10 @@ export default function ProfileScreen() {
                   <Ionicons name="checkmark-circle" size={20} color="#15803D" />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.alreadyCertifiedTitle}>
-                      {language === 'en' ? 'Cohort Officially Certified!' : 'Kelas Telah Tersertifikasi!'}
+                      Cohort Officially Certified!
                     </Text>
                     <Text style={styles.alreadyCertifiedDesc}>
-                      {language === 'en'
-                        ? `Certificate #${existingCert.certificateNumber} for "${existingCert.courseTitle}" issued with composite score ${existingCert.finalScore}/100.`
-                        : `Sertifikat nomor ${existingCert.certificateNumber} untuk program "${existingCert.courseTitle}" telah terbit dengan nilai akhir ${existingCert.finalScore}/100.`}
+                      Certificate #{existingCert.certificateNumber} for &quot;{existingCert.courseTitle}&quot; issued with composite score {existingCert.finalScore}/100.
                     </Text>
                   </View>
                 </View>
@@ -746,9 +746,7 @@ export default function ProfileScreen() {
                           styles.metricRowText,
                           { color: isDark ? '#F8FAFC' : '#0F172A' },
                         ]}>
-                        {language === 'en'
-                          ? `Curriculum Progress (${evalResult.completedLessons}/${evalResult.totalLessons} • 30% Weight)`
-                          : `Progres Materi (${evalResult.completedLessons}/${evalResult.totalLessons} • Bobot 30%)`}
+                        Curriculum Progress ({evalResult.completedLessons}/{evalResult.totalLessons} • 30% Weight)
                       </Text>
                     </View>
                     <Text style={styles.metricRowValue}>
@@ -772,7 +770,7 @@ export default function ProfileScreen() {
                           styles.metricRowText,
                           { color: isDark ? '#F8FAFC' : '#0F172A' },
                         ]}>
-                        {language === 'en' ? 'Quiz Assessment Average (30% Weight)' : 'Rerata Kuis Lulus (Bobot 30%)'}
+                        Quiz Assessment Average (30% Weight)
                       </Text>
                     </View>
                     <Text style={styles.metricRowValue}>{evalResult.quizAvg}%</Text>
@@ -861,8 +859,8 @@ export default function ProfileScreen() {
                     <Ionicons name="ribbon-outline" size={18} color="#FFFFFF" />
                     <Text style={styles.claimBtnText}>
                       {evalResult.canGraduate
-                        ? (language === 'en' ? 'Claim Official Certificate (+200 XP)' : 'Klaim Sertifikat Resmi (+200 XP)')
-                        : (language === 'en' ? 'Certificate Locked' : 'Sertifikat Belum Terbuka')}
+                        ? 'Claim Official Certificate (+200 XP)'
+                        : 'Certificate Locked'}
                     </Text>
                   </TouchableOpacity>
                 </>

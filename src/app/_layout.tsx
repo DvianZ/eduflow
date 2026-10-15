@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const tactileEffects = useSettingsStore((state) => state.tactileEffects);
 
   useEffect(() => {
     SplashScreen.hideAsync().catch(() => {});
@@ -18,13 +21,20 @@ export default function RootLayout() {
         <style
           // @ts-ignore
           dangerouslySetInnerHTML={{
-            __html: `
-              [role="button"]:active,
-              button:active {
-                transform: translateY(3px) !important;
-                border-bottom-width: 2px !important;
-              }
-            `,
+            __html: tactileEffects
+              ? `
+                [role="button"]:active,
+                button:active {
+                  transform: translateY(3px) !important;
+                  border-bottom-width: 2px !important;
+                }
+              `
+              : `
+                [role="button"]:active,
+                button:active {
+                  transform: none !important;
+                }
+              `,
           }}
         />
       )}

@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTranslation } from '@/i18n';

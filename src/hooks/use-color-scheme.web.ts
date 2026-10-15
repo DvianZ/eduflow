@@ -1,22 +1,14 @@
-import { useEffect, useState } from 'react';
 import { useColorScheme as useRNColorScheme } from 'react-native';
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 /**
- * To support static rendering, this value needs to be re-calculated on the client side for web
+ * Resolves active theme scheme ('light' | 'dark') based on user setting or system preference
  */
-export function useColorScheme() {
-  const [hasHydrated, setHasHydrated] = useState(false);
+export function useColorScheme(): 'light' | 'dark' {
+  const systemScheme = useRNColorScheme();
+  const theme = useSettingsStore((state) => state.theme);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasHydrated(true);
-  }, []);
-
-  const colorScheme = useRNColorScheme();
-
-  if (hasHydrated) {
-    return colorScheme;
-  }
-
-  return 'light';
+  if (theme === 'light') return 'light';
+  if (theme === 'dark') return 'dark';
+  return systemScheme === 'dark' ? 'dark' : 'light';
 }

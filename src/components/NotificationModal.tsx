@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  useColorScheme,
 } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
+import { useSettingsStore } from '@/store/useSettingsStore';
 import { InAppNotification, NotificationType } from '@/types/elearning';
 import { useTranslation } from '@/i18n';
 
@@ -23,7 +24,14 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
+
+  const {
+    notifGrades,
+    notifRevisions,
+    notifAnnouncements,
+    notifDeadlines,
+  } = useSettingsStore();
 
   const {
     currentUser,
@@ -35,10 +43,15 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
 
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
 
-  // Filter notifications belonging to currentUser
-  const userNotifications = notifications.filter(
-    (n) => n.userId === currentUser.id
-  );
+  // Filter notifications belonging to currentUser and enabled in Settings
+  const userNotifications = notifications.filter((n) => {
+    if (n.userId !== currentUser.id) return false;
+    if (n.type === 'grade' && !notifGrades) return false;
+    if (n.type === 'revision' && !notifRevisions) return false;
+    if (n.type === 'announcement' && !notifAnnouncements) return false;
+    if (n.type === 'deadline' && !notifDeadlines) return false;
+    return true;
+  });
 
   const unreadCount = userNotifications.filter((n) => !n.isRead).length;
 
@@ -73,7 +86,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
       if (diffDays === 1) return t.notifications.timeYesterday;
       if (diffDays < 7) return `${diffDays} ${t.notifications.timeDaysAgo}`;
 
-      return date.toLocaleDateString(language === 'en' ? 'en-US' : 'id-ID', {
+      return date.toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'short',
       });
@@ -109,6 +122,12 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
           icon: 'people',
           color: '#2563EB',
           bg: isDark ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
+        };
+      case 'deadline':
+        return {
+          icon: 'time',
+          color: '#EF4444',
+          bg: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEF2F2',
         };
       case 'system':
       default:

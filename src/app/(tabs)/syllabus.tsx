@@ -7,15 +7,16 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  useColorScheme,
   Alert,
   Linking,
   Platform,
 } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { DemoHeader } from '@/components/DemoHeader';
 import { useElearningStore } from '@/store/useElearningStore';
+import { useSettingsStore } from '@/store/useSettingsStore';
 import {
   isLessonUnlocked,
   isQuizUnlocked,
@@ -23,11 +24,13 @@ import {
 } from '@/utils/lockEngine';
 import { Lesson, Quiz, Assignment } from '@/types/elearning';
 import { useTranslation } from '@/i18n';
+import { triggerMilestoneFeedback } from '@/utils/feedback';
 
 export default function SyllabusScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { t } = useTranslation();
+  const autoAdvanceLesson = useSettingsStore((state) => state.autoAdvanceLesson);
 
   const {
     currentRole,
@@ -199,10 +202,16 @@ export default function SyllabusScreen() {
     if (selectedLesson) {
       if (!completedLessonIds.includes(selectedLesson.id)) {
         completeLesson(selectedLesson.id);
+        triggerMilestoneFeedback();
       }
       if (!autoNext) {
-        Alert.alert('Lesson Completed', 'Lesson marked as completed! +25 XP earned.');
-        setSelectedLesson(null);
+        if (autoAdvanceLesson && nextLessonInModule) {
+          Alert.alert('Lesson Completed', 'Lesson completed! +25 XP earned. Advancing to the next lesson.');
+          setSelectedLesson(nextLessonInModule);
+        } else {
+          Alert.alert('Lesson Completed', 'Lesson marked as completed! +25 XP earned.');
+          setSelectedLesson(null);
+        }
       }
     }
   };
@@ -210,6 +219,7 @@ export default function SyllabusScreen() {
   const handleNextLessonPress = (nextLesson: Lesson) => {
     if (selectedLesson && !completedLessonIds.includes(selectedLesson.id)) {
       completeLesson(selectedLesson.id);
+      triggerMilestoneFeedback();
     }
     setSelectedLesson(nextLesson);
   };
@@ -217,6 +227,7 @@ export default function SyllabusScreen() {
   const handleProceedToQuizPress = (quiz: Quiz) => {
     if (selectedLesson && !completedLessonIds.includes(selectedLesson.id)) {
       completeLesson(selectedLesson.id);
+      triggerMilestoneFeedback();
     }
     setSelectedLesson(null);
     handleOpenQuiz(quiz, true);
@@ -235,6 +246,7 @@ export default function SyllabusScreen() {
     setQuizResultText(result.explanation);
 
     if (result.isPassed) {
+      triggerMilestoneFeedback();
       Alert.alert('Congratulations!', `${result.explanation}\n+50 XP earned!`, [
         { text: 'Close', onPress: () => setSelectedQuiz(null) },
       ]);
@@ -1427,8 +1439,8 @@ export default function SyllabusScreen() {
               />
               <Text style={styles.modalPrimaryBtnText}>
                 {completedLessonIds.includes(selectedLesson?.id || '')
-                  ? 'Materi Sudah Selesai ✓'
-                  : 'Tandai Selesai (+25 XP)'}
+                  ? 'Lesson Completed ✓'
+                  : 'Mark Completed (+25 XP)'}
               </Text>
             </TouchableOpacity>
 
@@ -1443,7 +1455,7 @@ export default function SyllabusScreen() {
                   },
                 ]}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.nextStepSmallLabel}>Lanjut ke Materi Berikutnya:</Text>
+                  <Text style={styles.nextStepSmallLabel}>Continue to Next Lesson:</Text>
                   <Text
                     style={[
                       styles.nextStepTitle,
@@ -1469,7 +1481,7 @@ export default function SyllabusScreen() {
                 ]}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.nextStepSmallLabel, { color: '#059669' }]}>
-                    Materi Selesai! Uji Pemahaman:
+                    Lessons Completed! Test Your Knowledge:
                   </Text>
                   <Text
                     style={[

@@ -6,11 +6,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  useColorScheme,
   Alert,
   Modal,
   Platform,
 } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -23,7 +23,7 @@ export default function DashboardScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
 
   const {
     currentRole,
@@ -868,7 +868,7 @@ export default function DashboardScreen() {
                   <Text style={[styles.annAuthorNameText, { color: textPrimary }]}>{ann.authorName}</Text>
                 </View>
                 <Text style={styles.annDateBadge}>
-                  {new Date(ann.createdAt).toLocaleDateString(language === 'en' ? 'en-US' : 'id-ID', {
+                  {new Date(ann.createdAt).toLocaleDateString('en-US', {
                     day: 'numeric',
                     month: 'short',
                   })}
