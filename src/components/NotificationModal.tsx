@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +26,8 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { t } = useTranslation();
+  const { width: screenWidth } = useWindowDimensions();
+  const isCompact = screenWidth < 450;
 
   const {
     notifGrades,
@@ -142,33 +145,57 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="fade"
       transparent
       onRequestClose={onClose}>
-      <View style={styles.modalOverlay}>
+      <View
+        style={[
+          styles.modalOverlay,
+          !isCompact && styles.modalOverlayCenter,
+        ]}>
+        {/* Backdrop Dismiss Touch */}
+        <TouchableOpacity
+          activeOpacity={1}
+          style={StyleSheet.absoluteFill}
+          onPress={onClose}
+          accessibilityLabel="Dismiss notifications"
+        />
+
         <View
           style={[
             styles.modalContent,
+            isCompact ? styles.modalContentCompact : styles.modalContentCenter,
             {
               backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
               borderColor: isDark ? '#334155' : '#E2E8F0',
             },
           ]}>
+          {/* Sheet Handle */}
+          {isCompact && (
+            <View
+              style={[
+                styles.dragHandle,
+                { backgroundColor: isDark ? '#334155' : '#CBD5E1' },
+              ]}
+            />
+          )}
+
           {/* Header */}
-          <View style={styles.modalHeader}>
+          <View style={[styles.modalHeader, isCompact && { paddingHorizontal: 16, paddingTop: 12 }]}>
             <View style={styles.headerTitleRow}>
               <View style={styles.bellIconBox}>
-                <Ionicons name="notifications" size={20} color="#8B5CF6" />
+                <Ionicons name="notifications" size={18} color="#8B5CF6" />
               </View>
-              <View>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Text
+                  numberOfLines={1}
                   style={[
                     styles.modalTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
                   {t.notifications.modalTitle}
                 </Text>
-                <Text style={styles.modalSubtitle}>
+                <Text numberOfLines={1} style={styles.modalSubtitle}>
                   {unreadCount > 0
                     ? `${unreadCount} ${t.notifications.unreadTab.toLowerCase()}`
                     : t.notifications.modalSubtitle}
@@ -176,6 +203,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
               </View>
             </View>
 
+            {/* Header Action Buttons - Pinned & Never Clipped */}
             <View style={styles.headerActionBtns}>
               {unreadCount > 0 && (
                 <TouchableOpacity
@@ -183,21 +211,29 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                   style={[
                     styles.readAllBtn,
                     { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
-                  ]}>
-                  <Ionicons name="checkmark-done" size={16} color="#8B5CF6" />
-                  <Text style={styles.readAllText}>{t.notifications.markAllRead}</Text>
+                  ]}
+                  accessibilityLabel={t.notifications.markAllRead}>
+                  <Ionicons name="checkmark-done" size={15} color="#8B5CF6" />
+                  {!isCompact && (
+                    <Text style={styles.readAllText}>{t.notifications.markAllRead}</Text>
+                  )}
                 </TouchableOpacity>
               )}
               <TouchableOpacity
                 onPress={onClose}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                 style={[
                   styles.closeIconBtn,
-                  { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
-                ]}>
+                  {
+                    backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
+                    borderColor: isDark ? '#334155' : '#CBD5E1',
+                  },
+                ]}
+                accessibilityLabel="Close notifications">
                 <Ionicons
                   name="close"
-                  size={20}
-                  color={isDark ? '#94A3B8' : '#64748B'}
+                  size={19}
+                  color={isDark ? '#F8FAFC' : '#0F172A'}
                 />
               </TouchableOpacity>
             </View>
@@ -207,6 +243,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
           <View
             style={[
               styles.tabContainer,
+              isCompact && { marginHorizontal: 16 },
               { backgroundColor: isDark ? '#1E293B' : '#F8FAFC' },
             ]}>
             <TouchableOpacity
@@ -252,7 +289,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
 
           {/* Notification List */}
           <ScrollView
-            style={styles.listContainer}
+            style={[styles.listContainer, isCompact && { paddingHorizontal: 16 }]}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}>
             {displayedNotifications.length === 0 ? (
@@ -349,7 +386,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                         </Text>
                         {notif.linkRoute && (
                           <View style={styles.actionPrompt}>
-                            <Text style={styles.actionPromptText}>Buka</Text>
+                            <Text style={styles.actionPromptText}>Open</Text>
                             <Ionicons
                               name="arrow-forward"
                               size={12}
@@ -370,13 +407,14 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
             <View
               style={[
                 styles.modalFooter,
+                isCompact && { paddingHorizontal: 16 },
                 { borderTopColor: isDark ? '#1E293B' : '#E2E8F0' },
               ]}>
               <TouchableOpacity
                 onPress={() => clearNotifications(currentUser.id)}
                 style={styles.clearAllBtn}>
                 <Ionicons name="trash-outline" size={14} color="#EF4444" />
-                <Text style={styles.clearAllText}>Bersihkan Semua</Text>
+                <Text style={styles.clearAllText}>Clear All</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -389,44 +427,77 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.65)',
     justifyContent: 'flex-end',
   },
+  modalOverlayCenter: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   modalContent: {
+    borderWidth: 1.5,
+    overflow: 'hidden',
+  },
+  modalContentCompact: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    borderWidth: 1,
     borderBottomWidth: 0,
+    width: '100%',
+    maxHeight: '90%',
+    minHeight: 380,
+  },
+  modalContentCenter: {
+    borderRadius: 24,
+    width: '100%',
+    maxWidth: 500,
     maxHeight: '85%',
-    minHeight: '55%',
+    minHeight: 420,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  dragHandle: {
+    width: 38,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 4,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 14,
+    paddingTop: 16,
+    paddingBottom: 12,
+    gap: 8,
   },
   headerTitleRow: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
+    minWidth: 0,
   },
   bellIconBox: {
-    width: 38,
-    height: 38,
+    width: 36,
+    height: 36,
     borderRadius: 12,
     backgroundColor: 'rgba(139, 92, 246, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
+    flexShrink: 0,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '800',
   },
   modalSubtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#8B5CF6',
     fontWeight: '600',
     marginTop: 1,
@@ -435,14 +506,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    flexShrink: 0,
   },
   readAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 10,
+    minHeight: 34,
   },
   readAllText: {
     fontSize: 12,
@@ -450,11 +523,13 @@ const styles = StyleSheet.create({
     color: '#8B5CF6',
   },
   closeIconBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1.5,
+    flexShrink: 0,
   },
   tabContainer: {
     flexDirection: 'row',
