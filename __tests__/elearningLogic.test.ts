@@ -797,21 +797,21 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
       const budiRow = alexRows.find((r: any) => r.studentName === 'Budi Santoso');
       expect(budiRow).toBeDefined();
       expect(budiRow?.finalScore).toBe(95);
-      expect(budiRow?.graduationStatus).toBe('LULUS');
+      expect(budiRow?.graduationStatus).toBe('GRADUATED');
 
       // Siswa Ani: Progress 60 * 30% (18) + Quiz 65 * 30% (19.5) + Tugas 70 * 40% (28) = 66
       const aniRow = alexRows.find((r: any) => r.studentName === 'Ani Yudhoyono');
       expect(aniRow).toBeDefined();
       expect(aniRow?.finalScore).toBe(66);
-      expect(aniRow?.graduationStatus).toBe('DALAM PROSES');
+      expect(aniRow?.graduationStatus).toBe('IN PROGRESS');
     });
 
     test('Menghitung ringkasan statistik rekap nilai (total siswa, rerata nilai, tingkat kelulusan)', () => {
       const { calculateGradebookSummary } = require('../src/utils/exportGradebook');
 
       const mockRows = [
-        { graduationStatus: 'LULUS', finalScore: 95 },
-        { graduationStatus: 'DALAM PROSES', finalScore: 65 },
+        { graduationStatus: 'GRADUATED', finalScore: 95 },
+        { graduationStatus: 'IN PROGRESS', finalScore: 65 },
       ];
 
       const summary = calculateGradebookSummary(mockRows);
@@ -836,17 +836,17 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
           quizAverage: 90,
           assignmentScore: 95,
           finalScore: 95,
-          graduationStatus: 'LULUS',
+          graduationStatus: 'GRADUATED',
           enrolledAt: '2026-10-01',
         },
       ];
 
       const csv = formatGradebookCSV(sampleRows, 'MOB-101');
       expect(csv.startsWith('\uFEFF')).toBe(true);
-      expect(csv).toContain('Nama Siswa');
+      expect(csv).toContain('Student Name');
       expect(csv).toContain('Budi Santoso');
       expect(csv).toContain('budi@eduflow.id');
-      expect(csv).toContain('LULUS');
+      expect(csv).toContain('GRADUATED');
     });
   });
 
@@ -895,7 +895,7 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
       );
 
       expect(studentNotif).toBeDefined();
-      expect(studentNotif?.title).toContain('Tugas Dinilai');
+      expect(studentNotif?.title).toContain('Project Evaluated');
       expect(studentNotif?.title).toContain('95/100');
       expect(studentNotif?.isRead).toBe(false);
       expect(studentNotif?.message).toContain('Karya arsitektur aplikasi sangat baik!');
@@ -932,7 +932,7 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
       );
 
       expect(revisionNotif).toBeDefined();
-      expect(revisionNotif?.title).toContain('Revisi Tugas');
+      expect(revisionNotif?.title).toContain('Revision Requested');
       expect(revisionNotif?.isRead).toBe(false);
       expect(revisionNotif?.message).toContain('Perbaiki penanganan state offline');
     });
@@ -959,7 +959,7 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
 
       expect(newBudiAnnouncements.length).toBe(initialBudiCount + 1);
       const latestAnnNotif = newBudiAnnouncements[0];
-      expect(latestAnnNotif.title).toContain('Pengumuman Baru');
+      expect(latestAnnNotif.title).toContain('New Announcement');
       expect(latestAnnNotif.message).toContain('Webinar Live Q&A Besok Malam');
     });
 

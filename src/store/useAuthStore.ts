@@ -73,11 +73,11 @@ export const useAuthStore = create<AuthState>()(
 
         // Validate
         if (!fullName.trim() || !email.trim() || !password.trim()) {
-          return { success: false, error: 'Semua field wajib diisi.' };
+          return { success: false, error: 'All fields are required.' };
         }
 
         if (password.length < 6) {
-          return { success: false, error: 'Password minimal 6 karakter.' };
+          return { success: false, error: 'Password must be at least 6 characters.' };
         }
 
         const emailLower = email.toLowerCase().trim();
@@ -85,7 +85,7 @@ export const useAuthStore = create<AuthState>()(
           (u) => u.email.toLowerCase() === emailLower
         );
         if (exists) {
-          return { success: false, error: 'Email sudah terdaftar.' };
+          return { success: false, error: 'Email is already registered.' };
         }
 
         const newUser: AuthUser = {
@@ -108,7 +108,7 @@ export const useAuthStore = create<AuthState>()(
         const { registeredUsers } = get();
 
         if (!email.trim() || !password.trim()) {
-          return { success: false, error: 'Email dan password wajib diisi.' };
+          return { success: false, error: 'Email and password are required.' };
         }
 
         const emailLower = email.toLowerCase().trim();
@@ -117,7 +117,7 @@ export const useAuthStore = create<AuthState>()(
         );
 
         if (!user) {
-          return { success: false, error: 'Email atau password salah.' };
+          return { success: false, error: 'Invalid email or password.' };
         }
 
         const session: AuthSession = {

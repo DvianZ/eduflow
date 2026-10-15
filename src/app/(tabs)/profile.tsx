@@ -74,8 +74,8 @@ export default function ProfileScreen() {
   const handleSaveCertName = () => {
     if (!certNameInput.trim()) {
       Alert.alert(
-        'Nama Wajib Diisi',
-        'Masukkan nama lengkap resmi untuk dicetak di sertifikat kelulusan.'
+        'Legal Name Required',
+        'Please enter your official full name to appear on your graduation certificates.'
       );
       return;
     }
@@ -83,8 +83,8 @@ export default function ProfileScreen() {
     authUpdateCertName(currentUser.id, certNameInput.trim());
     setShowCertNameModal(false);
     Alert.alert(
-      'Nama Resmi Tersimpan! 🎉',
-      'Nama ini akan tertera pada seluruh sertifikat kelulusan digital Anda.'
+      'Official Name Saved! 🎉',
+      'This legal name will appear on all your verified digital credentials.'
     );
   };
 
@@ -127,8 +127,8 @@ export default function ProfileScreen() {
   const handleClaimCertificatePress = () => {
     if (!evalResult.canGraduate) {
       Alert.alert(
-        'Belum Memenuhi Syarat Kelulusan',
-        'Pastikan seluruh materi selesai (100%), seluruh kuis lulus, dan tugas proyek telah dinilai pengajar minimal 75.'
+        'Graduation Requirements Incomplete',
+        'Ensure all lessons are completed (100%), all quizzes passed (≥80%), and your project assignment is graded by the instructor with at least 75 points.'
       );
       return;
     }
@@ -137,17 +137,17 @@ export default function ProfileScreen() {
     if (cert) {
       setSelectedCertId(cert.id);
       Alert.alert(
-        '🎉 Selamat! Sertifikat Resmi Terbit',
-        `Nomor Kredensial: ${cert.certificateNumber}\nProgram: ${cert.courseTitle}\nNilai Akhir: ${cert.finalScore}/100\n+200 XP diperoleh!\n\nSertifikat baru kini aktif di Portofolio Anda!`
+        '🎉 Congratulations! Official Credential Issued',
+        `Credential ID: ${cert.certificateNumber}\nProgram: ${cert.courseTitle}\nFinal Score: ${cert.finalScore}/100\n+200 XP earned!\n\nYour certificate is now permanently active in your Portfolio!`
       );
     }
   };
 
   const handleLogout = () => {
-    Alert.alert('Keluar Akun', 'Apakah Anda yakin ingin keluar dari akun EduFlow?', [
-      { text: 'Batal', style: 'cancel' },
+    Alert.alert('Sign Out', 'Are you sure you want to sign out of your EduFlow account?', [
+      { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Keluar',
+        text: 'Sign Out',
         style: 'destructive',
         onPress: () => {
           logout();
@@ -215,8 +215,8 @@ export default function ProfileScreen() {
                   },
                 ]}>
                 {isTeacher
-                  ? (language === 'en' ? '👨‍🏫 Certified Cohort Instructor' : '👨‍🏫 Pengajar & Mentor Kelas')
-                  : (language === 'en' ? '👨‍🎓 Active Cohort Learner' : '👨‍🎓 Siswa Peserta Cohort')}
+                  ? '👨‍🏫 Certified Cohort Instructor'
+                  : '👨‍🎓 Active Cohort Learner'}
               </Text>
             </View>
           </View>
@@ -269,7 +269,7 @@ export default function ProfileScreen() {
                 style={styles.editCertNameBtn}>
                 <Ionicons name="create-outline" size={15} color="#2563EB" />
                 <Text style={styles.editCertNameBtnText}>
-                  {language === 'en' ? 'Edit Legal Name' : 'Ubah / Lengkapi'}
+                  Edit Legal Name
                 </Text>
               </TouchableOpacity>
             </View>
@@ -277,9 +277,7 @@ export default function ProfileScreen() {
             <View style={styles.certNameNoticeRow}>
               <Ionicons name="information-circle-outline" size={14} color="#64748B" />
               <Text style={styles.certNameNoticeText}>
-                {language === 'en'
-                  ? 'Ensure name matches your government-issued ID. Name cannot be altered once credential is officially issued.'
-                  : 'Pastikan nama sesuai kartu identitas resmi (KTP/Ijazah). Nama di sertifikat tidak dapat diubah setelah diterbitkan.'}
+                Ensure name matches your government-issued ID. Name cannot be altered once credential is officially issued.
               </Text>
             </View>
           </View>
@@ -303,7 +301,7 @@ export default function ProfileScreen() {
                   styles.teacherTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                Otoritas Penerbitan Sertifikat
+                Certificate Authority & Signatory Panel
               </Text>
             </View>
 
@@ -312,12 +310,12 @@ export default function ProfileScreen() {
                 styles.teacherNote,
                 { color: isDark ? '#CBD5E1' : '#64748B' },
               ]}>
-              Sebagai Pengajar/Mentor, Anda bertindak sebagai pihak evaluator dan penandatangan sertifikat resmi. Pengajar tidak menerima sertifikat kelulusan siswa, melainkan mengesahkan kelulusan siswa bimbingan.
+              As a certified Instructor/Mentor, you act as the official evaluator and signatory. Instructors oversee and endorse student graduation rather than receiving student certificates.
             </Text>
 
             {/* Batch Selector for Teacher Monitoring */}
             <View style={styles.cohortSelectorBox}>
-              <Text style={styles.cohortSelectorLabel}>PILIH KELAS BIMBINGAN:</Text>
+              <Text style={styles.cohortSelectorLabel}>SELECT COHORT CLASS:</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cohortPillsRow}>
                 {batches.map((b) => {
                   const isSelected = b.id === activeBatch.id;
@@ -360,7 +358,7 @@ export default function ProfileScreen() {
                   styles.monitorTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                👥 Monitoring Siswa ({activeBatch.classCode}):
+                👥 Student Monitoring ({activeBatch.classCode}):
               </Text>
 
               {batchEnrollments.length === 0 ? (
@@ -370,7 +368,7 @@ export default function ProfileScreen() {
                       styles.emptyMonitoringText,
                       { color: isDark ? '#94A3B8' : '#64748B' },
                     ]}>
-                    Belum ada siswa yang mendaftar di kelas ini. Bagikan kode kelas &quot;{activeBatch.classCode}&quot; kepada siswa Anda.
+                    No students enrolled in this cohort yet. Share class code &quot;{activeBatch.classCode}&quot; with your students.
                   </Text>
                 </View>
               ) : (
@@ -392,7 +390,7 @@ export default function ProfileScreen() {
                           {studentName}
                         </Text>
                         <Text style={styles.studentItemMeta}>
-                          Progres: {enr.progressPercentage}% • Status: {enr.graduationStatus}
+                          Progress: {enr.progressPercentage}% • Status: {enr.graduationStatus}
                         </Text>
                       </View>
 
@@ -410,7 +408,7 @@ export default function ProfileScreen() {
                               color: isCertified ? '#15803D' : '#D97706',
                             },
                           ]}>
-                          {isCertified ? 'Tersertifikasi' : 'Dalam Proses'}
+                          {isCertified ? 'Certified' : 'In Progress'}
                         </Text>
                       </View>
                     </View>
@@ -565,9 +563,7 @@ export default function ProfileScreen() {
                     </Text>
 
                     <Text style={styles.certBody}>
-                      {language === 'en'
-                        ? 'has successfully completed all required modules, assessments, and project deliverables for the accredited program:'
-                        : 'Telah berhasil menyelesaikan seluruh kurikulum, evaluasi kuis, dan tugas proyek pada program sertifikasi:'}
+                      has successfully completed all required modules, assessments, and project deliverables for the accredited program:
                     </Text>
                     <Text style={styles.certCourseName}>
                       {certToDisplay.courseTitle}
@@ -579,7 +575,7 @@ export default function ProfileScreen() {
                     <View style={styles.certFooter}>
                       <View style={styles.certScoreBox}>
                         <Text style={styles.certScoreLabel}>
-                          {language === 'en' ? 'FINAL SCORE' : 'NILAI AKHIR'}
+                          FINAL SCORE
                         </Text>
                         <Text style={styles.certScoreValue}>
                           {certToDisplay.finalScore} / 100
@@ -601,32 +597,28 @@ export default function ProfileScreen() {
                       <TouchableOpacity
                         onPress={() =>
                           Alert.alert(
-                            language === 'en' ? 'Credential ID' : 'Nomor Kredensial',
-                            language === 'en'
-                              ? `Certificate ID: ${certToDisplay.certificateNumber}\n\nID copied for your professional portfolio verification.`
-                              : `Nomor Sertifikat: ${certToDisplay.certificateNumber}\n\nNomor ini telah disalin untuk keperluan verifikasi portofolio Anda.`
+                            'Credential ID',
+                            `Certificate ID: ${certToDisplay.certificateNumber}\n\nID copied for your professional portfolio verification.`
                           )
                         }
                         style={styles.certActionBtn}>
                         <Ionicons name="copy-outline" size={14} color="#D97706" />
                         <Text style={styles.certActionBtnText}>
-                          {language === 'en' ? 'Copy Credential ID' : 'Salin ID Kredensial'}
+                          Copy Credential ID
                         </Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
                         onPress={() =>
                           Alert.alert(
-                            language === 'en' ? 'Credential Status' : 'Status Keabsahan Kredensial',
-                            language === 'en'
-                              ? `✅ Credential ${certToDisplay.certificateNumber} is OFFICIALLY VERIFIED on the EduFlow ledger & aligned with Wadhwani Cohort standards.`
-                              : `✅ Kredensial ${certToDisplay.certificateNumber} telah TERVERIFIKASI RESMI di blockchain ledger EduFlow & terakreditasi model Wadhwani Foundation.`
+                            'Credential Status',
+                            `✅ Credential ${certToDisplay.certificateNumber} is OFFICIALLY VERIFIED on the EduFlow ledger & aligned with Wadhwani Cohort standards.`
                           )
                         }
                         style={[styles.certActionBtn, { backgroundColor: '#DCFCE7', borderColor: '#86EFAC' }]}>
                         <Ionicons name="checkmark-done" size={14} color="#15803D" />
                         <Text style={[styles.certActionBtnText, { color: '#15803D' }]}>
-                          {language === 'en' ? 'Verified Official' : 'Terverifikasi Sah'}
+                          Verified Official
                         </Text>
                       </TouchableOpacity>
 
@@ -636,17 +628,15 @@ export default function ProfileScreen() {
                             window.print();
                           } else {
                             Alert.alert(
-                              language === 'en' ? 'Print Certificate' : 'Unduh Sertifikat',
-                              language === 'en'
-                                ? `Certificate ${certToDisplay.certificateNumber} ready for printing.`
-                                : `Sertifikat ${certToDisplay.certificateNumber} siap dicetak.`
+                              'Print Certificate',
+                              `Certificate ${certToDisplay.certificateNumber} ready for printing.`
                             );
                           }
                         }}
                         style={[styles.certActionBtn, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]}>
                         <Ionicons name="print-outline" size={14} color="#2563EB" />
                         <Text style={[styles.certActionBtnText, { color: '#2563EB' }]}>
-                          {language === 'en' ? 'Print / Save PDF' : 'Cetak / Simpan PDF'}
+                          Print / Save PDF
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -671,17 +661,17 @@ export default function ProfileScreen() {
                     styles.evalTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  {language === 'en' ? '🎓 Graduation Evaluator & Certificate Claim' : '🎓 Evaluasi Kelulusan & Klaim Sertifikat'}
+                  🎓 Graduation Evaluator & Certificate Claim
                 </Text>
                 <Text style={styles.finalScoreBadge}>
-                  {language === 'en' ? 'Score:' : 'Skor:'} {evalResult.finalScore}/100
+                  Score: {evalResult.finalScore}/100
                 </Text>
               </View>
 
               {/* Cohort Switcher for Evaluation */}
               <View style={styles.evalCohortSelector}>
                 <Text style={[styles.evalCohortLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-                  {language === 'en' ? 'SELECT COHORT TO EVALUATE:' : 'PILIH KELAS UNTUK EVALUASI KELULUSAN:'}
+                  SELECT COHORT TO EVALUATE:
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.evalCohortPills}>
                   {availableBatches.map((b) => {
@@ -805,13 +795,13 @@ export default function ProfileScreen() {
                           styles.metricRowText,
                           { color: isDark ? '#F8FAFC' : '#0F172A' },
                         ]}>
-                        {language === 'en' ? 'Instructor Project Score (40% Weight)' : 'Nilai Tugas Pengajar (Bobot 40%)'}
+                        Instructor Project Score (40% Weight)
                       </Text>
                     </View>
                     <Text style={styles.metricRowValue}>
                       {evalResult.assignmentGrade > 0
                         ? `${evalResult.assignmentGrade}/100`
-                        : (language === 'en' ? 'Pending Review' : 'Belum Dinilai')}
+                        : 'Pending Review'}
                     </Text>
                   </View>
 
@@ -844,12 +834,8 @@ export default function ProfileScreen() {
                         },
                       ]}>
                       {evalResult.canGraduate
-                        ? (language === 'en'
-                            ? 'All graduation criteria satisfied! You are eligible to claim your official credential.'
-                            : 'Seluruh kriteria kelulusan terpenuhi! Anda berhak mengklaim sertifikat.')
-                        : (language === 'en'
-                            ? 'Graduation standard: 100% lessons, all quizzes passed (≥80%), and project deliverable graded ≥75.'
-                            : 'Syarat kelulusan: Materi 100% tuntas, Kuis lulus, dan Tugas dinilai pengajar minimal 75.')}
+                        ? 'All graduation criteria satisfied! You are eligible to claim your official credential.'
+                        : 'Graduation standard: 100% lessons, all quizzes passed (≥80%), and project deliverable graded ≥75.'}
                     </Text>
                   </View>
 
@@ -900,9 +886,9 @@ export default function ProfileScreen() {
           onPress={() => {
             Alert.alert(
               'Reset Demo Data',
-              'Apakah Anda yakin ingin mengatur ulang data pengujian?',
+              'Are you sure you want to reset all demo evaluation and progress data?',
               [
-                { text: 'Batal', style: 'cancel' },
+                { text: 'Cancel', style: 'cancel' },
                 { text: 'Reset', style: 'destructive', onPress: resetDemoData },
               ]
             );
@@ -917,7 +903,7 @@ export default function ProfileScreen() {
           ]}>
           <Ionicons name="refresh-circle-outline" size={18} color="#EF4444" />
           <Text style={styles.resetContainerText}>
-            Reset Semua Data Pengujian Demo
+            Reset All Demo Testing Data
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -945,7 +931,7 @@ export default function ProfileScreen() {
                   styles.promptModalTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                Nama Resmi di Sertifikat
+                Official Certificate Name
               </Text>
             </View>
 
@@ -954,13 +940,13 @@ export default function ProfileScreen() {
                 styles.promptModalDesc,
                 { color: isDark ? '#94A3B8' : '#64748B' },
               ]}>
-              Masukkan nama lengkap beserta gelar (jika ada). Nama ini akan tertera secara permanen pada dokumen kelulusan digital Anda.
+              Enter your legal full name including any academic credentials. This will be printed permanently on your verified digital credentials.
             </Text>
 
             <TextInput
               value={certNameInput}
               onChangeText={setCertNameInput}
-              placeholder="Contoh: Budi Santoso, S.Kom"
+              placeholder="e.g. Alex Johnson, M.Sc"
               placeholderTextColor="#94A3B8"
               style={[
                 styles.promptInput,
@@ -976,7 +962,7 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 onPress={() => setShowCertNameModal(false)}
                 style={styles.promptCancelBtn}>
-                <Text style={styles.promptCancelText}>Batal</Text>
+                <Text style={styles.promptCancelText}>Cancel</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -989,7 +975,7 @@ export default function ProfileScreen() {
                     borderBottomColor: '#1E40AF',
                   },
                 ]}>
-                <Text style={styles.promptSaveText}>Simpan Nama</Text>
+                <Text style={styles.promptSaveText}>Save Name</Text>
               </TouchableOpacity>
             </View>
           </View>

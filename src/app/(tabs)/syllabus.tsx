@@ -27,7 +27,7 @@ import { useTranslation } from '@/i18n';
 export default function SyllabusScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
 
   const {
     currentRole,
@@ -150,7 +150,7 @@ export default function SyllabusScreen() {
   // Handler: Open student item
   const handleOpenLesson = (lesson: Lesson, unlocked: boolean) => {
     if (!unlocked && !isTeacher) {
-      Alert.alert('Materi Terkunci', 'Selesaikan materi prasyarat sebelumnya terlebih dahulu.');
+      Alert.alert('Lesson Locked', 'Please complete the prerequisite lesson units first.');
       return;
     }
     setSelectedLesson(lesson);
@@ -158,7 +158,7 @@ export default function SyllabusScreen() {
 
   const handleOpenQuiz = (quiz: Quiz, unlocked: boolean) => {
     if (!unlocked && !isTeacher) {
-      Alert.alert('Kuis Terkunci', 'Selesaikan seluruh materi pelajaran di modul ini terlebih dahulu.');
+      Alert.alert('Quiz Locked', 'Please complete all lesson units in this module first.');
       return;
     }
     setQuizAnswers({});
@@ -170,13 +170,13 @@ export default function SyllabusScreen() {
     if (!unlocked && !isTeacher) {
       if (assignment.moduleId === 'mod-2') {
         Alert.alert(
-          'Tugas Terkunci (Perlu Syarat Prasyarat)',
-          'Tugas di Modul 2 terkunci karena Anda belum lulus Kuis Evaluasi Modul 1. Selesaikan materi Modul 1 dan raih nilai kuis minimal 80% untuk membuka tugas ini!'
+          'Assignment Locked (Prerequisites Required)',
+          'This Module 2 assignment is locked because you have not yet passed the Module 1 Quiz. Complete Module 1 lessons and achieve at least 80% on the quiz to unlock this assignment!'
         );
       } else {
         Alert.alert(
-          'Tugas Terkunci',
-          'Selesaikan materi prasyarat sebelumnya terlebih dahulu.'
+          'Assignment Locked',
+          'Please complete the prerequisite module materials first.'
         );
       }
       return;
@@ -201,7 +201,7 @@ export default function SyllabusScreen() {
         completeLesson(selectedLesson.id);
       }
       if (!autoNext) {
-        Alert.alert('Sukses', 'Materi ditandai selesai! +25 XP ditambahkan.');
+        Alert.alert('Lesson Completed', 'Lesson marked as completed! +25 XP earned.');
         setSelectedLesson(null);
       }
     }
@@ -226,7 +226,7 @@ export default function SyllabusScreen() {
     if (!selectedQuiz) return;
     const answeredCount = Object.keys(quizAnswers).length;
     if (answeredCount < selectedQuiz.questions.length) {
-      Alert.alert('Perhatian', 'Mohon jawab semua pertanyaan kuis sebelum mengirimkan.');
+      Alert.alert('Attention', 'Please answer all quiz questions before submitting.');
       return;
     }
 
@@ -235,8 +235,8 @@ export default function SyllabusScreen() {
     setQuizResultText(result.explanation);
 
     if (result.isPassed) {
-      Alert.alert('Selamat!', `${result.explanation}\n+50 XP diperoleh!`, [
-        { text: 'Tutup', onPress: () => setSelectedQuiz(null) },
+      Alert.alert('Congratulations!', `${result.explanation}\n+50 XP earned!`, [
+        { text: 'Close', onPress: () => setSelectedQuiz(null) },
       ]);
     }
   };
@@ -244,7 +244,7 @@ export default function SyllabusScreen() {
   const handleSubmitAssignmentPress = () => {
     if (!selectedAssignment) return;
     if (!assignmentText.trim()) {
-      Alert.alert('Perhatian', 'Catatan/deskripsi tugas wajib diisi.');
+      Alert.alert('Attention', 'Assignment description or solution notes are required.');
       return;
     }
 
@@ -256,8 +256,8 @@ export default function SyllabusScreen() {
     );
 
     Alert.alert(
-      'Tugas Berhasil Dikumpulkan',
-      'Tugas Anda telah masuk ke antrean periksa pengajar. Beralih ke Mode Pengajar untuk memeriksa dan memberi nilai!',
+      'Assignment Submitted',
+      'Your deliverable is now waiting in the instructor evaluation queue. Switch to Instructor Mode to review and grade!',
       [{ text: 'OK', onPress: () => setSelectedAssignment(null) }]
     );
   };
@@ -275,7 +275,7 @@ export default function SyllabusScreen() {
 
   const handleSaveLesson = () => {
     if (!newLessonTitle.trim() || !newLessonBody.trim()) {
-      Alert.alert('Data Belum Lengkap', 'Judul dan isi materi pelajaran wajib diisi.');
+      Alert.alert('Incomplete Fields', 'Lesson title and content body are required.');
       return;
     }
     const mins = parseInt(newLessonDuration, 10) || 15;
@@ -288,21 +288,21 @@ export default function SyllabusScreen() {
       newLessonVideoUrl.trim() || undefined
     );
     setIsAddLessonModalOpen(false);
-    Alert.alert('Sukses', 'Materi pembelajaran baru berhasil ditambahkan!');
+    Alert.alert('Success', 'New lesson unit added successfully!');
   };
 
   const handleDeleteLesson = (lesson: Lesson) => {
     Alert.alert(
-      'Hapus Materi Pelajaran',
-      `Apakah Anda yakin ingin menghapus "${lesson.title}"?`,
+      'Delete Lesson Unit',
+      `Are you sure you want to delete "${lesson.title}"?`,
       [
-        { text: 'Batal', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Hapus',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => {
             deleteLesson(lesson.id);
-            Alert.alert('Terhapus', 'Materi berhasil dihapus dari kurikulum.');
+            Alert.alert('Deleted', 'Lesson unit removed from curriculum.');
           },
         },
       ]
@@ -320,7 +320,7 @@ export default function SyllabusScreen() {
 
   const handleSaveAssignment = () => {
     if (!newAssignTitle.trim() || !newAssignInstructions.trim()) {
-      Alert.alert('Data Belum Lengkap', 'Judul dan instruksi tugas wajib diisi.');
+      Alert.alert('Incomplete Fields', 'Assignment title and instructions are required.');
       return;
     }
     const score = parseInt(newAssignMaxScore, 10) || 100;
@@ -332,21 +332,21 @@ export default function SyllabusScreen() {
       score
     );
     setIsAddAssignmentModalOpen(false);
-    Alert.alert('Sukses', 'Tugas proyek baru berhasil ditambahkan beserta batas waktunya!');
+    Alert.alert('Success', 'New project assignment added with submission deadline!');
   };
 
   const handleDeleteAssignment = (assignment: Assignment) => {
     Alert.alert(
-      'Hapus Tugas Proyek',
-      `Apakah Anda yakin ingin menghapus "${assignment.title}"? Pengumpulan siswa pada tugas ini juga akan terhapus.`,
+      'Delete Project Assignment',
+      `Are you sure you want to delete "${assignment.title}"? Any existing student submissions will also be deleted.`,
       [
-        { text: 'Batal', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Hapus',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => {
             deleteAssignment(assignment.id);
-            Alert.alert('Terhapus', 'Tugas proyek berhasil dihapus.');
+            Alert.alert('Deleted', 'Project assignment removed.');
           },
         },
       ]
@@ -363,18 +363,18 @@ export default function SyllabusScreen() {
     if (!targetAssignmentToEdit || !editDueDateInput.trim()) return;
     updateAssignmentDueDate(targetAssignmentToEdit.id, editDueDateInput.trim());
     setIsEditDueDateModalOpen(false);
-    Alert.alert('Batas Waktu Diperbarui', `Batas waktu tugas diubah menjadi ${editDueDateInput.trim()}`);
+    Alert.alert('Deadline Updated', `Assignment submission deadline updated to ${editDueDateInput.trim()}`);
   };
 
   const handleSaveModule = () => {
     if (!newModuleTitle.trim()) {
-      Alert.alert('Data Belum Lengkap', 'Judul modul wajib diisi.');
+      Alert.alert('Incomplete Fields', 'Module title is required.');
       return;
     }
     addModule(activeCourse.id, newModuleTitle.trim());
     setNewModuleTitle('');
     setIsAddModuleModalOpen(false);
-    Alert.alert('Sukses', 'Modul baru berhasil ditambahkan ke kurikulum!');
+    Alert.alert('Success', 'New module added to curriculum!');
   };
 
   const renderFormattedLessonContent = (body: string, dark: boolean) => {
@@ -566,7 +566,7 @@ export default function SyllabusScreen() {
           </Text>
           <Text style={styles.screenSubtitle}>
             {isTeacher
-              ? (language === 'en' ? 'Instructor View: Manage lesson units, assignments, and schedule deadlines' : 'Mode Pengajar: Kelola materi & tugas per kelas, serta tentukan batas waktu')
+              ? 'Instructor View: Manage lesson units, assignments, and schedule deadlines'
               : t.syllabus.headerSubtitle}
           </Text>
         </View>
@@ -574,7 +574,7 @@ export default function SyllabusScreen() {
         {/* Horizontal Class / Cohort Selector */}
         <View style={styles.classSelectorContainer}>
           <Text style={[styles.selectorLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-            {language === 'en' ? 'MY COHORT CLASSES:' : 'KELAS & COHORT SAYA:'}
+            MY COHORT CLASSES:
           </Text>
           <ScrollView
             horizontal
@@ -749,8 +749,8 @@ export default function SyllabusScreen() {
               />
               <Text style={styles.referenceNoticeText}>
                 {activeBatch.status === 'completed'
-                  ? 'Siswa telah menuntaskan kurikulum ini dan sertifikat digital telah diterbitkan di Profil.'
-                  : 'Kurikulum & modul silabus dapat dibaca dan dieksplorasi.'}
+                  ? 'Learners have completed this accredited curriculum. Official digital credentials have been issued in Profile.'
+                  : 'Curriculum & syllabus modules are open for self-paced reference and study.'}
               </Text>
             </View>
           )}
@@ -763,7 +763,7 @@ export default function SyllabusScreen() {
               styles.moduleSectionTitle,
               { color: isDark ? '#F8FAFC' : '#0F172A' },
             ]}>
-            Daftar Modul ({currentModules.length})
+            Curriculum Modules ({currentModules.length})
           </Text>
           {isTeacher && (
             <TouchableOpacity
@@ -1671,7 +1671,7 @@ export default function SyllabusScreen() {
                       styles.instructionsTitle,
                       { color: isDark ? '#93C5FD' : '#1D4ED8' },
                     ]}>
-                    📋 Instruksi Tugas dari Pengajar:
+                    📋 Instructor Assignment Guidelines:
                   </Text>
                   <Text
                     style={[
@@ -1681,7 +1681,7 @@ export default function SyllabusScreen() {
                     {selectedAssignment.instructions}
                   </Text>
                   <Text style={styles.modalDueDateBadge}>
-                    ⏰ Batas Waktu: {selectedAssignment.dueDate}
+                    ⏰ Due Date: {selectedAssignment.dueDate}
                   </Text>
                 </View>
 
@@ -1690,7 +1690,7 @@ export default function SyllabusScreen() {
                     styles.inputLabel,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Tautan Repository / Berkas (Opsional):
+                  Repository Link / Deliverable URL (Optional):
                 </Text>
                 <TextInput
                   placeholder="https://github.com/username/project..."
@@ -1712,10 +1712,10 @@ export default function SyllabusScreen() {
                     styles.inputLabel,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Deskripsi & Jawaban Siswa *:
+                  Student Solution Notes & Implementation Details *:
                 </Text>
                 <TextInput
-                  placeholder="Tuliskan ringkasan implementasi tugas Anda di sini..."
+                  placeholder="Summarize your architecture, deliverables, and features..."
                   placeholderTextColor="#94A3B8"
                   value={assignmentText}
                   onChangeText={setAssignmentText}
@@ -1741,7 +1741,7 @@ export default function SyllabusScreen() {
               style={styles.tactileBtnGreen}>
               <Ionicons name="cloud-upload" size={18} color="#FFFFFF" />
               <Text style={styles.tactileBtnGreenText}>
-                Kumpulkan Tugas ke Pengajar (+75 XP)
+                Submit Project to Instructor (+75 XP)
               </Text>
             </TouchableOpacity>
           </View>
@@ -1768,7 +1768,7 @@ export default function SyllabusScreen() {
                 styles.modalHeaderTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Tambah Materi Pelajaran Baru
+              Add New Lesson Unit
             </Text>
             <View style={{ width: 24 }} />
           </View>
@@ -1780,7 +1780,7 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Modul Tujuan *:
+              Target Module *:
             </Text>
             <ScrollView
               horizontal
@@ -1836,10 +1836,10 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Judul Materi *:
+              Lesson Title *:
             </Text>
             <TextInput
-              placeholder="Contoh: 1.3 Navigasi Lanjutan dengan Expo Router"
+              placeholder="e.g. 1.3 Advanced Routing with Expo Router"
               placeholderTextColor="#94A3B8"
               value={newLessonTitle}
               onChangeText={setNewLessonTitle}
@@ -1858,7 +1858,7 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Estimasi Durasi (Menit):
+              Estimated Duration (Minutes):
             </Text>
             <TextInput
               placeholder="15"
@@ -1881,7 +1881,7 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Tipe Materi Pembelajaran *:
+              Lesson Content Type *:
             </Text>
             <View style={styles.typeSelectorRow}>
               <TouchableOpacity
@@ -1922,7 +1922,7 @@ export default function SyllabusScreen() {
                       fontWeight: newLessonType === 'reading' ? '700' : '500',
                     },
                   ]}>
-                  Bacaan & Teks
+                  Reading & Text
                 </Text>
               </TouchableOpacity>
 
@@ -1964,7 +1964,7 @@ export default function SyllabusScreen() {
                       fontWeight: newLessonType === 'video' ? '700' : '500',
                     },
                   ]}>
-                  Video Pelajaran
+                  Video Lecture
                 </Text>
               </TouchableOpacity>
             </View>
@@ -1976,10 +1976,10 @@ export default function SyllabusScreen() {
                     styles.inputLabel,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Tautan Video Pembelajaran (Opsional):
+                  Video Lecture URL (Optional):
                 </Text>
                 <TextInput
-                  placeholder="https://youtube.com/watch?v=... atau https://vimeo.com/..."
+                  placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
                   placeholderTextColor="#94A3B8"
                   value={newLessonVideoUrl}
                   onChangeText={setNewLessonVideoUrl}
@@ -2000,10 +2000,10 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Isi Materi Pembelajaran *:
+              Lesson Content & Body *:
             </Text>
             <TextInput
-              placeholder="Tulis materi penjelasan, konsep, atau tautan bacaan untuk siswa..."
+              placeholder="Write detailed lesson explanation, concepts, or references..."
               placeholderTextColor="#94A3B8"
               value={newLessonBody}
               onChangeText={setNewLessonBody}
@@ -2026,7 +2026,7 @@ export default function SyllabusScreen() {
               onPress={handleSaveLesson}
               style={styles.tactileBtnPurple}>
               <Ionicons name="add-circle" size={18} color="#FFFFFF" />
-              <Text style={styles.tactileBtnPurpleText}>Simpan Materi Baru</Text>
+              <Text style={styles.tactileBtnPurpleText}>Save Lesson Unit</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -2052,7 +2052,7 @@ export default function SyllabusScreen() {
                 styles.modalHeaderTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Tambah Tugas Proyek Baru
+              Add New Project Assignment
             </Text>
             <View style={{ width: 24 }} />
           </View>
@@ -2064,7 +2064,7 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Modul Tujuan *:
+              Target Module *:
             </Text>
             <ScrollView
               horizontal
@@ -2120,10 +2120,10 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Judul Tugas *:
+              Assignment Title *:
             </Text>
             <TextInput
-              placeholder="Contoh: Tugas 2: Pembuatan Komponen Reaktif"
+              placeholder="e.g. Assignment 2: Reactive State Architecture"
               placeholderTextColor="#94A3B8"
               value={newAssignTitle}
               onChangeText={setNewAssignTitle}
@@ -2142,10 +2142,10 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Batas Waktu Pengerjaan (Deadline) *:
+              Submission Deadline *:
             </Text>
             <TextInput
-              placeholder="Contoh: 2026-11-20 23:59"
+              placeholder="e.g. 2026-11-20 23:59"
               placeholderTextColor="#94A3B8"
               value={newAssignDueDate}
               onChangeText={setNewAssignDueDate}
@@ -2164,7 +2164,7 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Skor Maksimal:
+              Maximum Score:
             </Text>
             <TextInput
               placeholder="100"
@@ -2187,10 +2187,10 @@ export default function SyllabusScreen() {
                 styles.inputLabel,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Instruksi Tugas *:
+              Assignment Instructions *:
             </Text>
             <TextInput
-              placeholder="Jelaskan kriteria penilaian dan apa yang wajib dikumpulkan siswa..."
+              placeholder="Detail evaluation criteria and expected student deliverables..."
               placeholderTextColor="#94A3B8"
               value={newAssignInstructions}
               onChangeText={setNewAssignInstructions}
@@ -2213,7 +2213,7 @@ export default function SyllabusScreen() {
               onPress={handleSaveAssignment}
               style={styles.tactileBtnPurple}>
               <Ionicons name="save-outline" size={18} color="#FFFFFF" />
-              <Text style={styles.tactileBtnPurpleText}>Simpan Tugas Baru</Text>
+              <Text style={styles.tactileBtnPurpleText}>Save Project Assignment</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -2239,14 +2239,14 @@ export default function SyllabusScreen() {
                 styles.promptTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              ⏰ Tentukan Batas Waktu Tugas
+              ⏰ Set Assignment Deadline
             </Text>
             <Text style={styles.promptSubtitle}>
               {targetAssignmentToEdit?.title}
             </Text>
 
             <TextInput
-              placeholder="Contoh: 2026-11-25 23:59"
+              placeholder="e.g. 2026-11-25 23:59"
               placeholderTextColor="#94A3B8"
               value={editDueDateInput}
               onChangeText={setEditDueDateInput}
@@ -2265,13 +2265,13 @@ export default function SyllabusScreen() {
               <TouchableOpacity
                 onPress={() => setIsEditDueDateModalOpen(false)}
                 style={styles.promptCancelBtn}>
-                <Text style={styles.promptCancelText}>Batal</Text>
+                <Text style={styles.promptCancelText}>Cancel</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleSaveNewDueDate}
                 style={styles.promptSaveBtn}>
-                <Text style={styles.promptSaveText}>Perbarui Batas Waktu</Text>
+                <Text style={styles.promptSaveText}>Update Deadline</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -2298,17 +2298,17 @@ export default function SyllabusScreen() {
                 styles.promptTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              📁 Tambah Modul Baru
+              📁 Add New Module
             </Text>
 
             <Text style={styles.promptSubtitle}>
-              Buat bab/modul baru dalam kelas &quot;{activeCourse.title}&quot;
+              Create a new module chapter for &quot;{activeCourse.title}&quot;
             </Text>
 
             <TextInput
               value={newModuleTitle}
               onChangeText={setNewModuleTitle}
-              placeholder="Contoh: Modul 3: Deployment & CI/CD"
+              placeholder="e.g. Module 3: Deployment & CI/CD"
               placeholderTextColor="#94A3B8"
               style={[
                 styles.modalInput,
@@ -2325,13 +2325,13 @@ export default function SyllabusScreen() {
               <TouchableOpacity
                 onPress={() => setIsAddModuleModalOpen(false)}
                 style={styles.promptCancelBtn}>
-                <Text style={styles.promptCancelText}>Batal</Text>
+                <Text style={styles.promptCancelText}>Cancel</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleSaveModule}
                 style={[styles.promptSaveBtn, { backgroundColor: '#8B5CF6' }]}>
-                <Text style={styles.promptSaveText}>Simpan Modul</Text>
+                <Text style={styles.promptSaveText}>Save Module</Text>
               </TouchableOpacity>
             </View>
           </View>

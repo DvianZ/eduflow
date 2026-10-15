@@ -1,11 +1,9 @@
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { en } from './translations/en';
-import { id } from './translations/id';
 import { TranslationDictionary, Language } from './types';
 
 export const translations: Record<Language, TranslationDictionary> = {
   en,
-  id,
 };
 
 export function useTranslation() {
@@ -16,14 +14,13 @@ export function useTranslation() {
 
   return {
     t,
-    language,
+    language: 'en' as const,
     setLanguage,
   };
 }
 
-export function getTranslation(lang?: Language): TranslationDictionary {
-  const currentLang = lang || useSettingsStore.getState().language || 'en';
-  return translations[currentLang] || translations.en;
+export function getTranslation(_lang?: Language): TranslationDictionary {
+  return translations.en;
 }
 
 export * from './types';

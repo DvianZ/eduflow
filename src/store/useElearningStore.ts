@@ -387,11 +387,11 @@ export const useElearningStore = create<ElearningState>()(
           id: `notif-grade-${Date.now()}`,
           userId: submission.userId,
           title: requestRevision
-            ? '⚠️ Permintaan Revisi Tugas'
-            : `🎉 Tugas Dinilai: Skor ${score}/100`,
+            ? '⚠️ Project Revision Requested'
+            : `🎉 Project Evaluated: Score ${score}/100`,
           message: requestRevision
-            ? `${currentUser.fullName} meminta revisi tugas "${assignment?.title || 'Tugas Proyek'}". Catatan: "${feedbackNotes || 'Silakan cek catatan pengajar.'}"`
-            : `${currentUser.fullName} telah menilai tugas "${assignment?.title || 'Tugas Proyek'}". Catatan: "${feedbackNotes || 'Kerja bagus!'}"`,
+            ? `${currentUser.fullName} requested a revision on "${assignment?.title || 'Project Assignment'}". Remarks: "${feedbackNotes || 'Please review instructor notes.'}"`
+            : `${currentUser.fullName} evaluated "${assignment?.title || 'Project Assignment'}". Remarks: "${feedbackNotes || 'Excellent work!'}"`,
           type: requestRevision ? 'revision' : 'grade',
           isRead: false,
           createdAt: now,
@@ -439,7 +439,7 @@ export const useElearningStore = create<ElearningState>()(
         const newNotifs: InAppNotification[] = enrolledStudents.map((enr, idx) => ({
           id: `notif-ann-${Date.now()}-${idx}`,
           userId: enr.userId,
-          title: `📢 Pengumuman Baru: ${batch?.batchName || 'Kelas'}`,
+          title: `📢 New Announcement: ${batch?.batchName || 'Cohort'}`,
           message: `${currentUser.fullName}: "${title}"`,
           type: 'announcement',
           isRead: false,
@@ -780,14 +780,14 @@ export const useElearningStore = create<ElearningState>()(
         );
 
         if (!batch) {
-          return { success: false, error: 'Kode kelas tidak ditemukan.' };
+          return { success: false, error: 'Class code not found.' };
         }
 
         // Check if class is closed/completed
         if (batch.status === 'completed') {
           return {
             success: false,
-            error: 'Kelas ini telah ditutup/selesai. Pendaftaran siswa baru tidak lagi dibuka.',
+            error: 'This cohort has ended or is closed. New enrollments are no longer accepted.',
           };
         }
 
@@ -796,7 +796,7 @@ export const useElearningStore = create<ElearningState>()(
           (e) => e.batchId === batch.id && e.userId === userId
         );
         if (alreadyEnrolled) {
-          return { success: false, error: 'Anda sudah terdaftar di kelas ini.' };
+          return { success: false, error: 'You are already enrolled in this cohort.' };
         }
 
         // Check capacity
@@ -804,7 +804,7 @@ export const useElearningStore = create<ElearningState>()(
           (e) => e.batchId === batch.id
         ).length;
         if (currentEnrollCount >= batch.maxStudents) {
-          return { success: false, error: 'Kelas sudah penuh.' };
+          return { success: false, error: 'Class is at full capacity.' };
         }
 
         const newEnrollment: BatchEnrollment = {
@@ -820,8 +820,8 @@ export const useElearningStore = create<ElearningState>()(
         const teacherNotif: InAppNotification = {
           id: `notif-join-${Date.now()}`,
           userId: batch.instructorId,
-          title: '👋 Siswa Baru Terdaftar',
-          message: `Seorang siswa baru telah bergabung ke kelas ${batch.batchName}.`,
+          title: '👋 New Student Enrolled',
+          message: `A new student has enrolled in cohort ${batch.batchName}.`,
           type: 'enrollment',
           isRead: false,
           createdAt: new Date().toISOString(),

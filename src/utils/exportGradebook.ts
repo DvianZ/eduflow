@@ -14,7 +14,7 @@ export interface GradebookRow {
   quizAverage: number;
   assignmentScore: number;
   finalScore: number;
-  graduationStatus: 'LULUS' | 'DALAM PROSES' | 'BELUM MULAI';
+  graduationStatus: 'GRADUATED' | 'IN PROGRESS' | 'NOT STARTED';
   enrolledAt: string;
 }
 
@@ -42,7 +42,7 @@ export interface BuildGradebookOptions {
 }
 
 /**
- * Membangun baris rekap nilai terstruktur untuk pengajar
+ * Builds structured gradebook rows for instructors
  */
 export function buildGradebookRows(options: BuildGradebookOptions): GradebookRow[] {
   const {
@@ -85,7 +85,7 @@ export function buildGradebookRows(options: BuildGradebookOptions): GradebookRow
     batchEnrollments.forEach((enr) => {
       const user = registeredUsers.find((u) => u.id === enr.userId);
       const studentName = user?.fullName || enr.userId;
-      const studentEmail = user?.email || 'siswa@eduflow.id';
+      const studentEmail = user?.email || 'student@eduflow.id';
 
       // Quiz score average for this course
       const userAttempts = quizAttempts.filter(
@@ -120,11 +120,11 @@ export function buildGradebookRows(options: BuildGradebookOptions): GradebookRow
       );
 
       // Graduation Status
-      let status: 'LULUS' | 'DALAM PROSES' | 'BELUM MULAI' = 'BELUM MULAI';
+      let status: 'GRADUATED' | 'IN PROGRESS' | 'NOT STARTED' = 'NOT STARTED';
       if (progressPct === 100 && quizAvg >= 80 && assignmentScore >= 75) {
-        status = 'LULUS';
+        status = 'GRADUATED';
       } else if (progressPct > 0 || userSubmissions.length > 0 || userAttempts.length > 0) {
-        status = 'DALAM PROSES';
+        status = 'IN PROGRESS';
       }
 
       rows.push({
@@ -150,7 +150,7 @@ export function buildGradebookRows(options: BuildGradebookOptions): GradebookRow
 }
 
 /**
- * Menghitung ringkasan statistik rekap nilai
+ * Calculates summary statistics for the gradebook
  */
 export function calculateGradebookSummary(rows: GradebookRow[]): GradebookSummary {
   if (rows.length === 0) {
@@ -163,8 +163,8 @@ export function calculateGradebookSummary(rows: GradebookRow[]): GradebookSummar
     };
   }
 
-  const passedCount = rows.filter((r) => r.graduationStatus === 'LULUS').length;
-  const inProgressCount = rows.filter((r) => r.graduationStatus === 'DALAM PROSES').length;
+  const passedCount = rows.filter((r) => r.graduationStatus === 'GRADUATED').length;
+  const inProgressCount = rows.filter((r) => r.graduationStatus === 'IN PROGRESS').length;
   const totalScore = rows.reduce((acc, r) => acc + r.finalScore, 0);
   const averageScore = Math.round(totalScore / rows.length);
   const completionRate = Math.round((passedCount / rows.length) * 100);
@@ -179,24 +179,24 @@ export function calculateGradebookSummary(rows: GradebookRow[]): GradebookSummar
 }
 
 /**
- * Mengonversi baris rekap nilai ke string format CSV kompatibel Excel (UTF-8 BOM)
+ * Converts gradebook rows into Excel-compatible CSV string (UTF-8 BOM)
  */
-export function formatGradebookCSV(rows: GradebookRow[], className = 'Semua Kelas'): string {
-  // UTF-8 BOM so Excel opens with proper Indonesian characters
+export function formatGradebookCSV(rows: GradebookRow[], className = 'All Cohorts'): string {
+  // UTF-8 BOM so Excel opens with proper characters
   const BOM = '\uFEFF';
 
   const headers = [
     'No',
-    'Nama Siswa',
-    'Email Siswa',
-    'Nama Kelas',
-    'Kode Kelas',
-    'Materi Selesai (%)',
-    'Rata-rata Kuis',
-    'Nilai Tugas Proyek',
-    'Nilai Akhir Terbobot',
-    'Status Kelulusan',
-    'Tanggal Pendaftaran',
+    'Student Name',
+    'Student Email',
+    'Cohort Name',
+    'Class Code',
+    'Curriculum Progress (%)',
+    'Quiz Average',
+    'Project Score',
+    'Weighted Final Score',
+    'Graduation Status',
+    'Enrollment Date',
   ];
 
   // CSV escape helper
@@ -209,10 +209,10 @@ export function formatGradebookCSV(rows: GradebookRow[], className = 'Semua Kela
   };
 
   const metadataLines = [
-    `# REKAPITULASI NILAI AKADEMIK SISWA`,
-    `# Kelas: ${className}`,
-    `# Tanggal Ekspor: ${new Date().toISOString().split('T')[0]}`,
-    `# Diterbitkan oleh: EduFlow Cohort Learning System`,
+    `# STUDENT ACADEMIC GRADEBOOK RECAP`,
+    `# Cohort: ${className}`,
+    `# Export Date: ${new Date().toISOString().split('T')[0]}`,
+    `# Issued by: EduFlow Cohort Learning System`,
     ``,
   ];
 

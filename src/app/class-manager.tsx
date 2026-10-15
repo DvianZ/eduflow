@@ -96,7 +96,7 @@ export default function ClassManagerScreen() {
   const handleSaveBatchChanges = () => {
     if (!editingBatch) return;
     if (!editBatchName.trim()) {
-      Alert.alert('Perhatian', 'Nama batch tidak boleh kosong.');
+      Alert.alert('Attention', 'Cohort batch name cannot be empty.');
       return;
     }
     const maxStd = parseInt(editMaxStudents, 10) || 30;
@@ -108,37 +108,37 @@ export default function ClassManagerScreen() {
       status: editStatus,
     });
     setIsEditModalOpen(false);
-    Alert.alert('Sukses', 'Informasi kelas berhasil diperbarui!');
+    Alert.alert('Success', 'Cohort class information updated successfully!');
   };
 
   const handleQuickToggleBatchStatus = (batch: Batch) => {
     if (batch.status === 'active') {
       Alert.alert(
-        'Tutup Kelas Ini?',
-        `Apakah Anda yakin ingin menutup kelas "${batch.batchName}"? Status akan berubah menjadi Selesai dan pendaftaran siswa baru menggunakan kode "${batch.classCode}" akan dinonaktifkan.`,
+        'Close This Cohort Class?',
+        `Are you sure you want to close "${batch.batchName}"? Status will become Completed and enrollment via code "${batch.classCode}" will be deactivated.`,
         [
-          { text: 'Batal', style: 'cancel' },
+          { text: 'Cancel', style: 'cancel' },
           {
-            text: 'Tutup Kelas',
+            text: 'Close Class',
             style: 'destructive',
             onPress: () => {
               updateBatch(batch.id, { status: 'completed' });
-              Alert.alert('Kelas Ditutup', `Kelas "${batch.batchName}" telah ditandai Selesai.`);
+              Alert.alert('Class Closed', `Class "${batch.batchName}" is now marked as Completed.`);
             },
           },
         ]
       );
     } else {
       Alert.alert(
-        'Aktifkan Kembali Kelas?',
-        `Buka kembali pendaftaran untuk kelas "${batch.batchName}"? Status kelas akan menjadi Aktif kembali.`,
+        'Reactivate Cohort Class?',
+        `Re-open enrollment for "${batch.batchName}"? Class status will become Active again.`,
         [
-          { text: 'Batal', style: 'cancel' },
+          { text: 'Cancel', style: 'cancel' },
           {
-            text: 'Aktifkan',
+            text: 'Reactivate',
             onPress: () => {
               updateBatch(batch.id, { status: 'active' });
-              Alert.alert('Kelas Aktif', `Kelas "${batch.batchName}" kini berstatus Aktif.`);
+              Alert.alert('Class Active', `Class "${batch.batchName}" is now Active.`);
             },
           },
         ]
@@ -148,7 +148,7 @@ export default function ClassManagerScreen() {
 
   const handleCreate = () => {
     if (!courseTitle.trim() || !batchName.trim()) {
-      Alert.alert('Form Belum Lengkap', 'Judul course dan nama batch wajib diisi.');
+      Alert.alert('Incomplete Form', 'Course title and batch name are required.');
       return;
     }
 
@@ -158,7 +158,7 @@ export default function ClassManagerScreen() {
 
     const result = createBatch(
       courseTitle.trim(),
-      courseDesc.trim() || `Kelas ${courseTitle.trim()} oleh ${currentUser.fullName}`,
+      courseDesc.trim() || `Course ${courseTitle.trim()} by ${currentUser.fullName}`,
       courseCategory.trim() || 'General',
       courseLevel,
       batchName.trim(),
@@ -197,9 +197,9 @@ export default function ClassManagerScreen() {
   const inputBorder = isDark ? '#334155' : '#CBD5E1';
 
   const levelLabels: Record<CourseLevel, { label: string; color: string; bg: string }> = {
-    beginner: { label: 'Pemula', color: '#15803D', bg: '#DCFCE7' },
-    intermediate: { label: 'Menengah', color: '#D97706', bg: '#FEF3C7' },
-    advanced: { label: 'Lanjutan', color: '#DC2626', bg: '#FEE2E2' },
+    beginner: { label: 'Beginner', color: '#15803D', bg: '#DCFCE7' },
+    intermediate: { label: 'Intermediate', color: '#D97706', bg: '#FEF3C7' },
+    advanced: { label: 'Advanced', color: '#DC2626', bg: '#FEE2E2' },
   };
 
   return (
@@ -299,11 +299,11 @@ export default function ClassManagerScreen() {
                   <View style={styles.successBannerHeader}>
                     <Ionicons name="sparkles" size={20} color="#10B981" />
                     <Text style={styles.successBannerTitle}>
-                      Kelas Berhasil Dibuat! 🎉
+                      Class Created Successfully! 🎉
                     </Text>
                   </View>
                   <Text style={[styles.successBannerText, { color: isDark ? '#D1FAE5' : '#065F46' }]}>
-                    Kelas <Text style={{ fontWeight: '700' }}>{successCreatedBatch.title}</Text> telah aktif. Bagikan kode di bawah ke siswa Anda:
+                    Cohort class <Text style={{ fontWeight: '700' }}>{successCreatedBatch.title}</Text> is now active. Share this enrollment code with your students:
                   </Text>
                   <View style={styles.successCodeRow}>
                     <Text style={styles.successCodeText}>{successCreatedBatch.code}</Text>
@@ -326,7 +326,7 @@ export default function ClassManagerScreen() {
                         color="#FFFFFF"
                       />
                       <Text style={styles.successCopyBtnText}>
-                        {copiedCode === successCreatedBatch.code ? 'Tersalin!' : 'Salin Kode'}
+                        {copiedCode === successCreatedBatch.code ? 'Copied!' : 'Copy Code'}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -343,16 +343,16 @@ export default function ClassManagerScreen() {
                     <Ionicons name="school-outline" size={40} color="#8B5CF6" />
                   </View>
                   <Text style={[styles.emptyTitle, { color: textPrimary }]}>
-                    Belum Ada Kelas
+                    No Cohort Classes Yet
                   </Text>
                   <Text style={[styles.emptyDesc, { color: textSecondary }]}>
-                    Buat kelas pertama Anda dan bagikan kode kelas ke siswa.
+                    Create your first cohort class and share the enrollment code with students.
                   </Text>
                   <TouchableOpacity
                     style={styles.emptyBtn}
                     onPress={() => setActiveTab('create')}>
                     <Ionicons name="add" size={18} color="#FFFFFF" />
-                    <Text style={styles.emptyBtnText}>Buat Kelas</Text>
+                    <Text style={styles.emptyBtnText}>Create Class</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -412,10 +412,10 @@ export default function ClassManagerScreen() {
                                 },
                               ]}>
                               {batch.status === 'active'
-                                ? 'Aktif'
+                                ? 'Active'
                                 : batch.status === 'completed'
-                                ? 'Selesai'
-                                : 'Mendatang'}
+                                ? 'Completed'
+                                : 'Upcoming'}
                             </Text>
                           </View>
 
@@ -428,7 +428,7 @@ export default function ClassManagerScreen() {
                                 borderColor: isDark ? '#334155' : '#E2E8F0',
                               },
                             ]}
-                            accessibilityLabel="Pengaturan Kelas">
+                            accessibilityLabel="Class Settings">
                             <Ionicons name="settings-outline" size={15} color="#8B5CF6" />
                           </TouchableOpacity>
                         </View>
@@ -450,7 +450,7 @@ export default function ClassManagerScreen() {
                         <View style={styles.classMetricItem}>
                           <Ionicons name="people-outline" size={16} color="#8B5CF6" />
                           <Text style={[styles.classMetricText, { color: textSecondary }]}>
-                            {enrolledCount}/{batch.maxStudents} Siswa
+                            {enrolledCount}/{batch.maxStudents} Students
                           </Text>
                         </View>
                         <View style={styles.classMetricItem}>
@@ -482,7 +482,7 @@ export default function ClassManagerScreen() {
                         />
                         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                           <Text style={[styles.shareCodeLabel, { color: textSecondary }]}>
-                            Kode Kelas:
+                            Class Code:
                           </Text>
                           <Text
                             style={[
@@ -503,7 +503,7 @@ export default function ClassManagerScreen() {
                             color="#FFFFFF"
                           />
                           <Text style={styles.copyButtonPillText}>
-                            {isCopied ? 'Tersalin!' : 'Salin Kode'}
+                            {isCopied ? 'Copied!' : 'Copy Code'}
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -525,7 +525,7 @@ export default function ClassManagerScreen() {
                           ]}>
                           <Ionicons name="people" size={15} color="#6366F1" />
                           <Text style={[styles.rosterToggleText, { color: textPrimary }]}>
-                            Peserta ({enrolledCount})
+                            Roster ({enrolledCount})
                           </Text>
                           <Ionicons
                             name={isRosterExpanded ? 'chevron-up' : 'chevron-down'}
@@ -556,7 +556,7 @@ export default function ClassManagerScreen() {
                           }}
                           style={styles.openSyllabusBtn}>
                           <Ionicons name="book-outline" size={14} color="#FFFFFF" />
-                          <Text style={styles.openSyllabusBtnText}>Silabus</Text>
+                          <Text style={styles.openSyllabusBtnText}>Syllabus</Text>
                         </TouchableOpacity>
                       </View>
 
@@ -592,8 +592,8 @@ export default function ClassManagerScreen() {
                             },
                           ]}>
                           {batch.status === 'active'
-                            ? 'Kelas Berjalan • Ketuk untuk Menutup Kelas'
-                            : 'Kelas Ditutup • Ketuk untuk Membuka Kembali'}
+                            ? 'Active Cohort • Tap to Close Class'
+                            : 'Closed Cohort • Tap to Re-open'}
                         </Text>
                         <Ionicons
                           name="chevron-forward"
@@ -617,11 +617,11 @@ export default function ClassManagerScreen() {
                               styles.rosterListTitle,
                               { color: textSecondary },
                             ]}>
-                            DAFTAR SISWA TERDAFTAR:
+                            ENROLLED STUDENTS ROSTER:
                           </Text>
                           {batchEnrollments.length === 0 ? (
                             <Text style={[styles.emptyRosterText, { color: textSecondary }]}>
-                              Belum ada siswa yang mendaftar. Bagikan kode kelas &quot;{batch.classCode}&quot; kepada siswa.
+                              No students enrolled yet. Share class code &quot;{batch.classCode}&quot; with your students.
                             </Text>
                           ) : (
                             batchEnrollments.map((enr) => {
@@ -631,10 +631,10 @@ export default function ClassManagerScreen() {
                               const studentName =
                                 studentUser?.fullName ||
                                 (enr.userId === currentUser.id
-                                  ? currentUser.fullName
-                                  : enr.userId);
+                                    ? currentUser.fullName
+                                    : enr.userId);
                               const studentEmail =
-                                studentUser?.email || 'siswa@eduflow.id';
+                                studentUser?.email || 'student@eduflow.id';
                               const studentAvatar =
                                 studentUser?.avatarUrl ||
                                 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=160&q=80';
@@ -685,8 +685,8 @@ export default function ClassManagerScreen() {
                                         },
                                       ]}>
                                       {enr.graduationStatus === 'graduated'
-                                        ? 'Lulus'
-                                        : 'Belajar'}
+                                        ? 'Graduated'
+                                        : 'Learning'}
                                     </Text>
                                   </View>
                                 </View>
@@ -713,14 +713,14 @@ export default function ClassManagerScreen() {
               <View style={styles.formHeader}>
                 <Ionicons name="create-outline" size={22} color="#8B5CF6" />
                 <Text style={[styles.formTitle, { color: textPrimary }]}>
-                  Buat Kelas Baru
+                  Create New Cohort Class
                 </Text>
               </View>
 
               {/* Course Title */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                  Judul Course *
+                  Course Title *
                 </Text>
                 <TextInput
                   style={[
@@ -731,7 +731,7 @@ export default function ClassManagerScreen() {
                       borderColor: inputBorder,
                     },
                   ]}
-                  placeholder="Contoh: Fullstack Mobile Development"
+                  placeholder="e.g. Fullstack Mobile Development"
                   placeholderTextColor="#94A3B8"
                   value={courseTitle}
                   onChangeText={setCourseTitle}
@@ -741,7 +741,7 @@ export default function ClassManagerScreen() {
               {/* Course Description */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                  Deskripsi Course
+                  Course Description
                 </Text>
                 <TextInput
                   style={[
@@ -753,7 +753,7 @@ export default function ClassManagerScreen() {
                       borderColor: inputBorder,
                     },
                   ]}
-                  placeholder="Deskripsi singkat tentang course..."
+                  placeholder="Brief description of the course curriculum..."
                   placeholderTextColor="#94A3B8"
                   value={courseDesc}
                   onChangeText={setCourseDesc}
@@ -765,7 +765,7 @@ export default function ClassManagerScreen() {
               {/* Category */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                  Kategori
+                  Category
                 </Text>
                 <TextInput
                   style={[
@@ -776,7 +776,7 @@ export default function ClassManagerScreen() {
                       borderColor: inputBorder,
                     },
                   ]}
-                  placeholder="Contoh: Mobile Development"
+                  placeholder="e.g. Mobile Development"
                   placeholderTextColor="#94A3B8"
                   value={courseCategory}
                   onChangeText={setCourseCategory}
@@ -786,7 +786,7 @@ export default function ClassManagerScreen() {
               {/* Level Selector */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                  Tingkat Kesulitan
+                  Difficulty Level
                 </Text>
                 <View style={styles.levelRow}>
                   {(['beginner', 'intermediate', 'advanced'] as CourseLevel[]).map(
@@ -829,7 +829,7 @@ export default function ClassManagerScreen() {
               {/* Batch Name */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                  Nama Batch / Kelas *
+                  Batch / Cohort Name *
                 </Text>
                 <TextInput
                   style={[
@@ -840,7 +840,7 @@ export default function ClassManagerScreen() {
                       borderColor: inputBorder,
                     },
                   ]}
-                  placeholder="Contoh: Batch 01 - Mobile Cohort"
+                  placeholder="e.g. Batch 01 - Mobile Cohort"
                   placeholderTextColor="#94A3B8"
                   value={batchName}
                   onChangeText={setBatchName}
@@ -850,7 +850,7 @@ export default function ClassManagerScreen() {
               {/* Max Students */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: textSecondary }]}>
-                  Kapasitas Maks Siswa
+                  Maximum Student Capacity
                 </Text>
                 <TextInput
                   style={[
@@ -880,7 +880,7 @@ export default function ClassManagerScreen() {
                   <Ionicons name="checkmark-circle" size={20} color="#16A34A" />
                   <View style={styles.createdCodeTextCol}>
                     <Text style={styles.createdCodeLabel}>
-                      Kode Kelas Terakhir Dibuat:
+                      Latest Created Class Code:
                     </Text>
                     <Text style={styles.createdCodeValue}>{createdCode}</Text>
                   </View>
@@ -893,7 +893,7 @@ export default function ClassManagerScreen() {
                 onPress={handleCreate}
                 activeOpacity={0.85}>
                 <Ionicons name="rocket-outline" size={18} color="#FFFFFF" />
-                <Text style={styles.createBtnText}>Buat Kelas Sekarang</Text>
+                <Text style={styles.createBtnText}>Create Cohort Class</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -920,7 +920,7 @@ export default function ClassManagerScreen() {
               <Ionicons name="close" size={24} color={textPrimary} />
             </TouchableOpacity>
             <Text style={[styles.editModalHeaderTitle, { color: textPrimary }]}>
-              Pengaturan & Edit Kelas
+              Cohort Settings & Status
             </Text>
             <View style={{ width: 24 }} />
           </View>
@@ -942,7 +942,7 @@ export default function ClassManagerScreen() {
                   ]}>
                   <View style={styles.editCohortRow}>
                     <Text style={[styles.editCohortLabel, { color: textSecondary }]}>
-                      KODE KELAS (TIDAK DAPAT DIUBAH):
+                      CLASS CODE (PERMANENT IDENTIFIER):
                     </Text>
                     <View style={styles.editClassCodePill}>
                       <Text style={styles.editClassCodePillText}>
@@ -951,13 +951,13 @@ export default function ClassManagerScreen() {
                     </View>
                   </View>
                   <Text style={[styles.editCohortHelp, { color: textSecondary }]}>
-                    Siswa bergabung menggunakan kode unik di atas.
+                    Students join this cohort using the unique code above.
                   </Text>
                 </View>
 
                 {/* Status Selector */}
                 <Text style={[styles.editInputLabel, { color: textPrimary }]}>
-                  Status Siklus Hidup Kelas *:
+                  Cohort Lifecycle Status *:
                 </Text>
                 <View style={styles.statusSelectorRow}>
                   <TouchableOpacity
@@ -997,7 +997,7 @@ export default function ClassManagerScreen() {
                           fontWeight: editStatus === 'active' ? '700' : '500',
                         },
                       ]}>
-                      🟢 Aktif
+                      🟢 Active
                     </Text>
                   </TouchableOpacity>
 
@@ -1038,7 +1038,7 @@ export default function ClassManagerScreen() {
                           fontWeight: editStatus === 'upcoming' ? '700' : '500',
                         },
                       ]}>
-                      🟡 Mendatang
+                      🟡 Upcoming
                     </Text>
                   </TouchableOpacity>
 
@@ -1079,19 +1079,19 @@ export default function ClassManagerScreen() {
                           fontWeight: editStatus === 'completed' ? '700' : '500',
                         },
                       ]}>
-                      🔴 Selesai (Tutup)
+                      🔴 Completed (Closed)
                     </Text>
                   </TouchableOpacity>
                 </View>
 
                 {/* Batch Name */}
                 <Text style={[styles.editInputLabel, { color: textPrimary }]}>
-                  Nama Batch / Sesi Kelas *:
+                  Cohort Batch Name *:
                 </Text>
                 <TextInput
                   value={editBatchName}
                   onChangeText={setEditBatchName}
-                  placeholder="Contoh: Batch 01 - Mobile Cohort"
+                  placeholder="e.g. Batch 01 - Mobile Cohort"
                   placeholderTextColor="#94A3B8"
                   style={[
                     styles.editInput,
@@ -1105,7 +1105,7 @@ export default function ClassManagerScreen() {
 
                 {/* Max Students */}
                 <Text style={[styles.editInputLabel, { color: textPrimary }]}>
-                  Kapasitas Maksimum Siswa *:
+                  Maximum Student Capacity *:
                 </Text>
                 <TextInput
                   value={editMaxStudents}
@@ -1127,7 +1127,7 @@ export default function ClassManagerScreen() {
                 <View style={styles.dateInputsRow}>
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.editInputLabel, { color: textPrimary }]}>
-                      Tanggal Mulai:
+                      Start Date:
                     </Text>
                     <TextInput
                       value={editStartDate}
@@ -1146,7 +1146,7 @@ export default function ClassManagerScreen() {
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.editInputLabel, { color: textPrimary }]}>
-                      Tanggal Berakhir:
+                      End Date:
                     </Text>
                     <TextInput
                       value={editEndDate}
@@ -1170,7 +1170,7 @@ export default function ClassManagerScreen() {
                   <View style={styles.closureNoticeBox}>
                     <Ionicons name="information-circle-outline" size={18} color="#D97706" />
                     <Text style={styles.closureNoticeText}>
-                      Status Aktif: Siswa dapat memasukkan kode kelas &quot;{editingBatch.classCode}&quot; untuk bergabung. Ubah ke Selesai untuk menutup pendaftaran.
+                      Active Status: Students can enter class code &quot;{editingBatch.classCode}&quot; to enroll. Change to Completed to close enrollment.
                     </Text>
                   </View>
                 )}
@@ -1179,7 +1179,7 @@ export default function ClassManagerScreen() {
                   <View style={[styles.closureNoticeBox, { backgroundColor: '#FEE2E2', borderColor: '#FCA5A5' }]}>
                     <Ionicons name="lock-closed" size={18} color="#DC2626" />
                     <Text style={[styles.closureNoticeText, { color: '#991B1B' }]}>
-                      Status Selesai: Pendaftaran ditutup. Siswa baru yang memasukkan kode &quot;{editingBatch.classCode}&quot; akan ditolak.
+                      Completed Status: Enrollment closed. New students attempting to join with code &quot;{editingBatch.classCode}&quot; will be rejected.
                     </Text>
                   </View>
                 )}
@@ -1199,14 +1199,14 @@ export default function ClassManagerScreen() {
             <TouchableOpacity
               onPress={() => setIsEditModalOpen(false)}
               style={styles.editCancelBtn}>
-              <Text style={styles.editCancelBtnText}>Batal</Text>
+              <Text style={styles.editCancelBtnText}>Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleSaveBatchChanges}
               style={styles.editSaveBtn}>
               <Ionicons name="save-outline" size={16} color="#FFFFFF" />
-              <Text style={styles.editSaveBtnText}>Simpan Perubahan</Text>
+              <Text style={styles.editSaveBtnText}>Save Changes</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>

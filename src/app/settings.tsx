@@ -29,7 +29,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const { t, language, setLanguage } = useTranslation();
+  const { t } = useTranslation();
 
   const {
     theme,
@@ -104,9 +104,7 @@ export default function SettingsScreen() {
     }
     Alert.alert(
       t.assignment.downloadCsvSuccess,
-      language === 'en'
-        ? 'Gradebook CSV for all enrolled learners generated and downloaded.'
-        : 'Rekap nilai seluruh siswa berhasil diekspor dan diunduh.'
+      'Gradebook CSV for all enrolled learners generated and downloaded.'
     );
   };
 
@@ -186,26 +184,24 @@ export default function SettingsScreen() {
           </View>
 
           <View style={[styles.bentoCard, { backgroundColor: cardBg, borderColor }]}>
-            {/* English (Default) */}
-            <TouchableOpacity
-              onPress={() => setLanguage('en')}
+            {/* English (United States) - Standardized */}
+            <View
               style={[
                 styles.langOptionRow,
-                language === 'en' && {
+                {
                   backgroundColor: isDark ? '#172554' : '#EFF6FF',
                   borderColor: '#3B82F6',
                 },
-              ]}
-              activeOpacity={0.8}>
+              ]}>
               <View style={styles.langOptionLeft}>
                 <Text style={styles.flagEmoji}>🇺🇸</Text>
-                <View>
+                <View style={{ flex: 1 }}>
                   <View style={styles.langBadgeRow}>
                     <Text style={[styles.langName, { color: textPrimary }]}>
                       {t.settings.langEnglish}
                     </Text>
                     <View style={styles.defaultPill}>
-                      <Text style={styles.defaultPillText}>DEFAULT</Text>
+                      <Text style={styles.defaultPillText}>STANDARDIZED</Text>
                     </View>
                   </View>
                   <Text style={[styles.langDesc, { color: textSecondary }]}>
@@ -216,44 +212,28 @@ export default function SettingsScreen() {
               <View
                 style={[
                   styles.radioCircle,
-                  language === 'en' && styles.radioCircleActive,
+                  styles.radioCircleActive,
                 ]}>
-                {language === 'en' && <View style={styles.radioDot} />}
+                <Ionicons name="checkmark" size={12} color="#FFFFFF" />
               </View>
-            </TouchableOpacity>
+            </View>
 
             <View style={[styles.cardDivider, { backgroundColor: borderColor }]} />
 
-            {/* Bahasa Indonesia */}
-            <TouchableOpacity
-              onPress={() => setLanguage('id')}
-              style={[
-                styles.langOptionRow,
-                language === 'id' && {
-                  backgroundColor: isDark ? '#172554' : '#EFF6FF',
-                  borderColor: '#3B82F6',
-                },
-              ]}
-              activeOpacity={0.8}>
+            {/* Regional Formatting Info */}
+            <View style={[styles.langOptionRow, { paddingVertical: 12 }]}>
               <View style={styles.langOptionLeft}>
-                <Text style={styles.flagEmoji}>🇮🇩</Text>
-                <View>
-                  <Text style={[styles.langName, { color: textPrimary }]}>
-                    {t.settings.langIndonesian}
+                <Ionicons name="calendar-outline" size={20} color="#3B82F6" style={{ marginRight: 6 }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.langName, { color: textPrimary, fontSize: 13 }]}>
+                    {t.settings.langLocale}
                   </Text>
-                  <Text style={[styles.langDesc, { color: textSecondary }]}>
-                    {t.settings.langIndonesianDesc}
+                  <Text style={[styles.langDesc, { color: textSecondary, fontSize: 11 }]}>
+                    {t.settings.langLocaleDesc}
                   </Text>
                 </View>
               </View>
-              <View
-                style={[
-                  styles.radioCircle,
-                  language === 'id' && styles.radioCircleActive,
-                ]}>
-                {language === 'id' && <View style={styles.radioDot} />}
-              </View>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
 

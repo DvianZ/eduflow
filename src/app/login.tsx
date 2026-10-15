@@ -23,7 +23,7 @@ export default function LoginScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
-  const { t, language, setLanguage } = useTranslation();
+  const { t } = useTranslation();
 
   const { login } = useAuthStore();
   const { syncUserFromAuth } = useElearningStore();
@@ -84,24 +84,6 @@ export default function LoginScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled">
-          {/* Language Toggle in Top Right */}
-          <View style={styles.topLangRow}>
-            <TouchableOpacity
-              onPress={() => setLanguage(language === 'en' ? 'id' : 'en')}
-              style={[
-                styles.langTogglePill,
-                {
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderColor: isDark ? '#334155' : '#CBD5E1',
-                },
-              ]}>
-              <Text style={styles.langToggleText}>
-                {language === 'en' ? '🇺🇸 EN (Formal)' : '🇮🇩 ID'}
-              </Text>
-              <Ionicons name="swap-horizontal" size={13} color="#2563EB" />
-            </TouchableOpacity>
-          </View>
-
           {/* Brand */}
           <View style={styles.brandSection}>
             <View style={styles.logoContainer}>
@@ -113,9 +95,7 @@ export default function LoginScreen() {
               EduFlow <Text style={styles.cohortTag}>{t.header.cohortTag}</Text>
             </Text>
             <Text style={[styles.brandSubtitle, { color: textSecondary }]}>
-              {language === 'en'
-                ? 'Collaborative Cohort E-Learning'
-                : 'Platform E-Learning Kolaboratif'}
+              Collaborative Cohort E-Learning
             </Text>
           </View>
 

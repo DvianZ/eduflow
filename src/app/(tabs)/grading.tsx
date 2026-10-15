@@ -99,14 +99,14 @@ export default function GradingScreen() {
     const success = downloadCSVFile(csvString, filename);
     if (success) {
       Alert.alert(
-        'Berhasil Mengunduh Berkas',
-        `Berkas "${filename}" telah diunduh ke folder unduhan Anda.`
+        'Download Successful',
+        `File "${filename}" has been saved to your downloads.`
       );
     } else {
       copyCSVToClipboard(csvString);
       Alert.alert(
-        'Data CSV Disalin ke Clipboard',
-        'Berkas CSV telah disalin ke clipboard dan siap ditempel ke Google Sheets atau Excel.'
+        'CSV Copied to Clipboard',
+        'Gradebook CSV data has been copied to clipboard and is ready to paste into Excel or Google Sheets.'
       );
     }
   };
@@ -115,7 +115,7 @@ export default function GradingScreen() {
     const activeBatch = batches.find((b) => b.id === exportBatchFilter);
     const className = activeBatch
       ? `${activeBatch.classCode} - ${activeBatch.batchName}`
-      : 'Semua Kelas';
+      : 'All Classes';
     const csvString = formatGradebookCSV(gradebookRows, className);
     await copyCSVToClipboard(csvString);
     setIsCopiedCSV(true);
@@ -139,7 +139,7 @@ export default function GradingScreen() {
       setInputFeedback(existingGrade.feedbackNotes);
     } else {
       setInputScore('85');
-      setInputFeedback('Kerja bagus! Struktur arsitektur dan pemisahan state sudah rapi.');
+      setInputFeedback('Great work! Clean architectural structure and well-managed state.');
     }
     setSelectedSub(sub);
   };
@@ -148,22 +148,22 @@ export default function GradingScreen() {
     if (!selectedSub) return;
     const scoreNum = parseInt(inputScore, 10);
     if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 100) {
-      Alert.alert('Nilai Tidak Valid', 'Masukkan nilai angka antara 0 hingga 100.');
+      Alert.alert('Invalid Score', 'Please enter a numeric score between 0 and 100.');
       return;
     }
 
     gradeSubmission(
       selectedSub.id,
       scoreNum,
-      inputFeedback.trim() || 'Evaluasi selesai.',
+      inputFeedback.trim() || 'Evaluation completed.',
       isRevision
     );
 
     Alert.alert(
-      isRevision ? 'Permintaan Revisi Dikirim' : 'Nilai Berhasil Disimpan',
+      isRevision ? 'Revision Requested' : 'Grade Successfully Saved',
       isRevision
-        ? 'Siswa diminta memperbaiki tugas.'
-        : `Nilai ${scoreNum}/100 dan feedback berhasil diberikan kepada siswa.`
+        ? 'The student has been notified to revise their deliverable.'
+        : `Score ${scoreNum}/100 and feedback delivered to student.`
     );
     setSelectedSub(null);
   };
@@ -361,14 +361,14 @@ export default function GradingScreen() {
                 styles.emptyTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Belum Ada Pengumpulan Tugas
+              No Submissions Found
             </Text>
             <Text style={styles.emptySubtitle}>
               {isTeacher
                 ? selectedBatchFilter !== 'all'
-                  ? 'Belum ada pengumpulan tugas pada kelas ini.'
-                  : 'Siswa belum mengumpulkan tugas proyek di kelas Anda.'
-                : 'Buka tab Silabus dan kumpulkan tugas proyek Anda untuk diperiksa pengajar.'}
+                  ? 'No student submissions recorded for this cohort.'
+                  : 'No student project submissions waiting in your queue.'
+                : 'Navigate to the Syllabus tab and submit your project assignment for instructor evaluation.'}
             </Text>
           </View>
         ) : (
@@ -555,7 +555,7 @@ export default function GradingScreen() {
                 styles.modalHeaderTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              Form Penilaian Pengajar
+              Instructor Evaluation Form
             </Text>
             <View style={{ width: 24 }} />
           </View>
@@ -568,17 +568,17 @@ export default function GradingScreen() {
                     styles.studentHeaderLabel,
                     { color: isDark ? '#94A3B8' : '#64748B' },
                   ]}>
-                  Siswa: <Text style={{ fontWeight: '800' }}>{selectedSub.studentName}</Text>
+                  Student: <Text style={{ fontWeight: '800' }}>{selectedSub.studentName}</Text>
                 </Text>
 
                 <View style={styles.reviewBox}>
-                  <Text style={styles.reviewLabel}>Isi Jawaban Siswa:</Text>
+                  <Text style={styles.reviewLabel}>Student Submission Content:</Text>
                   <Text style={styles.reviewContent}>
                     {selectedSub.submissionContent}
                   </Text>
                   {selectedSub.attachmentUrl && (
                     <Text style={styles.reviewLink}>
-                      Tautan: {selectedSub.attachmentUrl}
+                      Deliverable Link: {selectedSub.attachmentUrl}
                     </Text>
                   )}
                 </View>
@@ -588,7 +588,7 @@ export default function GradingScreen() {
                     styles.inputFieldLabel,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Nilai Angka (0 - 100):
+                  Numeric Score (0 - 100):
                 </Text>
                 <TextInput
                   value={inputScore}
@@ -611,14 +611,14 @@ export default function GradingScreen() {
                     styles.inputFieldLabel,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Feedback & Evaluasi Tertulis:
+                  Instructor Feedback & Qualitative Remarks:
                 </Text>
                 <TextInput
                   value={inputFeedback}
                   onChangeText={setInputFeedback}
                   multiline
                   numberOfLines={4}
-                  placeholder="Tuliskan ulasan kualitatif untuk siswa..."
+                  placeholder="Write constructive qualitative remarks for the student..."
                   placeholderTextColor="#94A3B8"
                   style={[
                     styles.modalInput,
@@ -638,14 +638,14 @@ export default function GradingScreen() {
             <TouchableOpacity
               onPress={() => handleSaveGradePress(true)}
               style={styles.revisionBtn}>
-              <Text style={styles.revisionBtnText}>Minta Revisi</Text>
+              <Text style={styles.revisionBtnText}>Request Revision</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => handleSaveGradePress(false)}
               style={styles.saveGradeBtn}>
               <Ionicons name="checkmark-done" size={18} color="#FFFFFF" />
-              <Text style={styles.saveGradeBtnText}>Simpan Nilai Lulus</Text>
+              <Text style={styles.saveGradeBtnText}>Save Passing Grade</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -858,7 +858,7 @@ export default function GradingScreen() {
                 {gradebookRows.length === 0 ? (
                   <View style={{ padding: 20, alignItems: 'center' }}>
                     <Text style={{ color: '#94A3B8', fontSize: 13 }}>
-                      Belum ada siswa terdaftar pada kelas yang dipilih.
+                      No students enrolled in the selected cohort yet.
                     </Text>
                   </View>
                 ) : (
@@ -938,9 +938,9 @@ export default function GradingScreen() {
                             styles.tableStatusBadge,
                             {
                               backgroundColor:
-                                r.graduationStatus === 'LULUS'
+                                r.graduationStatus === 'GRADUATED'
                                   ? '#DCFCE7'
-                                  : r.graduationStatus === 'DALAM PROSES'
+                                  : r.graduationStatus === 'IN PROGRESS'
                                   ? '#FEF3C7'
                                   : '#F1F5F9',
                             },
@@ -950,9 +950,9 @@ export default function GradingScreen() {
                               styles.tableStatusBadgeText,
                               {
                                 color:
-                                  r.graduationStatus === 'LULUS'
+                                  r.graduationStatus === 'GRADUATED'
                                     ? '#15803D'
-                                    : r.graduationStatus === 'DALAM PROSES'
+                                    : r.graduationStatus === 'IN PROGRESS'
                                     ? '#B45309'
                                     : '#64748B',
                               },

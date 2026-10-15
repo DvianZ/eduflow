@@ -1,4 +1,4 @@
-export type Language = 'en' | 'id';
+export type Language = 'en';
 
 export interface TranslationDictionary {
   // Common & Navigation
@@ -439,8 +439,8 @@ export interface TranslationDictionary {
     languageSectionDesc: string;
     langEnglish: string;
     langEnglishDesc: string;
-    langIndonesian: string;
-    langIndonesianDesc: string;
+    langLocale: string;
+    langLocaleDesc: string;
     appearanceSectionTitle: string;
     appearanceSectionDesc: string;
     themeSystem: string;
