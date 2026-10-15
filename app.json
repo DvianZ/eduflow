@@ -2,7 +2,7 @@
   "expo": {
     "name": "EduFlow Cohort",
     "slug": "eduflow",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "eduflow",
@@ -13,6 +13,7 @@
     },
     "android": {
       "package": "com.depzy.eduflow",
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
