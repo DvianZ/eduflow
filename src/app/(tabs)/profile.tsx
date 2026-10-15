@@ -452,8 +452,12 @@ export default function ProfileScreen() {
                 ]}>
                 🎓 Graduation Evaluator & Certificate Claim
               </Text>
-              <Text style={styles.finalScoreBadge}>
-                Score: {evalResult.finalScore}/100
+              <Text
+                style={[
+                  styles.finalScoreBadge,
+                  existingCert && { color: '#10B981' },
+                ]}>
+                Score: {existingCert ? existingCert.finalScore : evalResult.finalScore}/100
               </Text>
             </View>
 
