@@ -160,8 +160,9 @@ In React Native and Expo cross-platform engineering, layout composition relies o
   {
     id: 'lesson-2',
     moduleId: 'mod-1',
-    title: '1.2 Reactive State Architecture with Zustand',
-    contentType: 'reading',
+    title: '1.2 Reactive State Architecture with Zustand (Video Lecture)',
+    contentType: 'video',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     durationMinutes: 20,
     sequenceNumber: 2,
     contentBody: `### Why Zustand for Enterprise E-Learning Platforms?

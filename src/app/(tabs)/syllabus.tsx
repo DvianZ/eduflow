@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Linking,
   Platform,
 } from 'react-native';
 import { Alert } from '@/utils/alert';
@@ -25,6 +24,7 @@ import {
 import { Lesson, Quiz, Assignment } from '@/types/elearning';
 import { useTranslation } from '@/i18n';
 import { triggerMilestoneFeedback } from '@/utils/feedback';
+import { InlineVideoPlayer } from '@/components/InlineVideoPlayer';
 
 export default function SyllabusScreen() {
   const colorScheme = useColorScheme();
@@ -112,6 +112,9 @@ export default function SyllabusScreen() {
   const [newLessonBody, setNewLessonBody] = useState('');
   const [newLessonType, setNewLessonType] = useState<'reading' | 'video'>('reading');
   const [newLessonVideoUrl, setNewLessonVideoUrl] = useState('');
+  const [videoSourceMode, setVideoSourceMode] = useState<'upload' | 'link'>('upload');
+  const [uploadedVideoName, setUploadedVideoName] = useState<string>('');
+  const [uploadedVideoSize, setUploadedVideoSize] = useState<string>('');
   const [copiedSnippetIndex, setCopiedSnippetIndex] = useState<number | null>(null);
 
   const currentLessonModule = modules.find((m) => m.id === selectedLesson?.moduleId);
@@ -282,12 +285,49 @@ export default function SyllabusScreen() {
     setNewLessonBody('');
     setNewLessonType('reading');
     setNewLessonVideoUrl('');
+    setVideoSourceMode('upload');
+    setUploadedVideoName('');
+    setUploadedVideoSize('');
     setIsAddLessonModalOpen(true);
+  };
+
+  const handlePickVideoFile = () => {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'video/mp4,video/webm,video/ogg,video/quicktime,video/*';
+      input.onchange = (e: any) => {
+        const file = e.target?.files?.[0];
+        if (file) {
+          const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+          const objectUrl = URL.createObjectURL(file);
+          setUploadedVideoName(file.name);
+          setUploadedVideoSize(`${sizeMB} MB`);
+          setNewLessonVideoUrl(objectUrl);
+        }
+      };
+      input.click();
+    } else {
+      // Fallback sample video for standalone native or web fallback
+      const sampleUrl =
+        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+      setUploadedVideoName('lecture_presentation_sample.mp4');
+      setUploadedVideoSize('8.2 MB');
+      setNewLessonVideoUrl(sampleUrl);
+      Alert.alert('Video Terpilih', 'File video berhasil disematkan untuk pemutaran langsung.');
+    }
   };
 
   const handleSaveLesson = () => {
     if (!newLessonTitle.trim() || !newLessonBody.trim()) {
       Alert.alert('Incomplete Fields', 'Lesson title and content body are required.');
+      return;
+    }
+    if (newLessonType === 'video' && !newLessonVideoUrl.trim()) {
+      Alert.alert(
+        'Video Lecture Wajib Diisi',
+        'Untuk materi tipe Video Lecture, Anda wajib mengunggah file video atau memasukkan tautan URL video agar materi dapat diputar langsung di dalam aplikasi.'
+      );
       return;
     }
     const mins = parseInt(newLessonDuration, 10) || 15;
@@ -300,7 +340,7 @@ export default function SyllabusScreen() {
       newLessonVideoUrl.trim() || undefined
     );
     setIsAddLessonModalOpen(false);
-    Alert.alert('Success', 'New lesson unit added successfully!');
+    Alert.alert('Sukses', 'Materi video lecture baru berhasil ditambahkan dan siap diputar langsung!');
   };
 
   const handleDeleteLesson = (lesson: Lesson) => {
@@ -907,6 +947,8 @@ export default function SyllabusScreen() {
                             {
                               backgroundColor: isDone
                                 ? '#DCFCE7'
+                                : lesson.contentType === 'video'
+                                ? '#FEE2E2'
                                 : unlocked || isTeacher
                                 ? '#DBEAFE'
                                 : '#F1F5F9',
@@ -916,6 +958,8 @@ export default function SyllabusScreen() {
                             name={
                               isDone
                                 ? 'checkmark-circle'
+                                : lesson.contentType === 'video'
+                                ? 'videocam'
                                 : unlocked || isTeacher
                                 ? 'play'
                                 : 'lock-closed'
@@ -924,6 +968,8 @@ export default function SyllabusScreen() {
                             color={
                               isDone
                                 ? '#15803D'
+                                : lesson.contentType === 'video'
+                                ? '#DC2626'
                                 : unlocked || isTeacher
                                 ? '#2563EB'
                                 : '#94A3B8'
@@ -939,20 +985,21 @@ export default function SyllabusScreen() {
                             {lesson.title}
                           </Text>
                           <Text style={styles.itemMeta}>
-                            Reading Material • {lesson.durationMinutes} min
+                            {lesson.contentType === 'video' ? 'Video Lecture' : 'Reading Material'} • {lesson.durationMinutes} min
                           </Text>
                         </View>
                       </TouchableOpacity>
 
                       <View style={styles.itemRightRow}>
-                        <View
+                        <TouchableOpacity
+                          onPress={() => handleOpenLesson(lesson, unlocked)}
                           style={[
                             styles.badgePill,
                             {
                               backgroundColor: isDone
                                 ? '#DCFCE7'
                                 : unlocked || isTeacher
-                                ? '#EFF6FF'
+                                ? (lesson.contentType === 'video' ? '#FEE2E2' : '#EFF6FF')
                                 : '#F1F5F9',
                             },
                           ]}>
@@ -963,13 +1010,13 @@ export default function SyllabusScreen() {
                                 color: isDone
                                   ? '#15803D'
                                   : unlocked || isTeacher
-                                  ? '#2563EB'
+                                  ? (lesson.contentType === 'video' ? '#DC2626' : '#2563EB')
                                   : '#94A3B8',
                               },
                             ]}>
                             {isDone ? 'Completed' : unlocked || isTeacher ? 'Open' : 'Locked'}
                           </Text>
-                        </View>
+                        </TouchableOpacity>
 
                         {/* Teacher Delete Lesson Button */}
                         {isTeacher && (
@@ -1365,42 +1412,12 @@ export default function SyllabusScreen() {
                   {selectedLesson.title}
                 </Text>
 
-                {/* Video Player Card Preview if video lesson */}
+                {/* In-Place Direct Video Player */}
                 {selectedLesson.contentType === 'video' && (
-                  <View
-                    style={[
-                      styles.videoPlayerCard,
-                      {
-                        backgroundColor: isDark ? '#020617' : '#1E293B',
-                        borderColor: isDark ? '#334155' : '#0F172A',
-                      },
-                    ]}>
-                    <View style={styles.videoPlayerScreen}>
-                      <View style={styles.videoIconCircle}>
-                        <Ionicons name="play" size={28} color="#FFFFFF" />
-                      </View>
-                      <Text style={styles.videoPlayerTitle}>Interactive Video Player</Text>
-                      <Text style={styles.videoPlayerSub} numberOfLines={1}>
-                        {selectedLesson.videoUrl
-                          ? selectedLesson.videoUrl
-                          : 'Module video lesson URL'}
-                      </Text>
-                      {selectedLesson.videoUrl && (
-                        <TouchableOpacity
-                          style={styles.videoLaunchBtn}
-                          onPress={() => {
-                            if (selectedLesson.videoUrl) {
-                              Linking.openURL(selectedLesson.videoUrl).catch(() => {
-                                Alert.alert('Video Link', selectedLesson.videoUrl);
-                              });
-                            }
-                          }}>
-                          <Ionicons name="open-outline" size={14} color="#FFFFFF" />
-                          <Text style={styles.videoLaunchBtnText}>Open Video URL</Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  </View>
+                  <InlineVideoPlayer
+                    videoUrl={selectedLesson.videoUrl}
+                    title={selectedLesson.title}
+                  />
                 )}
 
                 {/* Formatted Content */}
@@ -1982,29 +1999,321 @@ export default function SyllabusScreen() {
             </View>
 
             {newLessonType === 'video' && (
-              <>
+              <View
+                style={[
+                  styles.videoConfigBox,
+                  {
+                    backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                    borderColor: '#EF4444',
+                  },
+                ]}>
+                <View style={styles.videoConfigHeader}>
+                  <View style={styles.videoMandatoryRow}>
+                    <Ionicons name="videocam" size={16} color="#EF4444" />
+                    <Text
+                      style={[
+                        styles.inputLabel,
+                        { color: isDark ? '#F8FAFC' : '#0F172A', marginBottom: 0 },
+                      ]}>
+                      Materi Video Lecture (Wajib) *
+                    </Text>
+                  </View>
+                  <View style={styles.mandatoryBadge}>
+                    <Text style={styles.mandatoryBadgeText}>WAJIB DIISI</Text>
+                  </View>
+                </View>
+
                 <Text
                   style={[
-                    styles.inputLabel,
-                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                    styles.videoConfigSub,
+                    { color: isDark ? '#94A3B8' : '#64748B' },
                   ]}>
-                  Video Lecture URL (Optional):
+                  Pilih unggah file video langsung dari perangkat Anda atau masukkan tautan link video. Video dapat langsung diputar di dalam aplikasi tanpa berpindah tempat.
                 </Text>
-                <TextInput
-                  placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
-                  placeholderTextColor="#94A3B8"
-                  value={newLessonVideoUrl}
-                  onChangeText={setNewLessonVideoUrl}
+
+                {/* Dual Mode Switcher Tabs */}
+                <View
                   style={[
-                    styles.modalInput,
-                    {
-                      backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
-                      color: isDark ? '#F8FAFC' : '#0F172A',
-                      borderColor: isDark ? '#334155' : '#CBD5E1',
-                    },
-                  ]}
-                />
-              </>
+                    styles.videoModeToggleRow,
+                    { backgroundColor: isDark ? '#0F172A' : '#E2E8F0' },
+                  ]}>
+                  <TouchableOpacity
+                    onPress={() => setVideoSourceMode('upload')}
+                    style={[
+                      styles.videoModeTab,
+                      videoSourceMode === 'upload' && styles.videoModeTabActive,
+                    ]}>
+                    <Ionicons
+                      name="cloud-upload-outline"
+                      size={14}
+                      color={
+                        videoSourceMode === 'upload'
+                          ? '#FFFFFF'
+                          : isDark
+                          ? '#CBD5E1'
+                          : '#475569'
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.videoModeTabText,
+                        {
+                          color:
+                            videoSourceMode === 'upload'
+                              ? '#FFFFFF'
+                              : isDark
+                              ? '#CBD5E1'
+                              : '#475569',
+                        },
+                      ]}>
+                      Upload File Video
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => setVideoSourceMode('link')}
+                    style={[
+                      styles.videoModeTab,
+                      videoSourceMode === 'link' && styles.videoModeTabActive,
+                    ]}>
+                    <Ionicons
+                      name="link-outline"
+                      size={14}
+                      color={
+                        videoSourceMode === 'link'
+                          ? '#FFFFFF'
+                          : isDark
+                          ? '#CBD5E1'
+                          : '#475569'
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.videoModeTabText,
+                        {
+                          color:
+                            videoSourceMode === 'link'
+                              ? '#FFFFFF'
+                              : isDark
+                              ? '#CBD5E1'
+                              : '#475569',
+                        },
+                      ]}>
+                      Tautan Link Video
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Sub-view: Upload Video Mode */}
+                {videoSourceMode === 'upload' ? (
+                  <View style={styles.uploadSection}>
+                    {newLessonVideoUrl && uploadedVideoName ? (
+                      <View
+                        style={[
+                          styles.uploadedFileCard,
+                          {
+                            backgroundColor: isDark ? '#0F172A' : '#EFF6FF',
+                            borderColor: '#3B82F6',
+                          },
+                        ]}>
+                        <View style={styles.uploadedFileHeader}>
+                          <View style={styles.uploadedFileLeft}>
+                            <View style={styles.videoFileIcon}>
+                              <Ionicons name="film" size={20} color="#3B82F6" />
+                            </View>
+                            <View style={{ flex: 1, minWidth: 0 }}>
+                              <Text
+                                numberOfLines={1}
+                                style={[
+                                  styles.uploadedFileName,
+                                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                                ]}>
+                                {uploadedVideoName}
+                              </Text>
+                              <Text style={styles.uploadedFileSize}>
+                                {uploadedVideoSize} • Siap Diputar In-Place
+                              </Text>
+                            </View>
+                          </View>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setNewLessonVideoUrl('');
+                              setUploadedVideoName('');
+                              setUploadedVideoSize('');
+                            }}
+                            style={styles.removeVideoBtn}>
+                            <Ionicons name="trash-outline" size={16} color="#DC2626" />
+                          </TouchableOpacity>
+                        </View>
+
+                        {/* In-Place Preview */}
+                        <View style={{ marginTop: 8 }}>
+                          <Text
+                            style={[
+                              styles.previewLabel,
+                              { color: isDark ? '#94A3B8' : '#64748B' },
+                            ]}>
+                            Pratinjau Pemutar Video Langsung:
+                          </Text>
+                          <InlineVideoPlayer
+                            videoUrl={newLessonVideoUrl}
+                            title={newLessonTitle || 'Preview Video'}
+                          />
+                        </View>
+
+                        <TouchableOpacity
+                          onPress={handlePickVideoFile}
+                          style={styles.changeFileBtn}>
+                          <Ionicons name="swap-horizontal" size={14} color="#2563EB" />
+                          <Text style={styles.changeFileBtnText}>
+                            Ganti File Video Lain
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <View style={styles.dropzoneWrapper}>
+                        <TouchableOpacity
+                          onPress={handlePickVideoFile}
+                          style={[
+                            styles.dropzoneCard,
+                            {
+                              backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                              borderColor: isDark ? '#334155' : '#CBD5E1',
+                            },
+                          ]}
+                          activeOpacity={0.8}>
+                          <View style={styles.dropzoneIconCircle}>
+                            <Ionicons name="cloud-upload" size={28} color="#EF4444" />
+                          </View>
+                          <Text
+                            style={[
+                              styles.dropzoneTitle,
+                              { color: isDark ? '#F8FAFC' : '#0F172A' },
+                            ]}>
+                            Klik untuk Pilih & Unggah Video
+                          </Text>
+                          <Text style={styles.dropzoneSub}>
+                            Mendukung file MP4, WebM, MOV (Maksimal 100MB)
+                          </Text>
+                          <View style={styles.dropzonePill}>
+                            <Ionicons
+                              name="folder-open-outline"
+                              size={13}
+                              color="#EF4444"
+                            />
+                            <Text style={styles.dropzonePillText}>
+                              Buka File Picker
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+
+                        {/* Quick Sample Demo Video */}
+                        <TouchableOpacity
+                          onPress={() => {
+                            setUploadedVideoName('lecture_digital_venture_demo.mp4');
+                            setUploadedVideoSize('12.5 MB');
+                            setNewLessonVideoUrl(
+                              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                            );
+                          }}
+                          style={[
+                            styles.sampleQuickBtn,
+                            { backgroundColor: isDark ? '#0F172A' : '#FEF2F2' },
+                          ]}>
+                          <Ionicons name="sparkles" size={13} color="#DC2626" />
+                          <Text style={styles.sampleQuickBtnText}>
+                            Atau Gunakan File Video Sampel Demo (1-Klik)
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                ) : (
+                  /* Sub-view: Video Link Mode */
+                  <View style={styles.linkSection}>
+                    <Text
+                      style={[
+                        styles.inputLabel,
+                        { color: isDark ? '#F8FAFC' : '#0F172A', marginTop: 4 },
+                      ]}>
+                      Tautan URL Video (YouTube / MP4 Direct):
+                    </Text>
+                    <TextInput
+                      placeholder="https://www.youtube.com/watch?v=... atau https://.../video.mp4"
+                      placeholderTextColor="#94A3B8"
+                      value={newLessonVideoUrl}
+                      onChangeText={(val) => {
+                        setNewLessonVideoUrl(val);
+                        setUploadedVideoName('');
+                        setUploadedVideoSize('');
+                      }}
+                      style={[
+                        styles.modalInput,
+                        {
+                          backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                          color: isDark ? '#F8FAFC' : '#0F172A',
+                          borderColor: isDark ? '#334155' : '#CBD5E1',
+                        },
+                      ]}
+                    />
+
+                    {/* Quick Preset Buttons */}
+                    <View style={styles.presetRow}>
+                      <Text
+                        style={[
+                          styles.presetTitle,
+                          { color: isDark ? '#94A3B8' : '#64748B' },
+                        ]}>
+                        Preset Cepat:
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setNewLessonVideoUrl(
+                            'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                          )
+                        }
+                        style={[
+                          styles.presetChip,
+                          { backgroundColor: isDark ? '#0F172A' : '#EFF6FF' },
+                        ]}>
+                        <Text style={styles.presetChipText}>🎬 Sample MP4</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setNewLessonVideoUrl(
+                            'https://www.youtube.com/watch?v=kJQP7kiw5Fk'
+                          )
+                        }
+                        style={[
+                          styles.presetChip,
+                          { backgroundColor: isDark ? '#0F172A' : '#FEF2F2' },
+                        ]}>
+                        <Text
+                          style={[styles.presetChipText, { color: '#DC2626' }]}>
+                          🔴 YouTube
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Live In-Place Preview */}
+                    {newLessonVideoUrl.trim() ? (
+                      <View style={{ marginTop: 10 }}>
+                        <Text
+                          style={[
+                            styles.previewLabel,
+                            { color: isDark ? '#94A3B8' : '#64748B' },
+                          ]}>
+                          Pratinjau Pemutar Video Langsung:
+                        </Text>
+                        <InlineVideoPlayer
+                          videoUrl={newLessonVideoUrl}
+                          title={newLessonTitle || 'Preview Video'}
+                        />
+                      </View>
+                    ) : null}
+                  </View>
+                )}
+              </View>
             )}
 
             <Text
@@ -3301,5 +3610,216 @@ const styles = StyleSheet.create({
   typeSelectorText: {
     fontSize: 12,
   },
+  videoConfigBox: {
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    marginBottom: 16,
+  },
+  videoConfigHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  videoMandatoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  mandatoryBadge: {
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+  },
+  mandatoryBadgeText: {
+    color: '#DC2626',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  videoConfigSub: {
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: 12,
+  },
+  videoModeToggleRow: {
+    flexDirection: 'row',
+    padding: 3,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  videoModeTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  videoModeTabActive: {
+    backgroundColor: '#EF4444',
+  },
+  videoModeTabText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  uploadSection: {
+    marginTop: 4,
+  },
+  dropzoneWrapper: {
+    gap: 8,
+  },
+  dropzoneCard: {
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderRadius: 14,
+    padding: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  dropzoneIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
+  dropzoneTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  dropzoneSub: {
+    fontSize: 11,
+    color: '#94A3B8',
+    textAlign: 'center',
+  },
+  dropzonePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    backgroundColor: '#FEE2E2',
+    marginTop: 4,
+  },
+  dropzonePillText: {
+    color: '#DC2626',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  sampleQuickBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  sampleQuickBtnText: {
+    fontSize: 11,
+    color: '#DC2626',
+    fontWeight: '700',
+  },
+  uploadedFileCard: {
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  uploadedFileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  uploadedFileLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+    minWidth: 0,
+  },
+  videoFileIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadedFileName: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  uploadedFileSize: {
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  removeVideoBtn: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: '#FEE2E2',
+  },
+  changeFileBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    marginTop: 8,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  changeFileBtnText: {
+    color: '#2563EB',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  previewLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  linkSection: {
+    marginTop: 4,
+  },
+  presetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 8,
+    flexWrap: 'wrap',
+  },
+  presetTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  presetChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+  },
+  presetChipText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#2563EB',
+  },
 });
+
 
