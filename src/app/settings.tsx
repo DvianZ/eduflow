@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/i18n';
 import { useSettingsStore, AppTheme } from '@/store/useSettingsStore';
 import { useElearningStore } from '@/store/useElearningStore';
@@ -70,6 +70,25 @@ export default function SettingsScreen() {
   );
   const [showTourModal, setShowTourModal] = useState(false);
   const [nameSavedSuccess, setNameSavedSuccess] = useState(false);
+
+  const { section } = useLocalSearchParams<{ section?: string }>();
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (!section) return;
+    const timer = setTimeout(() => {
+      if (section === 'theme') {
+        scrollRef.current?.scrollTo({ y: 190, animated: true });
+      } else if (section === 'name') {
+        scrollRef.current?.scrollTo({ y: 490, animated: true });
+      } else if (section === 'export') {
+        scrollRef.current?.scrollTo({ y: 640, animated: true });
+      } else if (section === 'reset') {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }
+    }, 180);
+    return () => clearTimeout(timer);
+  }, [section]);
 
   const handleSaveOfficialName = () => {
     if (!officialName.trim()) return;
@@ -169,6 +188,7 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         {/* Module 1: Language & Localization */}
@@ -676,7 +696,7 @@ export default function SettingsScreen() {
                 Accreditation
               </Text>
               <Text style={[styles.aboutVal, { color: '#2563EB' }]}>
-                Wadhwani Cohort Standard
+                Global Cohort Standard
               </Text>
             </View>
             <View style={[styles.cardDivider, { backgroundColor: borderColor }]} />

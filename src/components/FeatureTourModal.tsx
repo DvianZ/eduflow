@@ -165,7 +165,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       subtitle: 'Formula Terbobot 30:30:40 & Cetak Lisensi',
       description:
         'Evaluator menghitung otomatis formula: 30% kurikulum + 30% kuis + 40% tugas. Siswa yang lulus dapat melihat sertifikat terakreditasi berskala penuh dan mencetak file PDF sesuai nama kelas!',
-      tip: 'Fokus Demo: Klik cohort WDF-101 lalu klik "View Certificate" atau "Print / Save PDF".',
+      tip: 'Fokus Demo: Klik kelas Digital Entrepreneurship lalu klik "View Certificate" atau "Print / Save PDF".',
       targetTab: '/(tabs)/profile',
       targetRole: 'learner',
       spotlight: {
@@ -178,24 +178,87 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       },
     },
     {
-      id: 'demo-utilities',
+      id: 'settings-theme',
       category: 'FITUR PENDUKUNG DEMO',
       isCore: false,
-      icon: 'flask',
-      title: '7. Notifikasi, Tema & Reset Demo Data',
-      subtitle: 'Dukungan Lengkap Pengujian Mandiri Klien',
+      icon: 'color-palette',
+      title: '7. Personalisasi Tema, Haptik & Audio',
+      subtitle: 'Kenyamanan Belajar & Tampilan Fleksibel',
       description:
-        'Aplikasi dilengkapi Pusat Notifikasi (🔔) untuk melacak revisi/nilai, mode Gelap/Terang, dan tombol "Reset All Demo Testing Data" (🔄) untuk mengembalikan seluruh simulasi data ke awal kapan pun!',
-      tip: 'Fokus Demo: Pengujian selesai! Anda kini dapat mencoba seluruh fitur secara bebas.',
-      targetTab: '/settings',
+        'Di menu Pengaturan, pengguna dapat beralih antara Mode Terang, Gelap, atau Sistem, mengaktifkan efek getar Haptik Taktil 3D saat menekan tombol, dan umpan balik audio interaktif.',
+      tip: 'Fokus Demo: Coba ganti tema Dark/Light dan rasakan responsivitas instan antarmuka.',
+      targetTab: '/settings?section=theme',
       targetRole: 'learner',
       spotlight: {
-        top: 180,
-        height: 265,
+        top: 135,
+        height: 255,
         left: 12,
         right: 12,
         borderRadius: 18,
-        label: 'RESET DATA & KONTROL PENGUJIAN DEMO',
+        label: 'TEMA TAMPILAN & EFEK HAPTIK 3D',
+      },
+    },
+    {
+      id: 'settings-name',
+      category: 'FITUR UTAMA',
+      isCore: true,
+      icon: 'ribbon',
+      title: '8. Nama Resmi Sertifikat Digital',
+      subtitle: 'Penyelarasan Gelar & Nama Sah Siswa',
+      description:
+        'Siswa dapat memasukkan nama lengkap resmi beserta gelar profesional untuk dicetak otomatis pada sertifikat digital terakreditasi dan dokumen PDF.',
+      tip: 'Fokus Demo: Ubah nama dan klik "Simpan Nama Resmi", sertifikat akan seketika tersinkronisasi.',
+      targetTab: '/settings?section=name',
+      targetRole: 'learner',
+      spotlight: {
+        top: 140,
+        height: 220,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'KUSTOMISASI NAMA RESMI SERTIFIKAT',
+      },
+    },
+    {
+      id: 'settings-export',
+      category: 'FITUR PENDUKUNG DEMO',
+      isCore: false,
+      icon: 'download',
+      title: '9. Ekspor Rekap Nilai Siswa (CSV)',
+      subtitle: 'Unduh Lembar Nilai UTF-8 BOM untuk Excel',
+      description:
+        'Fitur penguji & instruktur: Unduh rekapitulasi nilai seluruh siswa yang terdaftar dalam format CSV terstandar Excel dengan 1-klik, mencakup skor kuis, progres tugas, dan nilai akhir komposit.',
+      tip: 'Fokus Demo: Baris "Download Gradebook CSV" siap pakai untuk presentasi laporan evaluasi.',
+      targetTab: '/settings?section=export',
+      targetRole: 'learner',
+      spotlight: {
+        top: 165,
+        height: 155,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'EKSPOR REKAP NILAI GRADEBOOK (CSV)',
+      },
+    },
+    {
+      id: 'settings-reset',
+      category: 'FITUR PENDUKUNG DEMO',
+      isCore: false,
+      icon: 'refresh',
+      title: '10. Reset Data Demo (Kondisi Awal)',
+      subtitle: 'Simulasi Ulang Tanpa Khawatir Data Rusak',
+      description:
+        'Tombol pamungkas pengujian: Klien dapat mengembalikan seluruh simulasi data—tugas proyek, nilai kuis, pengumpulan revisi, dan sertifikat—kembali ke kondisi awal mock data kapan pun via konfirmasi modal aman!',
+      tip: 'Fokus Demo: Tombol merah "Reset All Demo Testing Data" dengan dialog konfirmasi aman.',
+      targetTab: '/settings?section=reset',
+      targetRole: 'learner',
+      spotlight: {
+        top: 185,
+        height: 150,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'RESET SEMUA DATA SIMULASI DEMO',
       },
     },
   ];
@@ -249,6 +312,18 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
   const spotlightLeft = activeStep.spotlight.left ?? 12;
   const spotlightRight = activeStep.spotlight.right ?? 12;
   const spotlightWidth = Math.max(0, windowWidth - spotlightLeft - spotlightRight);
+
+  const isResetStep = activeStep.id === 'settings-reset';
+  const spotlightBorderColor = isResetStep
+    ? '#EF4444'
+    : activeStep.isCore
+    ? '#3B82F6'
+    : '#F59E0B';
+  const spotlightBadgeColor = isResetStep
+    ? '#DC2626'
+    : activeStep.isCore
+    ? '#2563EB'
+    : '#D97706';
 
   const backdropBg = isDark
     ? 'rgba(6, 11, 22, 0.76)'
@@ -338,10 +413,12 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
                 width: spotlightWidth,
                 height: spotlightHeight,
                 borderRadius: activeStep.spotlight.borderRadius ?? 18,
-                borderColor: activeStep.isCore ? '#3B82F6' : '#F59E0B',
+                borderColor: spotlightBorderColor,
               },
               Platform.OS === 'web' && ({
-                boxShadow: activeStep.isCore
+                boxShadow: isResetStep
+                  ? '0 0 0 3px rgba(239, 68, 68, 0.35), 0 0 30px rgba(239, 68, 68, 0.65)'
+                  : activeStep.isCore
                   ? '0 0 0 3px rgba(59, 130, 246, 0.35), 0 0 30px rgba(59, 130, 246, 0.65)'
                   : '0 0 0 3px rgba(245, 158, 11, 0.35), 0 0 30px rgba(245, 158, 11, 0.65)',
               } as any),
@@ -352,11 +429,20 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
               style={[
                 styles.spotlightBadge,
                 {
-                  backgroundColor: activeStep.isCore ? '#2563EB' : '#D97706',
+                  backgroundColor: spotlightBadgeColor,
                 },
               ]}>
-              <View style={styles.spotlightPulseDot} />
-              <Ionicons name="sparkles" size={11} color="#FFFFFF" />
+              <View
+                style={[
+                  styles.spotlightPulseDot,
+                  { backgroundColor: isResetStep ? '#FCA5A5' : '#34D399' },
+                ]}
+              />
+              <Ionicons
+                name={isResetStep ? 'refresh' : 'sparkles'}
+                size={11}
+                color="#FFFFFF"
+              />
               <Text style={styles.spotlightBadgeText}>
                 {activeStep.spotlight.label}
               </Text>

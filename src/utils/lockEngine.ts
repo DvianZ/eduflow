@@ -54,7 +54,7 @@ export function isLessonUnlocked(
     return true;
   }
 
-  // Untuk modul kelas lain (misal: Wadhwani atau AI):
+  // Untuk modul kelas lain (misal: Entrepreneurship atau AI):
   // Lesson sequence 1 selalu terbuka
   if (lesson.sequenceNumber === 1) {
     return true;

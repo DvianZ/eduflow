@@ -43,8 +43,8 @@ export const INITIAL_COURSES: Course[] = [
   {
     id: 'course-wdf-101',
     title: 'Entrepreneurship & Digital Venture Creation',
-    slug: 'wadhwani-entrepreneurship',
-    description: 'Structured venture acceleration curriculum adhering to Wadhwani Foundation standards: market validation, unit economics, and investor pitch preparation.',
+    slug: 'digital-entrepreneurship',
+    description: 'Structured venture acceleration curriculum adhering to global cohort standards: market validation, unit economics, and investor pitch preparation.',
     category: 'Business & Entrepreneurship',
     level: 'beginner',
     thumbnailUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80',
@@ -78,7 +78,7 @@ export const INITIAL_BATCHES: Batch[] = [
     courseId: 'course-wdf-101',
     instructorId: 'user-hendra',
     instructorName: 'Dr. Hendra Wijaya, Ph.D.',
-    batchName: 'Wadhwani Entrepreneurship Cohort - Batch 01',
+    batchName: 'Digital Entrepreneurship Cohort - Batch 01',
     classCode: 'WDF-101',
     startDate: '2026-08-01',
     endDate: '2026-09-15',
@@ -195,7 +195,7 @@ To maintain long-term codebase health, adhere strictly to Separation of Concerns
     contentType: 'reading',
     durationMinutes: 20,
     sequenceNumber: 1,
-    contentBody: `### The Wadhwani Methodology: Uncovering Validated Market Demand
+    contentBody: `### The Venture Discovery Methodology: Uncovering Validated Market Demand
 
 Successful entrepreneurs identify urgent customer problems ("Hair-on-Fire Problems") before building solutions. Employ structured customer discovery interviews to rigorously validate initial assumptions.`,
   },
@@ -352,7 +352,7 @@ export const INITIAL_ANNOUNCEMENTS: BatchAnnouncement[] = [
     batchId: 'batch-wdf-101',
     authorId: 'user-hendra',
     authorName: 'Dr. Hendra Wijaya, Ph.D.',
-    title: '🎓 Official Graduation Announcement - Wadhwani Batch 01',
+    title: '🎓 Official Graduation Announcement - Entrepreneurship Batch 01',
     message: 'Congratulations to all accredited graduates! Verified digital credentials have been issued and are available in your Graduation Profile.',
     createdAt: '2026-09-15T10:00:00Z',
   },
@@ -403,8 +403,8 @@ export const INITIAL_CERTIFICATES: Certificate[] = [
     userId: 'user-budi',
     studentName: 'Budi Santoso',
     courseTitle: 'Entrepreneurship & Digital Venture Creation',
-    batchName: 'Wadhwani Entrepreneurship Cohort - Batch 01',
-    certificateNumber: 'WDF-CERT-2026-0891-WDF-101',
+    batchName: 'Digital Entrepreneurship Cohort - Batch 01',
+    certificateNumber: 'ENT-CERT-2026-0891-WDF-101',
     finalScore: 94,
     instructorName: 'Dr. Hendra Wijaya, Ph.D.',
     issuedAt: '2026-09-15T10:00:00Z',

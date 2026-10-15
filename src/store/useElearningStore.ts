@@ -904,6 +904,25 @@ export const useElearningStore = create<ElearningState>()(
     {
       name: 'eduflow-hybrid-store',
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.batches = state.batches.map((b) => ({
+            ...b,
+            batchName: b.batchName.replace(/wadhwani/gi, 'Digital'),
+          }));
+          state.certificates = state.certificates.map((c) => ({
+            ...c,
+            batchName: c.batchName.replace(/wadhwani/gi, 'Digital'),
+            certificateNumber: c.certificateNumber.replace(/WDF/g, 'ENT'),
+          }));
+          state.courses = state.courses.map((c) => ({
+            ...c,
+            description: c.description
+              .replace(/wadhwani foundation/gi, 'international cohort standards')
+              .replace(/wadhwani/gi, 'Digital Entrepreneurship'),
+          }));
+        }
+      },
     }
   )
 );

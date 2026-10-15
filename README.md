@@ -13,7 +13,7 @@
 > 
 > *Catatan Pengujian: APK ini adalah versi mandiri (internal distribution), klien cukup mengunduh file `.apk` ke smartphone Android dan langsung membukanya untuk memasang.*
 
-**EduFlow Cohort** adalah aplikasi mobile e-learning modern yang mengadopsi metodologi pembelajaran berbasis angkatan (*cohort-based learning*) berstandar internasional (seperti Wadhwani Foundation dan program akselerator digital). 
+**EduFlow Cohort** adalah aplikasi mobile e-learning modern yang mengadopsi metodologi pembelajaran berbasis angkatan (*cohort-based learning*) berstandar internasional dan akselerator digital terakreditasi. 
 
 Aplikasi ini dirancang untuk memberikan pengalaman belajar kolaboratif dengan kurikulum bertingkat yang terkunci (*sequential gatekeeper*), interaksi penilaian proyek dua arah antara pengajar dan siswa, penerbitan sertifikat digital terakreditasi, serta manajemen kelas yang fleksibel.
 
@@ -93,7 +93,7 @@ Aplikasi ini menggunakan pendekatan **Full Local Dinamis** bertenaga **Reactive 
   3. *Silabus & Sequential Gating Lock*: Kunci materi bertingkat & KKM Kuis 80%.
   4. *Kuis Taktil 3D & Tugas Proyek*: Pengalaman belajar interaktif & upload portofolio.
   5. *Panel Penilaian & Ekspor CSV*: Grading pengajar & unduh rekap nilai Excel UTF-8 BOM.
-  6. *Kelulusan & Sertifikat Digital*: Bobot Wadhwani 30:30:40 & multi-sertifikat bergelar.
+  6. *Kelulusan & Sertifikat Digital*: Bobot Komposit 30:30:40 & multi-sertifikat bergelar.
 - **Akses Fleksibel**: Dapat dibuka kapan saja via kartu *"Panduan Fitur Aplikasi"* di layar Login maupun tombol *"Panduan"* di bilah header utama dashboard.
 - **Navigasi Intuitif**: Dilengkapi indikator segmen progres, tombol navigasi mundur/maju/lewati, tips pengujian client, serta tautan langsung untuk mencoba fitur terkait.
 

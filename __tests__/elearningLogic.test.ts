@@ -250,9 +250,9 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
 
   test('Isolasi evaluasi batch: Menghitung progres spesifik per kelas dengan batchLessonIds', () => {
     const mobileLessonIds = ['lesson-1', 'lesson-2', 'lesson-3'];
-    const wadhwaniLessonIds = ['lesson-wdf-1', 'lesson-wdf-2', 'lesson-wdf-3'];
+    const entrepreneurshipLessonIds = ['lesson-wdf-1', 'lesson-wdf-2', 'lesson-wdf-3'];
 
-    // Siswa menyelesaikan seluruh materi Wadhwani dan 1 materi Mobile
+    // Siswa menyelesaikan seluruh materi Entrepreneurship dan 1 materi Mobile
     const completedLessonIds = ['lesson-wdf-1', 'lesson-wdf-2', 'lesson-wdf-3', 'lesson-1'];
 
     // Evaluasi Mobile Cohort hanya menghitung 1 dari 3 materi (33%)
@@ -270,23 +270,23 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
     expect(mobileEval.totalLessons).toBe(3);
     expect(mobileEval.lessonProgressPct).toBe(33);
 
-    // Evaluasi Wadhwani Cohort menghitung 3 dari 3 materi (100%)
-    const wadhwaniEval = calculateBatchEvaluation(
-      wadhwaniLessonIds.length,
+    // Evaluasi Entrepreneurship Cohort menghitung 3 dari 3 materi (100%)
+    const entrepreneurshipEval = calculateBatchEvaluation(
+      entrepreneurshipLessonIds.length,
       {
         completedLessonIds,
         quizAttempts: [],
         submissions: [],
         grades: [],
       },
-      wadhwaniLessonIds
+      entrepreneurshipLessonIds
     );
-    expect(wadhwaniEval.completedLessons).toBe(3);
-    expect(wadhwaniEval.totalLessons).toBe(3);
-    expect(wadhwaniEval.lessonProgressPct).toBe(100);
+    expect(entrepreneurshipEval.completedLessons).toBe(3);
+    expect(entrepreneurshipEval.totalLessons).toBe(3);
+    expect(entrepreneurshipEval.lessonProgressPct).toBe(100);
   });
 
-  test('Multi-Sertifikat ala Wadhwani: Siswa dapat memiliki beberapa sertifikat dari kelas berbeda', () => {
+  test('Multi-Sertifikat: Siswa dapat memiliki beberapa sertifikat dari kelas berbeda', () => {
     const studentCertificates = [
       {
         id: 'cert-wdf-1',
@@ -294,8 +294,8 @@ describe('EduFlow Cohort Logic & Sequential Gatekeeper Tests', () => {
         userId: 'user-budi',
         studentName: 'Budi Santoso',
         courseTitle: 'Entrepreneurship & Digital Venture Creation',
-        batchName: 'Wadhwani Entrepreneurship Cohort - Batch 01',
-        certificateNumber: 'WDF-CERT-2026-0891-WDF-101',
+        batchName: 'Digital Entrepreneurship Cohort - Batch 01',
+        certificateNumber: 'ENT-CERT-2026-0891-WDF-101',
         finalScore: 94,
         instructorName: 'Dr. Hendra Wijaya, S.E., M.M.',
         issuedAt: '2026-09-15T10:00:00Z',
