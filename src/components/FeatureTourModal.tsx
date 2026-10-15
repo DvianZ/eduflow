@@ -108,11 +108,24 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       targetRole: 'teacher',
     },
     {
+      id: 'profile-name',
+      category: 'CORE FEATURE',
+      isCore: true,
+      icon: 'person-circle',
+      title: '6. Official Legal Name for Certificates',
+      subtitle: 'Exclusive Verified Name Management in Profile',
+      description:
+        'Learners can configure their official legal full name directly on this Profile screen to appear on official accredited graduation certificates and digital verification records.',
+      tip: 'Demo Focus: Tap "Edit Legal Name" in the Official Certificate Name card on Profile.',
+      targetTab: '/(tabs)/profile',
+      targetRole: 'learner',
+    },
+    {
       id: 'certificate',
       category: 'CORE FEATURE',
       isCore: true,
       icon: 'ribbon',
-      title: '6. Graduation Evaluator & Certificate PDF',
+      title: '7. Graduation Evaluator & Certificate PDF',
       subtitle: 'Weighted 30:30:40 Formula & Official PDF',
       description:
         'The automated evaluator enforces the weighted formula: 30% curriculum progress + 30% quiz average + 40% project score. Graduated students can view credentials and print official PDF certificates!',
@@ -125,25 +138,12 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       category: 'DEMO UTILITY',
       isCore: false,
       icon: 'color-palette',
-      title: '7. Theme & Tactile Personalization',
+      title: '8. Theme & Tactile Personalization',
       subtitle: 'Dark Mode, Light Mode & 3D Haptics',
       description:
         'In Settings, customize your experience: toggle between Light and Dark themes, enable 3D tactile vibration haptics on buttons, and audio milestone feedback.',
       tip: 'Demo Focus: Toggle between Dark and Light mode to experience instant aesthetic adaptation.',
       targetTab: '/settings?section=theme',
-      targetRole: 'learner',
-    },
-    {
-      id: 'settings-name',
-      category: 'CORE FEATURE',
-      isCore: true,
-      icon: 'ribbon',
-      title: '8. Official Legal Name for Certificates',
-      subtitle: 'Verified Credential Name Synchronization',
-      description:
-        'Learners can configure their legal full name to appear on official accredited graduation certificates and digital verification records.',
-      tip: 'Demo Focus: Edit the legal name and save—it immediately updates across all verified certificates.',
-      targetTab: '/settings?section=name',
       targetRole: 'learner',
     },
     {

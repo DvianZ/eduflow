@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  TextInput,
   StyleSheet,
 } from 'react-native';
 import { Alert } from '@/utils/alert';
@@ -49,8 +48,6 @@ export default function SettingsScreen() {
   } = useSettingsStore();
 
   const {
-    currentUser,
-    updateCertificateName,
     resetDemoData,
     batches,
     courses,
@@ -63,13 +60,8 @@ export default function SettingsScreen() {
     quizAttempts,
   } = useElearningStore();
   const registeredUsers = useAuthStore((state) => state.registeredUsers);
-  const authUpdateCertName = useAuthStore((state) => state.updateCertificateName);
 
-  const [officialName, setOfficialName] = useState(
-    currentUser.certificateName || currentUser.fullName
-  );
   const [showTourModal, setShowTourModal] = useState(false);
-  const [nameSavedSuccess, setNameSavedSuccess] = useState(false);
 
   const { section } = useLocalSearchParams<{ section?: string }>();
   const scrollRef = useRef<ScrollView>(null);
@@ -79,24 +71,14 @@ export default function SettingsScreen() {
     const timer = setTimeout(() => {
       if (section === 'theme') {
         scrollRef.current?.scrollTo({ y: 190, animated: true });
-      } else if (section === 'name') {
-        scrollRef.current?.scrollTo({ y: 490, animated: true });
       } else if (section === 'export') {
-        scrollRef.current?.scrollTo({ y: 640, animated: true });
+        scrollRef.current?.scrollTo({ y: 520, animated: true });
       } else if (section === 'reset') {
         scrollRef.current?.scrollToEnd({ animated: true });
       }
     }, 180);
     return () => clearTimeout(timer);
   }, [section]);
-
-  const handleSaveOfficialName = () => {
-    if (!officialName.trim()) return;
-    updateCertificateName(officialName.trim());
-    authUpdateCertName(currentUser.id, officialName.trim());
-    setNameSavedSuccess(true);
-    setTimeout(() => setNameSavedSuccess(false), 3000);
-  };
 
   const handleExportGradebook = () => {
     const targetBatch = batches[0];
@@ -140,8 +122,7 @@ export default function SettingsScreen() {
           onPress: () => {
             resetDemoData();
             const defaultName = DEMO_USERS.learner.fullName;
-            setOfficialName(defaultName);
-            authUpdateCertName('user-budi', defaultName);
+            useAuthStore.getState().updateCertificateName('user-budi', defaultName);
             Alert.alert(t.common.success, t.header.resetSuccess);
           },
         },
@@ -508,69 +489,7 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Module 5: Official Certificate Identity */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <View style={[styles.sectionIconBadge, { backgroundColor: '#FCE7F3' }]}>
-              <Ionicons name="ribbon-outline" size={18} color="#BE185D" />
-            </View>
-            <View style={styles.sectionHeaderTexts}>
-              <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>
-                {t.settings.certificateSectionTitle}
-              </Text>
-              <Text style={[styles.sectionDesc, { color: textSecondary }]}>
-                {t.settings.certificateSectionDesc}
-              </Text>
-            </View>
-          </View>
-
-          <View style={[styles.bentoCard, { backgroundColor: cardBg, borderColor }]}>
-            <Text style={[styles.inputLabel, { color: textPrimary }]}>
-              {t.settings.officialNameLabel}
-            </Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
-                  borderColor: isDark ? '#334155' : '#CBD5E1',
-                  color: textPrimary,
-                },
-              ]}
-              value={officialName}
-              onChangeText={setOfficialName}
-              placeholder={t.settings.officialNamePlaceholder}
-              placeholderTextColor={textSecondary}
-            />
-
-            <TouchableOpacity
-              onPress={handleSaveOfficialName}
-              style={[
-                styles.saveBtn,
-                {
-                  backgroundColor: '#2563EB',
-                  borderBottomColor: '#1D4ED8',
-                },
-              ]}
-              activeOpacity={0.85}>
-              <Ionicons name="checkmark-circle-outline" size={16} color="#FFFFFF" />
-              <Text style={styles.saveBtnText}>
-                {t.settings.saveOfficialNameBtn}
-              </Text>
-            </TouchableOpacity>
-
-            {nameSavedSuccess && (
-              <View style={styles.successBanner}>
-                <Ionicons name="checkmark-circle" size={14} color="#15803D" />
-                <Text style={styles.successBannerText}>
-                  {t.profile.nameSavedSuccess}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Module 6: Testing & Demonstration Controls */}
+        {/* Module 5: Testing & Demonstration Controls */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <View style={[styles.sectionIconBadge, { backgroundColor: '#E0E7FF' }]}>
@@ -921,47 +840,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
   },
-  inputLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  textInput: {
-    borderWidth: 1.5,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  saveBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderBottomWidth: 3,
-  },
-  saveBtnText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  successBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#DCFCE7',
-    padding: 8,
-    borderRadius: 10,
-    marginTop: 8,
-  },
-  successBannerText: {
-    color: '#15803D',
-    fontSize: 11,
-    fontWeight: '700',
-  },
+
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
