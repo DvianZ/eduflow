@@ -29,6 +29,7 @@ interface TourStep {
   tip: string;
   targetTab?: string;
   targetRole?: 'learner' | 'teacher';
+  scrollOffset?: number | 'bottom';
 }
 
 export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
@@ -117,8 +118,9 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       description:
         'Learners can configure their official legal full name directly on this Profile screen to appear on official accredited graduation certificates and digital verification records.',
       tip: 'Demo Focus: Tap "Edit Legal Name" in the Official Certificate Name card on Profile.',
-      targetTab: '/(tabs)/profile',
+      targetTab: '/(tabs)/profile?section=name',
       targetRole: 'learner',
+      scrollOffset: 0,
     },
     {
       id: 'certificate',
@@ -130,8 +132,9 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       description:
         'The automated evaluator enforces the weighted formula: 30% curriculum progress + 30% quiz average + 40% project score. Graduated students can view credentials and print official PDF certificates!',
       tip: 'Demo Focus: Select Digital Entrepreneurship cohort, then tap "View Certificate" or "Print / Save PDF".',
-      targetTab: '/(tabs)/profile',
+      targetTab: '/(tabs)/profile?section=evaluator',
       targetRole: 'learner',
+      scrollOffset: 240,
     },
     {
       id: 'settings-theme',
@@ -145,6 +148,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Demo Focus: Toggle between Dark and Light mode to experience instant aesthetic adaptation.',
       targetTab: '/settings?section=theme',
       targetRole: 'learner',
+      scrollOffset: 190,
     },
     {
       id: 'settings-export',
@@ -158,6 +162,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Demo Focus: Tap "Download Gradebook CSV" to generate an export-ready spreadsheet.',
       targetTab: '/settings?section=export',
       targetRole: 'learner',
+      scrollOffset: 'bottom',
     },
     {
       id: 'settings-reset',
@@ -171,6 +176,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Demo Focus: Tap "Reset All Demo Testing Data" to reset state whenever needed.',
       targetTab: '/settings?section=reset',
       targetRole: 'learner',
+      scrollOffset: 'bottom',
     },
   ];
 
@@ -178,7 +184,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === tourSteps.length - 1;
 
-  // Dynamically navigate to the target screen and role as the tour progresses
+  // Dynamically navigate to the target screen, role, and scroll offset as the tour progresses
   useEffect(() => {
     if (visible && activeStep) {
       if (activeStep.targetRole) {
@@ -186,6 +192,29 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       }
       if (activeStep.targetTab) {
         router.push(activeStep.targetTab as any);
+      }
+      if (activeStep.scrollOffset !== undefined) {
+        const scrollTimer = setTimeout(() => {
+          if (Platform.OS === 'web') {
+            try {
+              const scrollables = document.querySelectorAll<HTMLElement>(
+                'div[class*="r-overflowY"], div[scrollable="true"]'
+              );
+              scrollables.forEach((el) => {
+                if (el.scrollHeight > el.clientHeight && el.clientHeight > 200) {
+                  const targetY =
+                    activeStep.scrollOffset === 'bottom'
+                      ? el.scrollHeight
+                      : (activeStep.scrollOffset as number);
+                  el.scrollTo({ top: targetY, behavior: 'smooth' });
+                }
+              });
+            } catch {
+              // Ignore DOM query issues on edge environments
+            }
+          }
+        }, 220);
+        return () => clearTimeout(scrollTimer);
       }
     }
   }, [visible, currentStepIndex, activeStep, router, switchRole]);

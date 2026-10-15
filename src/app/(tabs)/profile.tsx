@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useGlobalSearchParams } from 'expo-router';
 import { DemoHeader } from '@/components/DemoHeader';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -74,6 +74,29 @@ export default function ProfileScreen() {
   const [certNameInput, setCertNameInput] = useState(
     currentUser.certificateName || currentUser.fullName
   );
+
+  const { section } = useGlobalSearchParams<{ section?: string }>();
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (!section) return;
+    const timer = setTimeout(() => {
+      if (section === 'evaluator') {
+        scrollRef.current?.scrollTo({ y: 240, animated: true });
+        const node = (scrollRef.current as any)?.getScrollableNode?.();
+        if (node && typeof node.scrollTo === 'function') {
+          node.scrollTo({ top: 240, behavior: 'smooth' });
+        }
+      } else if (section === 'name') {
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+        const node = (scrollRef.current as any)?.getScrollableNode?.();
+        if (node && typeof node.scrollTo === 'function') {
+          node.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [section]);
 
   const handleSaveCertName = () => {
     if (!certNameInput.trim()) {
@@ -173,6 +196,7 @@ export default function ProfileScreen() {
       <DemoHeader />
 
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         {/* User Identity Hero Card */}

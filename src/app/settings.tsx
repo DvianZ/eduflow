@@ -11,7 +11,7 @@ import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useGlobalSearchParams } from 'expo-router';
 import { useTranslation } from '@/i18n';
 import { useSettingsStore, AppTheme } from '@/store/useSettingsStore';
 import { useElearningStore } from '@/store/useElearningStore';
@@ -63,7 +63,7 @@ export default function SettingsScreen() {
 
   const [showTourModal, setShowTourModal] = useState(false);
 
-  const { section } = useLocalSearchParams<{ section?: string }>();
+  const { section } = useGlobalSearchParams<{ section?: string }>();
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -71,10 +71,16 @@ export default function SettingsScreen() {
     const timer = setTimeout(() => {
       if (section === 'theme') {
         scrollRef.current?.scrollTo({ y: 190, animated: true });
-      } else if (section === 'export') {
-        scrollRef.current?.scrollTo({ y: 520, animated: true });
-      } else if (section === 'reset') {
+        const node = (scrollRef.current as any)?.getScrollableNode?.();
+        if (node && typeof node.scrollTo === 'function') {
+          node.scrollTo({ top: 190, behavior: 'smooth' });
+        }
+      } else if (section === 'export' || section === 'reset') {
         scrollRef.current?.scrollToEnd({ animated: true });
+        const node = (scrollRef.current as any)?.getScrollableNode?.();
+        if (node && typeof node.scrollTo === 'function') {
+          node.scrollTo({ top: node.scrollHeight, behavior: 'smooth' });
+        }
       }
     }, 180);
     return () => clearTimeout(timer);
