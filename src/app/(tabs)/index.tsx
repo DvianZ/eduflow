@@ -8,6 +8,7 @@ import {
   TextInput,
   Modal,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -24,6 +25,8 @@ export default function DashboardScreen() {
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { t } = useTranslation();
+  const { width: screenWidth } = useWindowDimensions();
+  const isCompact = screenWidth < 380;
 
   const {
     currentRole,
@@ -181,10 +184,10 @@ export default function DashboardScreen() {
           {/* ============================================================== */}
           {/* HERO CARD / MISI UTAMA (SPAN 2): 3D TACTILE GRADIENT */}
           {/* ============================================================== */}
-          <View style={[styles.bentoSpan2, styles.heroCard3D]}>
+          <View style={[styles.bentoSpan2, styles.heroCard3D, isCompact && { padding: 14 }]}>
             <View style={styles.heroTopRow}>
               {/* Status Pill */}
-              <View style={styles.heroBadgePill}>
+              <View style={[styles.heroBadgePill, isCompact && { paddingHorizontal: 8, paddingVertical: 4 }]}>
                 <Ionicons
                   name={
                     activeBatch.status === 'completed'
@@ -198,7 +201,7 @@ export default function DashboardScreen() {
                 />
                 <Text style={styles.heroBadgeText}>
                   {activeBatch.id === 'batch-edf-402'
-                    ? t.dashboard.heroBadgeActiveMission
+                    ? (isCompact ? 'ACTIVE MISSION' : t.dashboard.heroBadgeActiveMission)
                     : activeBatch.status === 'completed'
                     ? t.dashboard.heroBadgeGraduated
                     : t.dashboard.heroBadgeActiveClass}
@@ -211,6 +214,7 @@ export default function DashboardScreen() {
                 activeOpacity={0.8}
                 style={[
                   styles.heroCodePill,
+                  isCompact && { paddingHorizontal: 8, paddingVertical: 4 },
                   copiedCode === activeBatch.classCode && styles.heroCodePillCopied,
                 ]}>
                 <Ionicons
@@ -312,15 +316,22 @@ export default function DashboardScreen() {
                 style={[
                   styles.bentoSpan2,
                   styles.bentoCard3D,
+                  isCompact && { padding: 14 },
                   { backgroundColor: cardBg },
                 ]}>
                 <View style={styles.cardHeaderRow}>
-                  <View style={styles.cardHeaderLeft}>
+                  <View style={[styles.cardHeaderLeft, { flex: 1, minWidth: 140, marginRight: 6 }]}>
                     <View style={[styles.headerIconBox, { backgroundColor: '#EEF2FF', borderColor: '#C7D2FE' }]}>
                       <Ionicons name="sparkles" size={16} color="#4F46E5" />
                     </View>
-                    <Text style={[styles.cardHeaderTitle, { color: textPrimary }]}>
-                      {t.dashboard.adventureProgress}
+                    <Text
+                      style={[
+                        styles.cardHeaderTitle,
+                        isCompact && { fontSize: 14 },
+                        { color: textPrimary, flexShrink: 1 },
+                      ]}
+                      numberOfLines={1}>
+                      {isCompact ? 'Course Progress' : t.dashboard.adventureProgress}
                     </Text>
                   </View>
                   <View style={styles.progressBadgePill}>
@@ -441,7 +452,7 @@ export default function DashboardScreen() {
                     style={[
                       styles.widgetBigValue,
                       {
-                        fontSize: 17,
+                        fontSize: isCompact ? 14 : 17,
                         color: evalResult.canGraduate ? '#10B981' : '#4F46E5',
                       },
                     ]}>
@@ -959,14 +970,14 @@ const styles = StyleSheet.create({
   /* BENTO GRID 2-COLUMN LAYOUT */
   /* ============================================================== */
   bentoGrid: {
-    padding: 16,
+    padding: 12,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
     ...(Platform.OS === 'web' && {
       display: 'grid' as any,
       gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-      gap: 12,
+      gap: 10,
     }),
   },
   bentoSpan2: {
@@ -989,7 +1000,7 @@ const styles = StyleSheet.create({
   /* ============================================================== */
   heroCard3D: {
     borderRadius: 26,
-    padding: 20,
+    padding: 16,
     backgroundColor: '#4F46E5',
     borderWidth: 2,
     borderColor: '#4338CA',
@@ -1009,6 +1020,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+    flexWrap: 'wrap',
+    gap: 6,
   },
   heroBadgePill: {
     flexDirection: 'row',
@@ -1110,13 +1123,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   bentoWidget3D: {
-    borderRadius: 24,
-    padding: 16,
+    borderRadius: 20,
+    padding: 12,
     borderWidth: 2,
     borderColor: '#E2E8F0',
     borderBottomWidth: 5,
     borderBottomColor: '#CBD5E1',
-    minHeight: 120,
+    minHeight: 110,
     justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -1128,31 +1141,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 4,
   },
   widgetIconSquare: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     borderWidth: 1.5,
     justifyContent: 'center',
     alignItems: 'center',
   },
   widgetCategoryLabel: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   widgetBottomCol: {
-    marginTop: 8,
+    marginTop: 6,
   },
   widgetBigValue: {
-    fontSize: 22,
+    fontSize: 19,
     fontWeight: '900',
     letterSpacing: -0.5,
     marginBottom: 2,
   },
   widgetDescText: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '600',
   },
 
@@ -1164,11 +1179,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 14,
+    flexWrap: 'wrap',
+    gap: 8,
   },
   cardHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
+    flex: 1,
+    minWidth: 140,
+    marginRight: 6,
   },
   headerIconBox: {
     width: 34,
@@ -1259,12 +1279,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+    flex: 1,
+    minWidth: 0,
+    marginRight: 6,
   },
   tactileBtnPurpleText: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 14,
+    fontSize: 13,
     letterSpacing: 0.2,
+    flexShrink: 1,
   },
   tactileBtnPurpleMedium: {
     backgroundColor: '#8B5CF6',

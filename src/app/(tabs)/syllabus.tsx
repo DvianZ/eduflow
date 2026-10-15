@@ -498,7 +498,7 @@ export default function SyllabusScreen() {
                     color={isCopied ? '#10B981' : '#94A3B8'}
                   />
                   <Text style={[styles.richCopyText, isCopied && { color: '#10B981' }]}>
-                    {isCopied ? 'Tersalin' : 'Salin'}
+                    {isCopied ? 'Copied' : 'Copy'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -3195,6 +3195,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+    flexWrap: 'wrap',
+    gap: 6,
   },
   categoryBadge: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -3239,7 +3241,8 @@ const styles = StyleSheet.create({
   },
   courseBannerMetaRow: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 12,
+    flexWrap: 'wrap',
     marginBottom: 14,
     paddingTop: 10,
     borderTopWidth: 1,

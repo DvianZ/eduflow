@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
+import { Platform, useWindowDimensions } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -12,6 +12,8 @@ export default function TabsLayout() {
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { t } = useTranslation();
+  const { width: screenWidth } = useWindowDimensions();
+  const isNarrow = screenWidth < 360;
   const session = useAuthStore((state) => state.session);
   const currentRole = useElearningStore((state) => state.currentRole);
   const currentUser = useElearningStore((state) => state.currentUser);
@@ -56,14 +58,15 @@ export default function TabsLayout() {
           } as any)),
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
+          fontSize: isNarrow ? 9.5 : 10,
+          fontWeight: '700',
+          letterSpacing: -0.3,
         },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: t.common.dashboard,
+          title: isNarrow ? 'Home' : t.common.dashboard,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="grid-outline" size={size} color={color} />
           ),
@@ -81,7 +84,14 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="grading"
         options={{
-          title: currentRole === 'teacher' ? t.common.gradebook : t.common.assignments,
+          title:
+            currentRole === 'teacher'
+              ? isNarrow
+                ? 'Grades'
+                : t.common.gradebook
+              : isNarrow
+              ? 'Tasks'
+              : t.common.assignments,
           tabBarBadge:
             currentRole === 'teacher' && pendingSubmissionsCount > 0
               ? pendingSubmissionsCount
@@ -98,7 +108,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: currentRole === 'teacher' ? t.common.profile : t.common.graduation,
+          title:
+            currentRole === 'teacher'
+              ? t.common.profile
+              : isNarrow
+              ? 'Grad'
+              : t.common.graduation,
           tabBarIcon: ({ color, size }) => (
             <Ionicons
               name={currentRole === 'teacher' ? 'person-circle-outline' : 'ribbon-outline'}

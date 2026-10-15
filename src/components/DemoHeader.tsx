@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +20,9 @@ export function DemoHeader() {
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { t } = useTranslation();
+  const { width: screenWidth } = useWindowDimensions();
+  const isCompact = screenWidth < 380;
+  const isUltraCompact = screenWidth < 340;
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showFeatureTour, setShowFeatureTour] = useState(false);
@@ -60,6 +64,7 @@ export function DemoHeader() {
     <View
       style={[
         styles.container,
+        isCompact && { paddingHorizontal: isUltraCompact ? 8 : 10, paddingTop: 10, paddingBottom: 8 },
         {
           backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
           borderBottomColor: isDark ? '#1E293B' : '#E2E8F0',
@@ -67,36 +72,41 @@ export function DemoHeader() {
       ]}>
       {/* Brand & Streak Row */}
       <View style={styles.topRow}>
-        <View style={styles.brandContainer}>
+        <View style={[styles.brandContainer, isCompact && { gap: 5, marginRight: 2 }]}>
           <View
             style={[
               styles.logoIcon,
+              isCompact && { width: isUltraCompact ? 26 : 28, height: isUltraCompact ? 26 : 28, borderRadius: 6 },
               { backgroundColor: isTeacher ? '#8B5CF6' : '#2563EB' },
             ]}>
-            <Ionicons name="school" size={16} color="#FFFFFF" />
+            <Ionicons name="school" size={isUltraCompact ? 13 : 15} color="#FFFFFF" />
           </View>
           <View style={styles.brandTextWrapper}>
             <Text
               style={[
                 styles.brandTitle,
+                isCompact && { fontSize: isUltraCompact ? 12 : 13 },
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}
               numberOfLines={1}>
-              EduFlow <Text style={styles.cohortTag}>{t.header.cohortTag}</Text>
+              EduFlow{!isUltraCompact && <Text style={[styles.cohortTag, isCompact && { fontSize: 10 }]}> {t.header.cohortTag}</Text>}
             </Text>
-            <Text style={styles.userSubtitle} numberOfLines={1}>
-              {displayName}
+            <Text style={[styles.userSubtitle, isCompact && { fontSize: 10 }]} numberOfLines={1}>
+              {isUltraCompact ? displayName.split(' ')[0] : displayName}
             </Text>
           </View>
         </View>
 
-        <View style={styles.rightActions}>
+        <View style={[styles.rightActions, isCompact && { gap: isUltraCompact ? 3 : 4 }]}>
           <View
             style={[
               styles.streakBadge,
+              isCompact && { paddingHorizontal: isUltraCompact ? 3 : 4, paddingVertical: 2 },
               { backgroundColor: isDark ? '#1E293B' : '#FEF3C7' },
             ]}>
-            <Text style={styles.streakText}>🔥 {userStreak.currentStreak}d</Text>
+            <Text style={[styles.streakText, isCompact && { fontSize: 10 }]}>
+              {isUltraCompact ? `${userStreak.currentStreak}d` : `🔥 ${userStreak.currentStreak}d`}
+            </Text>
           </View>
 
           {/* Feature Tour Guide Button */}
@@ -104,6 +114,7 @@ export function DemoHeader() {
             onPress={() => setShowFeatureTour(true)}
             style={[
               styles.iconBtn,
+              isCompact && { width: isUltraCompact ? 24 : 26, height: isUltraCompact ? 24 : 26, borderRadius: 12 },
               {
                 backgroundColor: isDark ? '#1E293B' : '#EFF6FF',
                 borderWidth: 1,
@@ -111,7 +122,7 @@ export function DemoHeader() {
               },
             ]}
             accessibilityLabel={t.header.guideBtn}>
-            <Ionicons name="sparkles" size={15} color="#2563EB" />
+            <Ionicons name="sparkles" size={isUltraCompact ? 12 : 14} color="#2563EB" />
           </TouchableOpacity>
 
           {/* In-App Notification Bell */}
@@ -120,19 +131,20 @@ export function DemoHeader() {
             style={[
               styles.iconBtn,
               styles.notifBtn,
+              isCompact && { width: isUltraCompact ? 24 : 26, height: isUltraCompact ? 24 : 26, borderRadius: 12 },
               { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
             ]}
             accessibilityLabel={`${t.common.notifications} (${unreadCount})`}>
             <Ionicons
               name={unreadCount > 0 ? 'notifications' : 'notifications-outline'}
-              size={17}
+              size={isUltraCompact ? 13 : 15}
               color={
                 unreadCount > 0 ? '#8B5CF6' : isDark ? '#94A3B8' : '#64748B'
               }
             />
             {unreadCount > 0 && (
-              <View style={styles.badgeCountCircle}>
-                <Text style={styles.badgeCountText}>
+              <View style={[styles.badgeCountCircle, isUltraCompact && { width: 12, height: 12, top: -2, right: -2 }]}>
+                <Text style={[styles.badgeCountText, isUltraCompact && { fontSize: 8 }]}>
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </Text>
               </View>
@@ -144,12 +156,13 @@ export function DemoHeader() {
             onPress={() => router.push('/settings')}
             style={[
               styles.iconBtn,
+              isCompact && { width: isUltraCompact ? 24 : 26, height: isUltraCompact ? 24 : 26, borderRadius: 12 },
               { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
             ]}
             accessibilityLabel={t.common.settings}>
             <Ionicons
               name="settings-outline"
-              size={16}
+              size={isUltraCompact ? 13 : 15}
               color={isDark ? '#94A3B8' : '#64748B'}
             />
           </TouchableOpacity>
@@ -161,25 +174,29 @@ export function DemoHeader() {
         <View
           style={[
             styles.roleSwitchContainer,
+            isCompact && { padding: 2 },
             { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
           ]}>
           <TouchableOpacity
             onPress={() => switchRole('learner')}
             style={[
               styles.rolePill,
+              isCompact && { paddingVertical: 5, paddingHorizontal: 3, gap: 3 },
               !isTeacher && styles.activePillLearner,
             ]}>
             <Ionicons
               name="person"
-              size={14}
+              size={isCompact ? 11 : 14}
               color={!isTeacher ? '#FFFFFF' : isDark ? '#94A3B8' : '#64748B'}
             />
             <Text
               style={[
                 styles.rolePillText,
+                isCompact && { fontSize: isUltraCompact ? 10 : 11 },
                 { color: !isTeacher ? '#FFFFFF' : isDark ? '#94A3B8' : '#64748B' },
-              ]}>
-              {t.common.modeLearner}
+              ]}
+              numberOfLines={1}>
+              {isUltraCompact ? 'Learner' : isCompact ? 'Learner (Budi)' : t.common.modeLearner}
             </Text>
           </TouchableOpacity>
 
@@ -187,19 +204,22 @@ export function DemoHeader() {
             onPress={() => switchRole('teacher')}
             style={[
               styles.rolePill,
+              isCompact && { paddingVertical: 5, paddingHorizontal: 3, gap: 3 },
               isTeacher && styles.activePillTeacher,
             ]}>
             <Ionicons
               name="school"
-              size={14}
+              size={isCompact ? 11 : 14}
               color={isTeacher ? '#FFFFFF' : isDark ? '#94A3B8' : '#64748B'}
             />
             <Text
               style={[
                 styles.rolePillText,
+                isCompact && { fontSize: isUltraCompact ? 10 : 11 },
                 { color: isTeacher ? '#FFFFFF' : isDark ? '#94A3B8' : '#64748B' },
-              ]}>
-              {t.common.modeInstructor}
+              ]}
+              numberOfLines={1}>
+              {isUltraCompact ? 'Instructor' : isCompact ? 'Instructor (Alex)' : t.common.modeInstructor}
             </Text>
           </TouchableOpacity>
         </View>
@@ -207,6 +227,7 @@ export function DemoHeader() {
         <View
           style={[
             styles.roleIndicator,
+            isCompact && { paddingVertical: 6, gap: 4 },
             {
               backgroundColor: isTeacher
                 ? isDark
@@ -219,12 +240,13 @@ export function DemoHeader() {
           ]}>
           <Ionicons
             name={isTeacher ? 'school' : 'person'}
-            size={14}
+            size={isCompact ? 12 : 14}
             color={isTeacher ? '#A78BFA' : '#60A5FA'}
           />
           <Text
             style={[
               styles.roleIndicatorText,
+              isCompact && { fontSize: 11 },
               { color: isTeacher ? '#A78BFA' : '#60A5FA' },
             ]}>
             {t.header.loggedInAs} {isTeacher ? t.common.instructor : t.common.learner}
