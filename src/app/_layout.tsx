@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useSettingsStore } from '@/store/useSettingsStore';
 
+import { AlertModal } from '@/components/AlertModal';
+
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
@@ -44,6 +46,7 @@ export default function RootLayout() {
         <Stack.Screen name="class-manager" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
+      <AlertModal />
     </ThemeProvider>
   );
 }

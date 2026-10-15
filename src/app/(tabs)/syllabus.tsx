@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Alert,
   Linking,
   Platform,
 } from 'react-native';
+import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -1391,12 +1391,12 @@ export default function SyllabusScreen() {
                           onPress={() => {
                             if (selectedLesson.videoUrl) {
                               Linking.openURL(selectedLesson.videoUrl).catch(() => {
-                                Alert.alert('Tautan Video', selectedLesson.videoUrl);
+                                Alert.alert('Video Link', selectedLesson.videoUrl);
                               });
                             }
                           }}>
                           <Ionicons name="open-outline" size={14} color="#FFFFFF" />
-                          <Text style={styles.videoLaunchBtnText}>Buka Tautan Video</Text>
+                          <Text style={styles.videoLaunchBtnText}>Open Video URL</Text>
                         </TouchableOpacity>
                       )}
                     </View>

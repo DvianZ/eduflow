@@ -7,8 +7,8 @@ import {
   Switch,
   TextInput,
   StyleSheet,
-  Alert,
 } from 'react-native';
+import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
