@@ -20,7 +20,7 @@ interface FeatureTourModalProps {
 
 interface TourStep {
   id: string;
-  category: 'FITUR UTAMA' | 'FITUR PENDUKUNG DEMO';
+  category: 'CORE FEATURE' | 'DEMO UTILITY';
   isCore: boolean;
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
@@ -29,15 +29,6 @@ interface TourStep {
   tip: string;
   targetTab?: string;
   targetRole?: 'learner' | 'teacher';
-  actionButtonLabel?: string;
-  spotlight: {
-    top: number;
-    height: number;
-    left?: number;
-    right?: number;
-    borderRadius?: number;
-    label: string;
-  };
 }
 
 export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
@@ -53,213 +44,133 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
   const tourSteps: TourStep[] = [
     {
       id: 'dashboard',
-      category: 'FITUR UTAMA',
+      category: 'CORE FEATURE',
       isCore: true,
       icon: 'compass',
-      title: '1. Dashboard & Misi Belajar Cohort',
-      subtitle: 'Pusat Pembelajaran Berbasis Waktu',
+      title: '1. Dashboard & Cohort Mission',
+      subtitle: 'Time-Based Cohort Learning Hub',
       description:
-        'Selamat datang di EduFlow! Di Dashboard ini, siswa dapat melihat Misi Aktif, kode kelas (bisa langsung disalin), metrik progres belajar, dan kartu cohort kelas yang diikuti.',
-      tip: 'Fokus Demo: Perhatikan kartu Misi 3D di atas dan ringkasan progres belajar.',
+        'Welcome to EduFlow! On the Dashboard, learners view their Active Mission, class code (1-click copy), real-time curriculum progress, and enrolled cohorts.',
+      tip: 'Demo Focus: Notice the 3D active mission card EDF-402 and live progress tracker.',
       targetTab: '/(tabs)',
       targetRole: 'learner',
-      spotlight: {
-        top: 106,
-        height: 220,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'MISI AKTIF & KODE KELAS',
-      },
     },
     {
       id: 'role-switcher',
-      category: 'FITUR PENDUKUNG DEMO',
+      category: 'DEMO UTILITY',
       isCore: false,
       icon: 'swap-horizontal',
-      title: '2. Role Switcher Instan (1-Klik)',
-      subtitle: 'Simulasi Siswa vs Instruktur Tanpa Relogin',
+      title: '2. Instant 1-Click Role Switcher',
+      subtitle: 'Learner ⇄ Instructor Toggle Without Re-login',
       description:
-        'Fitur pendukung demo: Klien penguji dapat beralih peran antara Siswa (Budi) dan Instruktur (Mr. Alex) seketika melalui tombol di bar atas tanpa perlu login ulang!',
-      tip: 'Fokus Demo: Tombol pill switcher di header atas mempermudah demo 2 sisi.',
+        'Built-in demo utility: Test both sides of the platform instantly! Switch between Learner (Budi) and Instructor (Mr. Alex) with one tap in the top header.',
+      tip: 'Demo Focus: The pill switcher in the top header makes two-sided client evaluation seamless.',
       targetTab: '/(tabs)',
       targetRole: 'learner',
-      spotlight: {
-        top: 8,
-        height: 98,
-        left: 8,
-        right: 8,
-        borderRadius: 16,
-        label: 'ROLE SWITCHER 1-KLIK (SISWA ⇄ INSTRUKTUR)',
-      },
     },
     {
       id: 'gatekeeper',
-      category: 'FITUR UTAMA',
+      category: 'CORE FEATURE',
       isCore: true,
       icon: 'layers',
-      title: '3. Kurikulum & Gatekeeper Prasyarat',
-      subtitle: 'Membuka Materi & Kuis Berkelanjutan',
+      title: '3. Curriculum & Prerequisite Gatekeeper',
+      subtitle: 'Automated Milestone & Lock Engine',
       description:
-        'Kurikulum menerapkan aturan Gatekeeper otomatis: Pelajaran berikutnya dan tugas proyek terkunci sampai siswa menyelesaikan materi prasyarat dan lulus kuis (≥ 80%).',
-      tip: 'Fokus Demo: Perhatikan tanda gembok pada Modul 2 yang mengunci tugas proyek.',
+        'The curriculum enforces sequential gatekeeper rules: Advanced lessons and project deliverables unlock only after finishing prerequisite materials and passing quizzes (≥80%).',
+      tip: 'Demo Focus: Check Module 2 to see the lock gatekeeper protecting advanced assignments.',
       targetTab: '/(tabs)/syllabus',
       targetRole: 'learner',
-      spotlight: {
-        top: 175,
-        height: 250,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'KURIKULUM & GATEKEEPER PRASYARAT',
-      },
     },
     {
       id: 'grading',
-      category: 'FITUR UTAMA',
+      category: 'CORE FEATURE',
       isCore: true,
       icon: 'clipboard',
-      title: '4. Review Tugas, Nilai & Revisi',
-      subtitle: 'Penilaian Dua Arah & Umpan Balik Instruktur',
+      title: '4. Project Review, Grading & Revisions',
+      subtitle: 'Instructor Evaluation Queue & Feedback',
       description:
-        'Beralih ke mode Pengajar: Instruktur dapat memeriksa tugas proyek siswa, memberi skor komposit 0–100, atau meminta revisi (Request Revision) yang seketika memicu notifikasi peringatan.',
-      tip: 'Fokus Demo: Antrean penilaian instruktur dengan tombol Request Revision & ekspor CSV.',
+        'Switched to Instructor mode: Mr. Alex can review project deliverables, assign composite scores (0–100), or request revisions with feedback that triggers instant student alerts.',
+      tip: 'Demo Focus: The grading queue features revision workflows and gradebook CSV exports.',
       targetTab: '/(tabs)/grading',
       targetRole: 'teacher',
-      spotlight: {
-        top: 110,
-        height: 260,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'ANTREAN REVIEW TUGAS, SKOR & REVISI',
-      },
     },
     {
       id: 'class-manager',
-      category: 'FITUR UTAMA',
+      category: 'CORE FEATURE',
       isCore: true,
       icon: 'people',
-      title: '5. Manajemen Kelas & Siswa',
-      subtitle: 'Buat Cohort Baru & Pantau Kelulusan Roster',
+      title: '5. Class & Student Management Panel',
+      subtitle: 'Cohort Creation & Roster Monitoring',
       description:
-        'Panel otoritas instruktur untuk membuka kelas baru, menentukan kuota kapasitas, menghasilkan kode kelas acak, dan memantau status kelulusan seluruh siswa yang terdaftar.',
-      tip: 'Fokus Demo: Manajemen kuota kelas dan pembuatan kode unik pendaftaran.',
+        'Instructor authority panel: Create new cohort batches, configure student seat limits, generate unique enrollment codes, and monitor learner graduation progress.',
+      tip: 'Demo Focus: Manage active cohort enrollment codes and track roster progress.',
       targetTab: '/class-manager',
       targetRole: 'teacher',
-      spotlight: {
-        top: 65,
-        height: 240,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'MANAJEMEN KELAS, KUOTA & KODE COHORT',
-      },
     },
     {
       id: 'certificate',
-      category: 'FITUR UTAMA',
+      category: 'CORE FEATURE',
       isCore: true,
       icon: 'ribbon',
-      title: '6. Evaluasi Kelulusan & Sertifikat PDF',
-      subtitle: 'Formula Terbobot 30:30:40 & Cetak Lisensi',
+      title: '6. Graduation Evaluator & Certificate PDF',
+      subtitle: 'Weighted 30:30:40 Formula & Official PDF',
       description:
-        'Evaluator menghitung otomatis formula: 30% kurikulum + 30% kuis + 40% tugas. Siswa yang lulus dapat melihat sertifikat terakreditasi berskala penuh dan mencetak file PDF sesuai nama kelas!',
-      tip: 'Fokus Demo: Klik kelas Digital Entrepreneurship lalu klik "View Certificate" atau "Print / Save PDF".',
+        'The automated evaluator enforces the weighted formula: 30% curriculum progress + 30% quiz average + 40% project score. Graduated students can view credentials and print official PDF certificates!',
+      tip: 'Demo Focus: Select Digital Entrepreneurship cohort, then tap "View Certificate" or "Print / Save PDF".',
       targetTab: '/(tabs)/profile',
       targetRole: 'learner',
-      spotlight: {
-        top: 195,
-        height: 285,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'EVALUATOR KELULUSAN 30:30:40 & CETAK PDF',
-      },
     },
     {
       id: 'settings-theme',
-      category: 'FITUR PENDUKUNG DEMO',
+      category: 'DEMO UTILITY',
       isCore: false,
       icon: 'color-palette',
-      title: '7. Personalisasi Tema, Haptik & Audio',
-      subtitle: 'Kenyamanan Belajar & Tampilan Fleksibel',
+      title: '7. Theme & Tactile Personalization',
+      subtitle: 'Dark Mode, Light Mode & 3D Haptics',
       description:
-        'Di menu Pengaturan, pengguna dapat beralih antara Mode Terang, Gelap, atau Sistem, mengaktifkan efek getar Haptik Taktil 3D saat menekan tombol, dan umpan balik audio interaktif.',
-      tip: 'Fokus Demo: Coba ganti tema Dark/Light dan rasakan responsivitas instan antarmuka.',
+        'In Settings, customize your experience: toggle between Light and Dark themes, enable 3D tactile vibration haptics on buttons, and audio milestone feedback.',
+      tip: 'Demo Focus: Toggle between Dark and Light mode to experience instant aesthetic adaptation.',
       targetTab: '/settings?section=theme',
       targetRole: 'learner',
-      spotlight: {
-        top: 135,
-        height: 255,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'TEMA TAMPILAN & EFEK HAPTIK 3D',
-      },
     },
     {
       id: 'settings-name',
-      category: 'FITUR UTAMA',
+      category: 'CORE FEATURE',
       isCore: true,
       icon: 'ribbon',
-      title: '8. Nama Resmi Sertifikat Digital',
-      subtitle: 'Penyelarasan Gelar & Nama Sah Siswa',
+      title: '8. Official Legal Name for Certificates',
+      subtitle: 'Verified Credential Name Synchronization',
       description:
-        'Siswa dapat memasukkan nama lengkap resmi beserta gelar profesional untuk dicetak otomatis pada sertifikat digital terakreditasi dan dokumen PDF.',
-      tip: 'Fokus Demo: Ubah nama dan klik "Simpan Nama Resmi", sertifikat akan seketika tersinkronisasi.',
+        'Learners can configure their legal full name to appear on official accredited graduation certificates and digital verification records.',
+      tip: 'Demo Focus: Edit the legal name and save—it immediately updates across all verified certificates.',
       targetTab: '/settings?section=name',
       targetRole: 'learner',
-      spotlight: {
-        top: 140,
-        height: 220,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'KUSTOMISASI NAMA RESMI SERTIFIKAT',
-      },
     },
     {
       id: 'settings-export',
-      category: 'FITUR PENDUKUNG DEMO',
+      category: 'DEMO UTILITY',
       isCore: false,
       icon: 'download',
-      title: '9. Ekspor Rekap Nilai Siswa (CSV)',
-      subtitle: 'Unduh Lembar Nilai UTF-8 BOM untuk Excel',
+      title: '9. Cohort Gradebook Export (CSV)',
+      subtitle: '1-Click Excel-Compatible Gradebook Sheet',
       description:
-        'Fitur penguji & instruktur: Unduh rekapitulasi nilai seluruh siswa yang terdaftar dalam format CSV terstandar Excel dengan 1-klik, mencakup skor kuis, progres tugas, dan nilai akhir komposit.',
-      tip: 'Fokus Demo: Baris "Download Gradebook CSV" siap pakai untuk presentasi laporan evaluasi.',
+        'Export complete cohort performance data into UTF-8 BOM CSV for Excel, including quiz attempts, deliverable marks, and final graduation status.',
+      tip: 'Demo Focus: Tap "Download Gradebook CSV" to generate an export-ready spreadsheet.',
       targetTab: '/settings?section=export',
       targetRole: 'learner',
-      spotlight: {
-        top: 165,
-        height: 155,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'EKSPOR REKAP NILAI GRADEBOOK (CSV)',
-      },
     },
     {
       id: 'settings-reset',
-      category: 'FITUR PENDUKUNG DEMO',
+      category: 'DEMO UTILITY',
       isCore: false,
       icon: 'refresh',
-      title: '10. Reset Data Demo (Kondisi Awal)',
-      subtitle: 'Simulasi Ulang Tanpa Khawatir Data Rusak',
+      title: '10. Reset Demo Data to Initial State',
+      subtitle: 'Safe Sandbox Re-simulation Any Time',
       description:
-        'Tombol pamungkas pengujian: Klien dapat mengembalikan seluruh simulasi data—tugas proyek, nilai kuis, pengumpulan revisi, dan sertifikat—kembali ke kondisi awal mock data kapan pun via konfirmasi modal aman!',
-      tip: 'Fokus Demo: Tombol merah "Reset All Demo Testing Data" dengan dialog konfirmasi aman.',
+        'The ultimate testing tool: Evaluators can revert all mock data—quizzes, student submissions, revision requests, and certificates—back to default with 1 tap via a safe confirmation modal!',
+      tip: 'Demo Focus: Tap "Reset All Demo Testing Data" to reset state whenever needed.',
       targetTab: '/settings?section=reset',
       targetRole: 'learner',
-      spotlight: {
-        top: 185,
-        height: 150,
-        left: 12,
-        right: 12,
-        borderRadius: 18,
-        label: 'RESET SEMUA DATA SIMULASI DEMO',
-      },
     },
   ];
 
@@ -305,37 +216,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
 
   if (!visible) return null;
 
-  const cardMaxWidth = Math.min(windowWidth - 24, 520);
-
-  const spotlightTop = activeStep.spotlight.top;
-  const spotlightHeight = activeStep.spotlight.height;
-  const spotlightLeft = activeStep.spotlight.left ?? 12;
-  const spotlightRight = activeStep.spotlight.right ?? 12;
-  const spotlightWidth = Math.max(0, windowWidth - spotlightLeft - spotlightRight);
-
-  const isResetStep = activeStep.id === 'settings-reset';
-  const spotlightBorderColor = isResetStep
-    ? '#EF4444'
-    : activeStep.isCore
-    ? '#3B82F6'
-    : '#F59E0B';
-  const spotlightBadgeColor = isResetStep
-    ? '#DC2626'
-    : activeStep.isCore
-    ? '#2563EB'
-    : '#D97706';
-
-  const backdropBg = isDark
-    ? 'rgba(6, 11, 22, 0.76)'
-    : 'rgba(15, 23, 42, 0.72)';
-
-  const backdropBlurStyle = Platform.select({
-    web: {
-      backdropFilter: 'blur(5px)',
-      WebkitBackdropFilter: 'blur(5px)',
-    } as any,
-    default: {},
-  });
+  const cardMaxWidth = Math.min(windowWidth - 20, 500);
 
   return (
     <Modal
@@ -344,113 +225,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       transparent
       onRequestClose={handleFinish}>
       <View style={styles.modalRoot} pointerEvents="box-none">
-        {/* SPOTLIGHT CUTOUT & BLURRED BACKDROP */}
-        <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-          {/* Top backdrop */}
-          <View
-            style={[
-              styles.backdropPanel,
-              backdropBlurStyle,
-              {
-                top: 0,
-                left: 0,
-                right: 0,
-                height: Math.max(0, spotlightTop),
-                backgroundColor: backdropBg,
-              },
-            ]}
-          />
-          {/* Bottom backdrop */}
-          <View
-            style={[
-              styles.backdropPanel,
-              backdropBlurStyle,
-              {
-                top: spotlightTop + spotlightHeight,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: backdropBg,
-              },
-            ]}
-          />
-          {/* Left backdrop */}
-          <View
-            style={[
-              styles.backdropPanel,
-              backdropBlurStyle,
-              {
-                top: spotlightTop,
-                left: 0,
-                width: spotlightLeft,
-                height: spotlightHeight,
-                backgroundColor: backdropBg,
-              },
-            ]}
-          />
-          {/* Right backdrop */}
-          <View
-            style={[
-              styles.backdropPanel,
-              backdropBlurStyle,
-              {
-                top: spotlightTop,
-                left: windowWidth - spotlightRight,
-                right: 0,
-                height: spotlightHeight,
-                backgroundColor: backdropBg,
-              },
-            ]}
-          />
-
-          {/* Spotlight Illuminated Frame with glowing border */}
-          <View
-            style={[
-              styles.spotlightFrame,
-              {
-                top: spotlightTop,
-                left: spotlightLeft,
-                width: spotlightWidth,
-                height: spotlightHeight,
-                borderRadius: activeStep.spotlight.borderRadius ?? 18,
-                borderColor: spotlightBorderColor,
-              },
-              Platform.OS === 'web' && ({
-                boxShadow: isResetStep
-                  ? '0 0 0 3px rgba(239, 68, 68, 0.35), 0 0 30px rgba(239, 68, 68, 0.65)'
-                  : activeStep.isCore
-                  ? '0 0 0 3px rgba(59, 130, 246, 0.35), 0 0 30px rgba(59, 130, 246, 0.65)'
-                  : '0 0 0 3px rgba(245, 158, 11, 0.35), 0 0 30px rgba(245, 158, 11, 0.65)',
-              } as any),
-            ]}
-            pointerEvents="none">
-            {/* Illuminated Badge on Spotlight */}
-            <View
-              style={[
-                styles.spotlightBadge,
-                {
-                  backgroundColor: spotlightBadgeColor,
-                },
-              ]}>
-              <View
-                style={[
-                  styles.spotlightPulseDot,
-                  { backgroundColor: isResetStep ? '#FCA5A5' : '#34D399' },
-                ]}
-              />
-              <Ionicons
-                name={isResetStep ? 'refresh' : 'sparkles'}
-                size={11}
-                color="#FFFFFF"
-              />
-              <Text style={styles.spotlightBadgeText}>
-                {activeStep.spotlight.label}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* BOTTOM DOCK OR FLOATING PILL */}
+        {/* NON-BLOCKING FLOATING DOCK (NO BLUR, NO DIMMING, FULL SCREEN VISIBLE) */}
         <View style={styles.dockOverlayContainer} pointerEvents="box-none">
           {/* MINIMIZED FLOATING PILL */}
           {isMinimized ? (
@@ -462,291 +237,291 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
                   borderColor: activeStep.isCore ? '#3B82F6' : '#F59E0B',
                 },
               ]}>
-            <TouchableOpacity
-              onPress={() => setIsMinimized(false)}
-              style={styles.minimizedLeft}>
-              <View
-                style={[
-                  styles.minimizedBadge,
-                  { backgroundColor: activeStep.isCore ? '#2563EB' : '#D97706' },
-                ]}>
-                <Ionicons name={activeStep.icon} size={14} color="#FFFFFF" />
-              </View>
-              <Text
-                numberOfLines={1}
-                style={[
-                  styles.minimizedText,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
-                ]}>
-                Tour ({currentStepIndex + 1}/{tourSteps.length}): {activeStep.title.replace(/^\d+\.\s*/, '')}
-              </Text>
-            </TouchableOpacity>
-
-            <View style={styles.minimizedActions}>
               <TouchableOpacity
-                onPress={handleNext}
-                style={[
-                  styles.minimizedNextBtn,
-                  { backgroundColor: activeStep.isCore ? '#2563EB' : '#10B981' },
-                ]}>
-                <Text style={styles.minimizedNextBtnText}>
-                  {isLastStep ? 'Selesai' : 'Lanjut ➔'}
+                onPress={() => setIsMinimized(false)}
+                style={styles.minimizedLeft}>
+                <View
+                  style={[
+                    styles.minimizedBadge,
+                    { backgroundColor: activeStep.isCore ? '#2563EB' : '#D97706' },
+                  ]}>
+                  <Ionicons name={activeStep.icon} size={13} color="#FFFFFF" />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.minimizedText,
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  ]}>
+                  Tour ({currentStepIndex + 1}/{tourSteps.length}): {activeStep.title.replace(/^\d+\.\s*/, '')}
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => setIsMinimized(false)}
-                style={styles.minimizedIconBtn}
-                accessibilityLabel="Perbesar tour">
-                <Ionicons
-                  name="expand-outline"
-                  size={16}
-                  color={isDark ? '#CBD5E1' : '#64748B'}
-                />
-              </TouchableOpacity>
+              <View style={styles.minimizedActions}>
+                <TouchableOpacity
+                  onPress={handleNext}
+                  style={[
+                    styles.minimizedNextBtn,
+                    { backgroundColor: activeStep.isCore ? '#2563EB' : '#10B981' },
+                  ]}>
+                  <Text style={styles.minimizedNextBtnText}>
+                    {isLastStep ? 'Finish' : 'Next ➔'}
+                  </Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={handleFinish}
-                style={styles.minimizedCloseBtn}
-                accessibilityLabel="Tutup tour">
-                <Ionicons name="close" size={16} color="#DC2626" />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setIsMinimized(false)}
+                  style={styles.minimizedIconBtn}
+                  accessibilityLabel="Expand tour">
+                  <Ionicons
+                    name="expand-outline"
+                    size={16}
+                    color={isDark ? '#CBD5E1' : '#64748B'}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleFinish}
+                  style={styles.minimizedCloseBtn}
+                  accessibilityLabel="Close tour">
+                  <Ionicons name="close" size={16} color="#DC2626" />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ) : (
-          /* EXPANDED INTERACTIVE WALKTHROUGH DOCK */
-          <View
-            style={[
-              styles.dockCard,
-              {
-                maxWidth: cardMaxWidth,
-                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                borderColor: activeStep.isCore ? '#3B82F6' : '#F59E0B',
-                borderBottomColor: activeStep.isCore ? '#1D4ED8' : '#D97706',
-              },
-            ]}>
-            {/* Top Tag & Control Bar */}
-            <View style={styles.dockTopRow}>
-              <View style={styles.tagGroup}>
+          ) : (
+            /* EXPANDED INTERACTIVE TOUR DOCK */
+            <View
+              style={[
+                styles.dockCard,
+                {
+                  maxWidth: cardMaxWidth,
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  borderColor: activeStep.isCore ? '#3B82F6' : '#F59E0B',
+                  borderBottomColor: activeStep.isCore ? '#1D4ED8' : '#D97706',
+                },
+              ]}>
+              {/* Top Tag & Control Bar */}
+              <View style={styles.dockTopRow}>
+                <View style={styles.tagGroup}>
+                  <View
+                    style={[
+                      styles.categoryTagPill,
+                      {
+                        backgroundColor: activeStep.isCore ? '#EEF2FF' : '#FEF3C7',
+                        borderColor: activeStep.isCore ? '#BFDBFE' : '#FDE68A',
+                      },
+                    ]}>
+                    <Ionicons
+                      name={activeStep.isCore ? 'sparkles' : 'flask'}
+                      size={11}
+                      color={activeStep.isCore ? '#2563EB' : '#D97706'}
+                    />
+                    <Text
+                      style={[
+                        styles.categoryTagText,
+                        { color: activeStep.isCore ? '#1D4ED8' : '#B45309' },
+                      ]}>
+                      {activeStep.category}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.stepProgressPill,
+                      { backgroundColor: isDark ? '#0F172A' : '#F1F5F9' },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.stepProgressText,
+                        { color: isDark ? '#CBD5E1' : '#475569' },
+                      ]}>
+                      Step {currentStepIndex + 1} of {tourSteps.length}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.topControlBtns}>
+                  {/* Minimize Button */}
+                  <TouchableOpacity
+                    onPress={() => setIsMinimized(true)}
+                    style={styles.controlIconBtn}
+                    accessibilityLabel="Minimize tour">
+                    <Ionicons
+                      name="chevron-down"
+                      size={18}
+                      color={isDark ? '#CBD5E1' : '#64748B'}
+                    />
+                  </TouchableOpacity>
+
+                  {/* Close / Skip Button */}
+                  <TouchableOpacity
+                    onPress={handleFinish}
+                    style={styles.controlIconBtn}
+                    accessibilityLabel="Exit tour">
+                    <Ionicons
+                      name="close"
+                      size={18}
+                      color={isDark ? '#CBD5E1' : '#64748B'}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Title & Subtitle */}
+              <View style={styles.dockTitleRow}>
                 <View
                   style={[
-                    styles.categoryTagPill,
+                    styles.titleIconSquare,
                     {
-                      backgroundColor: activeStep.isCore ? '#EEF2FF' : '#FEF3C7',
+                      backgroundColor: activeStep.isCore ? '#EFF6FF' : '#FFFBEB',
                       borderColor: activeStep.isCore ? '#BFDBFE' : '#FDE68A',
                     },
                   ]}>
                   <Ionicons
-                    name={activeStep.isCore ? 'sparkles' : 'flask'}
-                    size={11}
+                    name={activeStep.icon}
+                    size={17}
                     color={activeStep.isCore ? '#2563EB' : '#D97706'}
                   />
-                  <Text
-                    style={[
-                      styles.categoryTagText,
-                      { color: activeStep.isCore ? '#1D4ED8' : '#B45309' },
-                    ]}>
-                    {activeStep.category}
-                  </Text>
                 </View>
 
-                <View
-                  style={[
-                    styles.stepProgressPill,
-                    { backgroundColor: isDark ? '#0F172A' : '#F1F5F9' },
-                  ]}>
+                <View style={{ flex: 1, minWidth: 0 }}>
                   <Text
+                    numberOfLines={1}
                     style={[
-                      styles.stepProgressText,
-                      { color: isDark ? '#CBD5E1' : '#475569' },
+                      styles.dockTitle,
+                      { color: isDark ? '#F8FAFC' : '#0F172A' },
                     ]}>
-                    Langkah {currentStepIndex + 1} dari {tourSteps.length}
+                    {activeStep.title}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.dockSubtitle,
+                      { color: activeStep.isCore ? '#3B82F6' : '#D97706' },
+                    ]}>
+                    {activeStep.subtitle}
                   </Text>
                 </View>
               </View>
 
-              <View style={styles.topControlBtns}>
-                {/* Minimize Button */}
-                <TouchableOpacity
-                  onPress={() => setIsMinimized(true)}
-                  style={styles.controlIconBtn}
-                  accessibilityLabel="Minimize tour">
-                  <Ionicons
-                    name="chevron-down"
-                    size={18}
-                    color={isDark ? '#CBD5E1' : '#64748B'}
-                  />
-                </TouchableOpacity>
-
-                {/* Close / Skip Button */}
-                <TouchableOpacity
-                  onPress={handleFinish}
-                  style={styles.controlIconBtn}
-                  accessibilityLabel="Exit tour">
-                  <Ionicons
-                    name="close"
-                    size={18}
-                    color={isDark ? '#CBD5E1' : '#64748B'}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Title & Subtitle */}
-            <View style={styles.dockTitleRow}>
-              <View
-                style={[
-                  styles.titleIconSquare,
-                  {
-                    backgroundColor: activeStep.isCore ? '#EFF6FF' : '#FFFBEB',
-                    borderColor: activeStep.isCore ? '#BFDBFE' : '#FDE68A',
-                  },
-                ]}>
-                <Ionicons
-                  name={activeStep.icon}
-                  size={18}
-                  color={activeStep.isCore ? '#2563EB' : '#D97706'}
-                />
-              </View>
-
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    styles.dockTitle,
-                    { color: isDark ? '#F8FAFC' : '#0F172A' },
-                  ]}>
-                  {activeStep.title}
-                </Text>
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    styles.dockSubtitle,
-                    { color: activeStep.isCore ? '#3B82F6' : '#D97706' },
-                  ]}>
-                  {activeStep.subtitle}
-                </Text>
-              </View>
-            </View>
-
-            {/* Description Body */}
-            <Text
-              style={[
-                styles.dockDesc,
-                { color: isDark ? '#CBD5E1' : '#475569' },
-              ]}>
-              {activeStep.description}
-            </Text>
-
-            {/* Highlight Focus Tip */}
-            <View
-              style={[
-                styles.focusTipBox,
-                {
-                  backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
-                  borderColor: isDark ? '#334155' : '#E2E8F0',
-                },
-              ]}>
-              <Ionicons
-                name="bulb-outline"
-                size={14}
-                color={activeStep.isCore ? '#2563EB' : '#D97706'}
-              />
+              {/* Description Body */}
               <Text
                 style={[
-                  styles.focusTipText,
-                  { color: isDark ? '#94A3B8' : '#64748B' },
+                  styles.dockDesc,
+                  { color: isDark ? '#CBD5E1' : '#475569' },
                 ]}>
-                {activeStep.tip}
+                {activeStep.description}
               </Text>
-            </View>
 
-            {/* Bottom Actions Row */}
-            <View style={styles.dockBottomRow}>
-              {/* Prev Button */}
-              <TouchableOpacity
-                onPress={handlePrev}
-                disabled={isFirstStep}
+              {/* Highlight Focus Tip */}
+              <View
                 style={[
-                  styles.navBtn,
-                  styles.prevBtn,
-                  isFirstStep && styles.navBtnDisabled,
+                  styles.focusTipBox,
                   {
-                    backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
-                    borderColor: isDark ? '#334155' : '#CBD5E1',
-                    borderBottomColor: isDark ? '#0B0F19' : '#94A3B8',
+                    backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                    borderColor: isDark ? '#334155' : '#E2E8F0',
                   },
                 ]}>
                 <Ionicons
-                  name="arrow-back"
-                  size={15}
-                  color={isFirstStep ? '#94A3B8' : isDark ? '#CBD5E1' : '#475569'}
+                  name="bulb-outline"
+                  size={13}
+                  color={activeStep.isCore ? '#2563EB' : '#D97706'}
                 />
                 <Text
                   style={[
-                    styles.prevBtnText,
-                    { color: isFirstStep ? '#94A3B8' : isDark ? '#CBD5E1' : '#475569' },
+                    styles.focusTipText,
+                    { color: isDark ? '#94A3B8' : '#64748B' },
                   ]}>
-                  Kembali
+                  {activeStep.tip}
                 </Text>
-              </TouchableOpacity>
-
-              {/* Progress Dots */}
-              <View style={styles.dotsRow}>
-                {tourSteps.map((_, idx) => (
-                  <TouchableOpacity
-                    key={idx}
-                    onPress={() => setCurrentStepIndex(idx)}
-                    style={[
-                      styles.dotItem,
-                      idx === currentStepIndex
-                        ? [
-                            styles.dotItemActive,
-                            {
-                              backgroundColor: activeStep.isCore
-                                ? '#2563EB'
-                                : '#D97706',
-                            },
-                          ]
-                        : {
-                            backgroundColor: isDark ? '#334155' : '#CBD5E1',
-                          },
-                    ]}
-                  />
-                ))}
               </View>
 
-              {/* Next / Finish Button */}
-              <TouchableOpacity
-                onPress={handleNext}
-                style={[
-                  styles.navBtn,
-                  styles.nextBtn,
-                  {
-                    backgroundColor: isLastStep
-                      ? '#10B981'
-                      : activeStep.isCore
-                      ? '#2563EB'
-                      : '#F59E0B',
-                    borderColor: isLastStep
-                      ? '#059669'
-                      : activeStep.isCore
-                      ? '#1D4ED8'
-                      : '#D97706',
-                    borderBottomColor: isLastStep
-                      ? '#047857'
-                      : activeStep.isCore
-                      ? '#1E40AF'
-                      : '#B45309',
-                  },
-                ]}>
-                <Text style={styles.nextBtnText}>
-                  {isLastStep ? 'Selesai Tour 🎉' : 'Lanjut Tour ➔'}
-                </Text>
-              </TouchableOpacity>
+              {/* Bottom Actions Row */}
+              <View style={styles.dockBottomRow}>
+                {/* Prev Button */}
+                <TouchableOpacity
+                  onPress={handlePrev}
+                  disabled={isFirstStep}
+                  style={[
+                    styles.navBtn,
+                    styles.prevBtn,
+                    isFirstStep && styles.navBtnDisabled,
+                    {
+                      backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
+                      borderColor: isDark ? '#334155' : '#CBD5E1',
+                      borderBottomColor: isDark ? '#0B0F19' : '#94A3B8',
+                    },
+                  ]}>
+                  <Ionicons
+                    name="arrow-back"
+                    size={14}
+                    color={isFirstStep ? '#94A3B8' : isDark ? '#CBD5E1' : '#475569'}
+                  />
+                  <Text
+                    style={[
+                      styles.prevBtnText,
+                      { color: isFirstStep ? '#94A3B8' : isDark ? '#CBD5E1' : '#475569' },
+                    ]}>
+                    Back
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Progress Dots */}
+                <View style={styles.dotsRow}>
+                  {tourSteps.map((_, idx) => (
+                    <TouchableOpacity
+                      key={idx}
+                      onPress={() => setCurrentStepIndex(idx)}
+                      style={[
+                        styles.dotItem,
+                        idx === currentStepIndex
+                          ? [
+                              styles.dotItemActive,
+                              {
+                                backgroundColor: activeStep.isCore
+                                  ? '#2563EB'
+                                  : '#D97706',
+                              },
+                            ]
+                          : {
+                              backgroundColor: isDark ? '#334155' : '#CBD5E1',
+                            },
+                      ]}
+                    />
+                  ))}
+                </View>
+
+                {/* Next / Finish Button */}
+                <TouchableOpacity
+                  onPress={handleNext}
+                  style={[
+                    styles.navBtn,
+                    styles.nextBtn,
+                    {
+                      backgroundColor: isLastStep
+                        ? '#10B981'
+                        : activeStep.isCore
+                        ? '#2563EB'
+                        : '#F59E0B',
+                      borderColor: isLastStep
+                        ? '#059669'
+                        : activeStep.isCore
+                        ? '#1D4ED8'
+                        : '#D97706',
+                      borderBottomColor: isLastStep
+                        ? '#047857'
+                        : activeStep.isCore
+                        ? '#1E40AF'
+                        : '#B45309',
+                    },
+                  ]}>
+                  <Text style={styles.nextBtnText}>
+                    {isLastStep ? 'Finish Tour 🎉' : 'Next Step ➔'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
+          )}
         </View>
       </View>
     </Modal>
@@ -757,69 +532,20 @@ const styles = StyleSheet.create({
   modalRoot: {
     flex: 1,
     position: 'relative',
-  },
-  backdropPanel: {
-    position: 'absolute',
-  },
-  spotlightFrame: {
-    position: 'absolute',
-    borderWidth: 2.5,
     backgroundColor: 'transparent',
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 18,
-    elevation: 10,
-  },
-  spotlightBadge: {
-    position: 'absolute',
-    top: -14,
-    left: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  spotlightBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-  },
-  spotlightPulseDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#34D399',
   },
   dockOverlayContainer: {
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingBottom: Platform.OS === 'ios' ? 24 : 14,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     zIndex: 50,
-  },
-  overlayContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: Platform.OS === 'ios' ? 24 : 14,
-    paddingHorizontal: 12,
   },
   dockCard: {
     width: '100%',
-    borderRadius: 22,
-    padding: 16,
+    borderRadius: 20,
+    padding: 14,
     borderWidth: 2,
     borderBottomWidth: 5,
     shadowColor: '#000',
@@ -832,7 +558,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   tagGroup: {
     flexDirection: 'row',
@@ -844,13 +570,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: 8,
     borderWidth: 1,
   },
   categoryTagText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '900',
     letterSpacing: 0.4,
   },
@@ -860,7 +586,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   stepProgressText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '800',
   },
   topControlBtns: {
@@ -869,8 +595,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   controlIconBtn: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -878,74 +604,74 @@ const styles = StyleSheet.create({
   dockTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 8,
+    gap: 8,
+    marginBottom: 6,
   },
   titleIconSquare: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 9,
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
   dockTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '900',
     letterSpacing: -0.2,
   },
   dockSubtitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
     marginTop: 1,
   },
   dockDesc: {
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 11.5,
+    lineHeight: 16,
     fontWeight: '500',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   focusTipBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 10,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+    borderRadius: 9,
     borderWidth: 1,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   focusTipText: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '600',
     flex: 1,
-    lineHeight: 15,
+    lineHeight: 14,
   },
   dockBottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: 6,
   },
   navBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
-    paddingVertical: 9,
-    paddingHorizontal: 14,
-    borderRadius: 12,
+    gap: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 11,
     borderWidth: 1.5,
     borderBottomWidth: 3.5,
-    minHeight: 38,
+    minHeight: 36,
   },
   navBtnDisabled: {
     opacity: 0.45,
   },
   prevBtn: {},
   prevBtnText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '800',
   },
   nextBtn: {
@@ -953,32 +679,32 @@ const styles = StyleSheet.create({
   },
   nextBtnText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '900',
     textAlign: 'center',
   },
   dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
   },
   dotItem: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
   },
   dotItemActive: {
-    width: 14,
-    borderRadius: 4,
+    width: 12,
+    borderRadius: 3,
   },
   // MINIMIZED PILL STYLES
   minimizedPill: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 18,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 16,
     borderWidth: 2,
     borderBottomWidth: 4,
     shadowColor: '#000',
@@ -988,48 +714,48 @@ const styles = StyleSheet.create({
     elevation: 6,
     maxWidth: 480,
     width: '100%',
-    gap: 8,
+    gap: 6,
   },
   minimizedLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     flex: 1,
     minWidth: 0,
   },
   minimizedBadge: {
-    width: 24,
-    height: 24,
-    borderRadius: 7,
+    width: 22,
+    height: 22,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
   minimizedText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
     flex: 1,
   },
   minimizedActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
     flexShrink: 0,
   },
   minimizedNextBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 7,
   },
   minimizedNextBtnText: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '800',
   },
   minimizedIconBtn: {
-    padding: 4,
+    padding: 3,
   },
   minimizedCloseBtn: {
-    padding: 4,
+    padding: 3,
     marginLeft: 2,
   },
 });
