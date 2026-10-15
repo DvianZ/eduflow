@@ -129,7 +129,8 @@ export default function SettingsScreen() {
             resetDemoData();
             const defaultName = DEMO_USERS.learner.fullName;
             useAuthStore.getState().updateCertificateName('user-budi', defaultName);
-            Alert.alert(t.common.success, t.header.resetSuccess);
+            useAuthStore.getState().logout();
+            router.replace('/login');
           },
         },
       ]

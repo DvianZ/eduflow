@@ -20,6 +20,7 @@ import { calculateBatchEvaluation } from '@/utils/lockEngine';
 import { useTranslation } from '@/i18n';
 import { triggerMilestoneFeedback } from '@/utils/feedback';
 import { getCertificatePdfFilename, printCertificatePDF } from '@/utils/certificatePdf';
+import { DEMO_USERS } from '@/data/mockData';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -831,7 +832,17 @@ export default function ProfileScreen() {
               'Are you sure you want to reset all demo evaluation and progress data?',
               [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Reset', style: 'destructive', onPress: resetDemoData },
+                {
+                  text: 'Reset',
+                  style: 'destructive',
+                  onPress: () => {
+                    resetDemoData();
+                    const defaultName = DEMO_USERS.learner.fullName;
+                    authUpdateCertName('user-budi', defaultName);
+                    logout();
+                    router.replace('/login');
+                  },
+                },
               ]
             );
           }}
