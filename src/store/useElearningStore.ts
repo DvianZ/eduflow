@@ -657,6 +657,7 @@ export const useElearningStore = create<ElearningState>()(
           batches: INITIAL_BATCHES,
           modules: INITIAL_MODULES,
           lessons: INITIAL_LESSONS,
+          quizzes: INITIAL_QUIZZES,
           assignments: INITIAL_ASSIGNMENTS,
           enrollments: INITIAL_ENROLLMENTS,
           completedLessonIds: [
@@ -666,6 +667,15 @@ export const useElearningStore = create<ElearningState>()(
             'lesson-wdf-3',
             'lesson-ai-1',
           ],
+          userCompletedLessons: {
+            'user-budi': [
+              'lesson-1',
+              'lesson-wdf-1',
+              'lesson-wdf-2',
+              'lesson-wdf-3',
+              'lesson-ai-1',
+            ],
+          },
           quizAttempts: [],
           submissions: [],
           grades: [],

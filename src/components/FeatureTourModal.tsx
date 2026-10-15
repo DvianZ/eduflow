@@ -30,6 +30,14 @@ interface TourStep {
   targetTab?: string;
   targetRole?: 'learner' | 'teacher';
   actionButtonLabel?: string;
+  spotlight: {
+    top: number;
+    height: number;
+    left?: number;
+    right?: number;
+    borderRadius?: number;
+    label: string;
+  };
 }
 
 export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
@@ -55,6 +63,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Fokus Demo: Perhatikan kartu Misi 3D di atas dan ringkasan progres belajar.',
       targetTab: '/(tabs)',
       targetRole: 'learner',
+      spotlight: {
+        top: 106,
+        height: 220,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'MISI AKTIF & KODE KELAS',
+      },
     },
     {
       id: 'role-switcher',
@@ -68,6 +84,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Fokus Demo: Tombol pill switcher di header atas mempermudah demo 2 sisi.',
       targetTab: '/(tabs)',
       targetRole: 'learner',
+      spotlight: {
+        top: 8,
+        height: 98,
+        left: 8,
+        right: 8,
+        borderRadius: 16,
+        label: 'ROLE SWITCHER 1-KLIK (SISWA ⇄ INSTRUKTUR)',
+      },
     },
     {
       id: 'gatekeeper',
@@ -81,6 +105,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Fokus Demo: Perhatikan tanda gembok pada Modul 2 yang mengunci tugas proyek.',
       targetTab: '/(tabs)/syllabus',
       targetRole: 'learner',
+      spotlight: {
+        top: 175,
+        height: 250,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'KURIKULUM & GATEKEEPER PRASYARAT',
+      },
     },
     {
       id: 'grading',
@@ -94,6 +126,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Fokus Demo: Antrean penilaian instruktur dengan tombol Request Revision & ekspor CSV.',
       targetTab: '/(tabs)/grading',
       targetRole: 'teacher',
+      spotlight: {
+        top: 110,
+        height: 260,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'ANTREAN REVIEW TUGAS, SKOR & REVISI',
+      },
     },
     {
       id: 'class-manager',
@@ -107,6 +147,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Fokus Demo: Manajemen kuota kelas dan pembuatan kode unik pendaftaran.',
       targetTab: '/class-manager',
       targetRole: 'teacher',
+      spotlight: {
+        top: 65,
+        height: 240,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'MANAJEMEN KELAS, KUOTA & KODE COHORT',
+      },
     },
     {
       id: 'certificate',
@@ -120,6 +168,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Fokus Demo: Klik cohort WDF-101 lalu klik "View Certificate" atau "Print / Save PDF".',
       targetTab: '/(tabs)/profile',
       targetRole: 'learner',
+      spotlight: {
+        top: 195,
+        height: 285,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'EVALUATOR KELULUSAN 30:30:40 & CETAK PDF',
+      },
     },
     {
       id: 'demo-utilities',
@@ -133,6 +189,14 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
       tip: 'Fokus Demo: Pengujian selesai! Anda kini dapat mencoba seluruh fitur secara bebas.',
       targetTab: '/settings',
       targetRole: 'learner',
+      spotlight: {
+        top: 180,
+        height: 265,
+        left: 12,
+        right: 12,
+        borderRadius: 18,
+        label: 'RESET DATA & KONTROL PENGUJIAN DEMO',
+      },
     },
   ];
 
@@ -180,23 +244,138 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
 
   const cardMaxWidth = Math.min(windowWidth - 24, 520);
 
+  const spotlightTop = activeStep.spotlight.top;
+  const spotlightHeight = activeStep.spotlight.height;
+  const spotlightLeft = activeStep.spotlight.left ?? 12;
+  const spotlightRight = activeStep.spotlight.right ?? 12;
+  const spotlightWidth = Math.max(0, windowWidth - spotlightLeft - spotlightRight);
+
+  const backdropBg = isDark
+    ? 'rgba(6, 11, 22, 0.76)'
+    : 'rgba(15, 23, 42, 0.72)';
+
+  const backdropBlurStyle = Platform.select({
+    web: {
+      backdropFilter: 'blur(5px)',
+      WebkitBackdropFilter: 'blur(5px)',
+    } as any,
+    default: {},
+  });
+
   return (
     <Modal
       visible={visible}
       animationType="fade"
       transparent
       onRequestClose={handleFinish}>
-      <View style={styles.overlayContainer} pointerEvents="box-none">
-        {/* MINIMIZED FLOATING PILL */}
-        {isMinimized ? (
+      <View style={styles.modalRoot} pointerEvents="box-none">
+        {/* SPOTLIGHT CUTOUT & BLURRED BACKDROP */}
+        <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+          {/* Top backdrop */}
           <View
             style={[
-              styles.minimizedPill,
+              styles.backdropPanel,
+              backdropBlurStyle,
               {
-                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: Math.max(0, spotlightTop),
+                backgroundColor: backdropBg,
+              },
+            ]}
+          />
+          {/* Bottom backdrop */}
+          <View
+            style={[
+              styles.backdropPanel,
+              backdropBlurStyle,
+              {
+                top: spotlightTop + spotlightHeight,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: backdropBg,
+              },
+            ]}
+          />
+          {/* Left backdrop */}
+          <View
+            style={[
+              styles.backdropPanel,
+              backdropBlurStyle,
+              {
+                top: spotlightTop,
+                left: 0,
+                width: spotlightLeft,
+                height: spotlightHeight,
+                backgroundColor: backdropBg,
+              },
+            ]}
+          />
+          {/* Right backdrop */}
+          <View
+            style={[
+              styles.backdropPanel,
+              backdropBlurStyle,
+              {
+                top: spotlightTop,
+                left: windowWidth - spotlightRight,
+                right: 0,
+                height: spotlightHeight,
+                backgroundColor: backdropBg,
+              },
+            ]}
+          />
+
+          {/* Spotlight Illuminated Frame with glowing border */}
+          <View
+            style={[
+              styles.spotlightFrame,
+              {
+                top: spotlightTop,
+                left: spotlightLeft,
+                width: spotlightWidth,
+                height: spotlightHeight,
+                borderRadius: activeStep.spotlight.borderRadius ?? 18,
                 borderColor: activeStep.isCore ? '#3B82F6' : '#F59E0B',
               },
-            ]}>
+              Platform.OS === 'web' && ({
+                boxShadow: activeStep.isCore
+                  ? '0 0 0 3px rgba(59, 130, 246, 0.35), 0 0 30px rgba(59, 130, 246, 0.65)'
+                  : '0 0 0 3px rgba(245, 158, 11, 0.35), 0 0 30px rgba(245, 158, 11, 0.65)',
+              } as any),
+            ]}
+            pointerEvents="none">
+            {/* Illuminated Badge on Spotlight */}
+            <View
+              style={[
+                styles.spotlightBadge,
+                {
+                  backgroundColor: activeStep.isCore ? '#2563EB' : '#D97706',
+                },
+              ]}>
+              <View style={styles.spotlightPulseDot} />
+              <Ionicons name="sparkles" size={11} color="#FFFFFF" />
+              <Text style={styles.spotlightBadgeText}>
+                {activeStep.spotlight.label}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* BOTTOM DOCK OR FLOATING PILL */}
+        <View style={styles.dockOverlayContainer} pointerEvents="box-none">
+          {/* MINIMIZED FLOATING PILL */}
+          {isMinimized ? (
+            <View
+              style={[
+                styles.minimizedPill,
+                {
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  borderColor: activeStep.isCore ? '#3B82F6' : '#F59E0B',
+                },
+              ]}>
             <TouchableOpacity
               onPress={() => setIsMinimized(false)}
               style={styles.minimizedLeft}>
@@ -482,12 +661,68 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
             </View>
           </View>
         )}
+        </View>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  modalRoot: {
+    flex: 1,
+    position: 'relative',
+  },
+  backdropPanel: {
+    position: 'absolute',
+  },
+  spotlightFrame: {
+    position: 'absolute',
+    borderWidth: 2.5,
+    backgroundColor: 'transparent',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  spotlightBadge: {
+    position: 'absolute',
+    top: -14,
+    left: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  spotlightBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  spotlightPulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#34D399',
+  },
+  dockOverlayContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: Platform.OS === 'ios' ? 24 : 14,
+    paddingHorizontal: 12,
+    zIndex: 50,
+  },
   overlayContainer: {
     flex: 1,
     justifyContent: 'flex-end',

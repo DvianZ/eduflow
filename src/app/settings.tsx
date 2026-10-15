@@ -24,6 +24,7 @@ import {
   downloadCSVFile,
   copyCSVToClipboard,
 } from '@/utils/exportGradebook';
+import { DEMO_USERS } from '@/data/mockData';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -109,21 +110,24 @@ export default function SettingsScreen() {
   };
 
   const handleResetDemo = () => {
-    const doReset = () => {
-      resetDemoData();
-      Alert.alert(t.common.success, t.header.resetSuccess);
-    };
-
-    if (typeof window !== 'undefined' && window.confirm) {
-      if (window.confirm(t.header.resetConfirmMsg)) {
-        doReset();
-      }
-    } else {
-      Alert.alert(t.header.resetConfirmTitle, t.header.resetConfirmMsg, [
+    Alert.alert(
+      t.header.resetConfirmTitle,
+      t.header.resetConfirmMsg,
+      [
         { text: t.common.cancel, style: 'cancel' },
-        { text: t.common.reset, style: 'destructive', onPress: doReset },
-      ]);
-    }
+        {
+          text: t.common.reset,
+          style: 'destructive',
+          onPress: () => {
+            resetDemoData();
+            const defaultName = DEMO_USERS.learner.fullName;
+            setOfficialName(defaultName);
+            authUpdateCertName('user-budi', defaultName);
+            Alert.alert(t.common.success, t.header.resetSuccess);
+          },
+        },
+      ]
+    );
   };
 
   const bg = isDark ? '#090D16' : '#F4F6FA';

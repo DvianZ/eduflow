@@ -4,9 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  useWindowDimensions,
 } from 'react-native';
-import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -21,8 +19,6 @@ export function DemoHeader() {
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { t } = useTranslation();
-  const { width: screenWidth } = useWindowDimensions();
-  const isCompactMobile = screenWidth < 430;
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showFeatureTour, setShowFeatureTour] = useState(false);
@@ -31,12 +27,11 @@ export function DemoHeader() {
     currentRole,
     switchRole,
     userStreak,
-    resetDemoData,
     currentUser,
     notifications,
     hasSeenAppTour,
   } = useElearningStore();
-  const { logout, getCurrentUser } = useAuthStore();
+  const { getCurrentUser } = useAuthStore();
   const authUser = getCurrentUser();
 
   // Auto-show guided tour if user hasn't seen it yet
@@ -53,42 +48,6 @@ export function DemoHeader() {
     (n) => n.userId === currentUser.id
   );
   const unreadCount = userNotifications.filter((n) => !n.isRead).length;
-
-  const handleReset = () => {
-    if (typeof window !== 'undefined' && window.confirm) {
-      if (window.confirm(t.header.resetConfirmMsg)) {
-        resetDemoData();
-      }
-    } else {
-      Alert.alert(
-        t.header.resetConfirmTitle,
-        t.header.resetConfirmMsg,
-        [
-          { text: t.common.cancel, style: 'cancel' },
-          { text: t.common.reset, style: 'destructive', onPress: resetDemoData },
-        ]
-      );
-    }
-  };
-
-  const handleLogout = () => {
-    const doLogout = () => {
-      logout();
-      resetDemoData();
-      router.replace('/login');
-    };
-
-    if (typeof window !== 'undefined' && window.confirm) {
-      if (window.confirm(t.header.logoutConfirmMsg)) {
-        doLogout();
-      }
-    } else {
-      Alert.alert(t.header.logoutConfirmTitle, t.header.logoutConfirmMsg, [
-        { text: t.common.cancel, style: 'cancel' },
-        { text: t.common.logout, style: 'destructive', onPress: doLogout },
-      ]);
-    }
-  };
 
   const isTeacher = currentRole === 'teacher';
   const displayName = authUser?.fullName || currentUser.fullName;
@@ -194,35 +153,6 @@ export function DemoHeader() {
               color={isDark ? '#94A3B8' : '#64748B'}
             />
           </TouchableOpacity>
-
-          {/* Quick testing actions (shown on wider screens / tablets / web) */}
-          {!isCompactMobile && (
-            <>
-              <TouchableOpacity
-                onPress={handleReset}
-                style={[
-                  styles.iconBtn,
-                  { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' },
-                ]}
-                accessibilityLabel={t.common.reset}>
-                <Ionicons
-                  name="refresh-outline"
-                  size={16}
-                  color={isDark ? '#94A3B8' : '#64748B'}
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={handleLogout}
-                style={[
-                  styles.iconBtn,
-                  { backgroundColor: isDark ? '#371520' : '#FEE2E2' },
-                ]}
-                accessibilityLabel={t.common.logout}>
-                <Ionicons name="log-out-outline" size={16} color="#DC2626" />
-              </TouchableOpacity>
-            </>
-          )}
         </View>
       </View>
 
