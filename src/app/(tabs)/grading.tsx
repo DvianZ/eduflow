@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  useWindowDimensions,
 } from 'react-native';
 import { Alert } from '@/utils/alert';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -29,6 +30,8 @@ export default function GradingScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { t } = useTranslation();
+  const { width: screenWidth } = useWindowDimensions();
+  const isCompact = screenWidth < 520;
 
   const {
     currentRole,
@@ -52,8 +55,6 @@ export default function GradingScreen() {
   const teacherBatches = batches.filter((b) => b.instructorId === currentUser.id);
   const teacherBatchIds = teacherBatches.map((b) => b.id);
 
-  // Data isolation:
-  // - Teacher only sees submissions from their own classes
   // Data isolation:
   // - Teacher only sees submissions from their own classes
   // - Student only sees their own submitted assignments
@@ -90,10 +91,10 @@ export default function GradingScreen() {
     const activeBatch = batches.find((b) => b.id === exportBatchFilter);
     const className = activeBatch
       ? `${activeBatch.classCode} - ${activeBatch.batchName}`
-      : 'Semua Kelas';
+      : 'All Cohorts';
     const csvString = formatGradebookCSV(gradebookRows, className);
-    const filename = `rekap_nilai_${
-      activeBatch ? activeBatch.classCode.toLowerCase() : 'semua_kelas'
+    const filename = `gradebook_${
+      activeBatch ? activeBatch.classCode.toLowerCase() : 'all_cohorts'
     }_${new Date().toISOString().split('T')[0]}.csv`;
 
     const success = downloadCSVFile(csvString, filename);
@@ -115,7 +116,7 @@ export default function GradingScreen() {
     const activeBatch = batches.find((b) => b.id === exportBatchFilter);
     const className = activeBatch
       ? `${activeBatch.classCode} - ${activeBatch.batchName}`
-      : 'All Classes';
+      : 'All Cohorts';
     const csvString = formatGradebookCSV(gradebookRows, className);
     await copyCSVToClipboard(csvString);
     setIsCopiedCSV(true);
@@ -215,17 +216,18 @@ export default function GradingScreen() {
           <View
             style={[
               styles.exportActionCard,
+              isCompact && styles.exportActionCardCompact,
               {
                 backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                 borderColor: isDark ? '#334155' : '#E2E8F0',
                 borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
               },
             ]}>
-            <View style={styles.exportActionLeft}>
+            <View style={[styles.exportActionLeft, isCompact && { width: '100%' }]}>
               <View style={styles.exportIconBadge}>
                 <Ionicons name="document-text" size={20} color="#10B981" />
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Text
                   style={[
                     styles.exportCardTitle,
@@ -244,9 +246,14 @@ export default function GradingScreen() {
                 setExportBatchFilter(selectedBatchFilter);
                 setIsExportModalOpen(true);
               }}
-              style={styles.openExportModalBtn}>
+              style={[
+                styles.openExportModalBtn,
+                isCompact && styles.openExportModalBtnCompact,
+              ]}>
               <Ionicons name="cloud-download-outline" size={15} color="#FFFFFF" />
-              <Text style={styles.openExportModalBtnText}>{t.assignment.exportCsvBtn}</Text>
+              <Text style={styles.openExportModalBtnText}>
+                {t.assignment.exportCsvBtn || 'Export Gradebook CSV'}
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -295,7 +302,7 @@ export default function GradingScreen() {
                     fontWeight: selectedBatchFilter === 'all' ? '800' : '600',
                   },
                 ]}>
-                Semua Kelas ({relevantSubmissions.length})
+                All Cohorts ({relevantSubmissions.length})
               </Text>
             </TouchableOpacity>
 
@@ -385,6 +392,7 @@ export default function GradingScreen() {
                 key={sub.id}
                 style={[
                   styles.submissionCard,
+                  isCompact && { padding: 14 },
                   {
                     backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                     borderColor: isGraded
@@ -403,6 +411,7 @@ export default function GradingScreen() {
                   <View style={styles.studentInfo}>
                     <Ionicons name="person-circle-outline" size={20} color="#2563EB" />
                     <Text
+                      numberOfLines={1}
                       style={[
                         styles.studentName,
                         { color: isDark ? '#F8FAFC' : '#0F172A' },
@@ -439,10 +448,10 @@ export default function GradingScreen() {
                         },
                       ]}>
                       {isGraded
-                        ? 'TELAH DINILAI'
+                        ? 'GRADED'
                         : isRevision
-                        ? 'PERLU REVISI'
-                        : 'MENUNGGU DIPERIKSA'}
+                        ? 'REVISION REQUIRED'
+                        : 'PENDING REVIEW'}
                     </Text>
                   </View>
                 </View>
@@ -452,7 +461,7 @@ export default function GradingScreen() {
                     styles.assignTitle,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  {assignment?.title || 'Tugas Proyek'}
+                  {assignment?.title || 'Project Deliverable'}
                 </Text>
 
                 {sub.attachmentUrl && (
@@ -465,7 +474,7 @@ export default function GradingScreen() {
                 )}
 
                 <View style={styles.contentBox}>
-                  <Text style={styles.contentLabel}>Jawaban Siswa:</Text>
+                  <Text style={styles.contentLabel}>Student Submission:</Text>
                   <Text
                     style={[
                       styles.contentText,
@@ -486,11 +495,11 @@ export default function GradingScreen() {
                     ]}>
                     <View style={styles.gradeResultHeader}>
                       <Text style={styles.gradeScoreText}>
-                        Skor: <Text style={styles.scoreHighlight}>{grade.score}/100</Text>
+                        Score: <Text style={styles.scoreHighlight}>{grade.score}/100</Text>
                       </Text>
-                      <Text style={styles.graderNameText}>Oleh: {grade.graderName}</Text>
+                      <Text style={styles.graderNameText}>Evaluator: {grade.graderName}</Text>
                     </View>
-                    <Text style={styles.feedbackLabel}>Catatan / Feedback:</Text>
+                    <Text style={styles.feedbackLabel}>Feedback & Qualitative Notes:</Text>
                     <Text
                       style={[
                         styles.feedbackText,
@@ -525,7 +534,7 @@ export default function GradingScreen() {
                       color="#FFFFFF"
                     />
                     <Text style={styles.gradeActionBtnText}>
-                      {isGraded ? 'Ubah Nilai & Feedback' : 'Periksa & Beri Nilai'}
+                      {isGraded ? 'Edit Grade & Feedback' : 'Review & Grade Deliverable'}
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -672,10 +681,10 @@ export default function GradingScreen() {
                   styles.modalHeaderTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                Rekapitulasi Nilai Siswa
+                Cohort Gradebook & Evaluations
               </Text>
               <Text style={styles.modalHeaderSub}>
-                Format Kompatibel Microsoft Excel & Google Sheets
+                Microsoft Excel & Google Sheets Compatible
               </Text>
             </View>
             <View style={{ width: 24 }} />
@@ -684,7 +693,7 @@ export default function GradingScreen() {
           <ScrollView style={styles.modalScroll} contentContainerStyle={{ paddingBottom: 32 }}>
             {/* Filter by Batch in Modal */}
             <Text style={[styles.exportFilterLabel, { color: isDark ? '#F8FAFC' : '#0F172A' }]}>
-              PILIH KELAS UNTUK DIREKAP:
+              SELECT COHORT TO EXPORT:
             </Text>
             <ScrollView
               horizontal
@@ -722,7 +731,7 @@ export default function GradingScreen() {
                       fontWeight: exportBatchFilter === 'all' ? '700' : '500',
                     },
                   ]}>
-                  Semua Kelas ({batches.filter((b) => b.instructorId === currentUser.id).length})
+                  All Cohorts ({batches.filter((b) => b.instructorId === currentUser.id).length})
                 </Text>
               </TouchableOpacity>
 
@@ -770,40 +779,41 @@ export default function GradingScreen() {
             <View
               style={[
                 styles.summaryStatsGrid,
+                isCompact && styles.summaryStatsGridCompact,
                 {
                   backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
                   borderColor: isDark ? '#334155' : '#E2E8F0',
                 },
               ]}>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Total Siswa</Text>
+              <View style={[styles.statBox, isCompact && styles.statBoxCompact]}>
+                <Text style={styles.statLabel}>Total Students</Text>
                 <Text style={[styles.statValue, { color: isDark ? '#F8FAFC' : '#0F172A' }]}>
                   {gradebookSummary.totalStudents}
                 </Text>
               </View>
 
-              <View style={styles.statDivider} />
+              {!isCompact && <View style={styles.statDivider} />}
 
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Rata-rata Nilai</Text>
+              <View style={[styles.statBox, isCompact && styles.statBoxCompact]}>
+                <Text style={styles.statLabel}>Average Score</Text>
                 <Text style={[styles.statValue, { color: '#8B5CF6' }]}>
                   {gradebookSummary.averageScore}
                 </Text>
               </View>
 
-              <View style={styles.statDivider} />
+              {!isCompact && <View style={styles.statDivider} />}
 
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Siswa Lulus</Text>
+              <View style={[styles.statBox, isCompact && styles.statBoxCompact]}>
+                <Text style={styles.statLabel}>Graduated</Text>
                 <Text style={[styles.statValue, { color: '#10B981' }]}>
                   {gradebookSummary.passedCount}
                 </Text>
               </View>
 
-              <View style={styles.statDivider} />
+              {!isCompact && <View style={styles.statDivider} />}
 
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Kelulusan</Text>
+              <View style={[styles.statBox, isCompact && styles.statBoxCompact]}>
+                <Text style={styles.statLabel}>Passing Rate</Text>
                 <Text style={[styles.statValue, { color: '#2563EB' }]}>
                   {gradebookSummary.completionRate}%
                 </Text>
@@ -817,9 +827,9 @@ export default function GradingScreen() {
                   styles.tableSectionTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                Pratinjau Data Rekap Nilai ({gradebookRows.length} Siswa)
+                Gradebook Data Preview ({gradebookRows.length} Students)
               </Text>
-              <Text style={styles.tableScrollHint}>Geser ke samping ➔</Text>
+              <Text style={styles.tableScrollHint}>Scroll horizontally ➔</Text>
             </View>
 
             {/* Scrollable Table Preview */}
@@ -845,12 +855,12 @@ export default function GradingScreen() {
                     },
                   ]}>
                   <Text style={[styles.thCell, { width: 36 }]}>No</Text>
-                  <Text style={[styles.thCell, { width: 140 }]}>Nama Siswa</Text>
-                  <Text style={[styles.thCell, { width: 80 }]}>Kelas</Text>
-                  <Text style={[styles.thCell, { width: 70, textAlign: 'center' }]}>Materi</Text>
-                  <Text style={[styles.thCell, { width: 70, textAlign: 'center' }]}>Kuis</Text>
-                  <Text style={[styles.thCell, { width: 70, textAlign: 'center' }]}>Tugas</Text>
-                  <Text style={[styles.thCell, { width: 80, textAlign: 'center' }]}>Nilai Akhir</Text>
+                  <Text style={[styles.thCell, { width: 140 }]}>Student Name</Text>
+                  <Text style={[styles.thCell, { width: 80 }]}>Cohort</Text>
+                  <Text style={[styles.thCell, { width: 70, textAlign: 'center' }]}>Lessons</Text>
+                  <Text style={[styles.thCell, { width: 70, textAlign: 'center' }]}>Quiz</Text>
+                  <Text style={[styles.thCell, { width: 70, textAlign: 'center' }]}>Project</Text>
+                  <Text style={[styles.thCell, { width: 80, textAlign: 'center' }]}>Final Score</Text>
                   <Text style={[styles.thCell, { width: 100, textAlign: 'center' }]}>Status</Text>
                 </View>
 
@@ -970,7 +980,7 @@ export default function GradingScreen() {
             <View style={styles.excelNoticeCard}>
               <Ionicons name="information-circle" size={18} color="#2563EB" />
               <Text style={styles.excelNoticeText}>
-                Berkas CSV disandikan dengan UTF-8 BOM, sehingga otomatis terbaca rapi oleh Microsoft Excel, Apple Numbers, dan Google Spreadsheet tanpa perlu konfigurasi pemisah kolom tambahan.
+                CSV files are encoded with UTF-8 BOM, ensuring clean automatic formatting in Microsoft Excel, Apple Numbers, and Google Sheets without manual delimiter settings.
               </Text>
             </View>
           </ScrollView>
@@ -979,6 +989,7 @@ export default function GradingScreen() {
           <View
             style={[
               styles.exportModalFooter,
+              isCompact && styles.exportModalFooterCompact,
               {
                 backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
                 borderTopColor: isDark ? '#1E293B' : '#E2E8F0',
@@ -988,6 +999,7 @@ export default function GradingScreen() {
               onPress={handleCopyCSV}
               style={[
                 styles.copyCSVBtn,
+                isCompact && { flex: 1 },
                 {
                   backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
                   borderColor: isDark ? '#334155' : '#CBD5E1',
@@ -1003,15 +1015,15 @@ export default function GradingScreen() {
                   styles.copyCSVBtnText,
                   isCopiedCSV && { color: '#10B981' },
                 ]}>
-                {isCopiedCSV ? 'Tersalin!' : 'Salin CSV'}
+                {isCopiedCSV ? 'Copied!' : 'Copy CSV'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleDownloadCSV}
-              style={styles.downloadCSVBtn}>
+              style={[styles.downloadCSVBtn, isCompact && { flex: 1.5 }]}>
               <Ionicons name="cloud-download" size={18} color="#FFFFFF" />
-              <Text style={styles.downloadCSVBtnText}>Unduh Berkas CSV (Excel)</Text>
+              <Text style={styles.downloadCSVBtnText}>Download CSV (Excel)</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -1136,12 +1148,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
     marginBottom: 10,
   },
   studentInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    flex: 1,
+    minWidth: 150,
   },
   studentName: {
     fontSize: 14,
@@ -1368,6 +1384,11 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
+  exportActionCardCompact: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: 12,
+  },
   exportActionLeft: {
     flex: 1,
     flexDirection: 'row',
@@ -1405,6 +1426,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 14,
     minHeight: 42,
+  },
+  openExportModalBtnCompact: {
+    alignSelf: 'stretch',
+    justifyContent: 'center',
   },
   openExportModalBtnText: {
     color: '#FFFFFF',
@@ -1447,9 +1472,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4,
     marginBottom: 16,
   },
+  summaryStatsGridCompact: {
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: 12,
+    gap: 8,
+  },
   statBox: {
     flex: 1,
     alignItems: 'center',
+  },
+  statBoxCompact: {
+    flex: undefined,
+    width: '47%',
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderRadius: 12,
   },
   statLabel: {
     fontSize: 10,
@@ -1551,6 +1589,11 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 16,
     borderTopWidth: 1,
+  },
+  exportModalFooterCompact: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
   },
   copyCSVBtn: {
     flexDirection: 'row',

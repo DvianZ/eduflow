@@ -54,7 +54,7 @@ export function InlineVideoPlayer({
         ]}>
         <Ionicons name="videocam-outline" size={32} color="#94A3B8" />
         <Text style={[styles.emptyText, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-          Tautan video belum disematkan pada materi ini.
+          Video lecture content has not been attached to this unit.
         </Text>
       </View>
     );
@@ -74,7 +74,7 @@ export function InlineVideoPlayer({
     ? { icon: 'logo-youtube', label: 'YouTube In-App HD', color: '#EF4444' }
     : isVimeo
     ? { icon: 'videocam', label: 'Vimeo In-App', color: '#0EA5E9' }
-    : { icon: 'film', label: 'Pemutar Video Langsung', color: '#10B981' };
+    : { icon: 'film', label: 'Direct Video Player', color: '#10B981' };
 
   return (
     <View
@@ -98,7 +98,7 @@ export function InlineVideoPlayer({
           </Text>
         </View>
         <Text style={styles.inlineNoticeText}>
-          Putar Langsung Tanpa Pindah Layar
+          Plays In-App Without Leaving Screen
         </Text>
       </View>
 
@@ -146,7 +146,7 @@ export function InlineVideoPlayer({
               }}
               src={trimmedUrl}>
               <track kind="captions" />
-              Browser Anda tidak mendukung pemutar video HTML5.
+              Your browser does not support HTML5 video playback.
             </video>
           )
         ) : (

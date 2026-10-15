@@ -314,7 +314,7 @@ export default function SyllabusScreen() {
       setUploadedVideoName('lecture_presentation_sample.mp4');
       setUploadedVideoSize('8.2 MB');
       setNewLessonVideoUrl(sampleUrl);
-      Alert.alert('Video Terpilih', 'File video berhasil disematkan untuk pemutaran langsung.');
+      Alert.alert('Video Selected', 'Video file successfully selected for in-place playback.');
     }
   };
 
@@ -325,8 +325,8 @@ export default function SyllabusScreen() {
     }
     if (newLessonType === 'video' && !newLessonVideoUrl.trim()) {
       Alert.alert(
-        'Video Lecture Wajib Diisi',
-        'Untuk materi tipe Video Lecture, Anda wajib mengunggah file video atau memasukkan tautan URL video agar materi dapat diputar langsung di dalam aplikasi.'
+        'Video Lecture Required',
+        'For Video Lecture lessons, you must upload a video file or provide a video URL so it can be played directly within the app.'
       );
       return;
     }
@@ -340,7 +340,7 @@ export default function SyllabusScreen() {
       newLessonVideoUrl.trim() || undefined
     );
     setIsAddLessonModalOpen(false);
-    Alert.alert('Sukses', 'Materi video lecture baru berhasil ditambahkan dan siap diputar langsung!');
+    Alert.alert('Success', 'New video lecture unit added successfully and ready to play in-place!');
   };
 
   const handleDeleteLesson = (lesson: Lesson) => {
@@ -2015,11 +2015,11 @@ export default function SyllabusScreen() {
                         styles.inputLabel,
                         { color: isDark ? '#F8FAFC' : '#0F172A', marginBottom: 0 },
                       ]}>
-                      Materi Video Lecture (Wajib) *
+                      Video Lecture Material (Mandatory) *
                     </Text>
                   </View>
                   <View style={styles.mandatoryBadge}>
-                    <Text style={styles.mandatoryBadgeText}>WAJIB DIISI</Text>
+                    <Text style={styles.mandatoryBadgeText}>REQUIRED</Text>
                   </View>
                 </View>
 
@@ -2028,7 +2028,7 @@ export default function SyllabusScreen() {
                     styles.videoConfigSub,
                     { color: isDark ? '#94A3B8' : '#64748B' },
                   ]}>
-                  Pilih unggah file video langsung dari perangkat Anda atau masukkan tautan link video. Video dapat langsung diputar di dalam aplikasi tanpa berpindah tempat.
+                  Upload a video file from your device or provide a video URL link. The video will be playable directly in-place without leaving the screen.
                 </Text>
 
                 {/* Dual Mode Switcher Tabs */}
@@ -2066,7 +2066,7 @@ export default function SyllabusScreen() {
                               : '#475569',
                         },
                       ]}>
-                      Upload File Video
+                      Upload Video File
                     </Text>
                   </TouchableOpacity>
 
@@ -2099,7 +2099,7 @@ export default function SyllabusScreen() {
                               : '#475569',
                         },
                       ]}>
-                      Tautan Link Video
+                      Video URL Link
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -2131,7 +2131,7 @@ export default function SyllabusScreen() {
                                 {uploadedVideoName}
                               </Text>
                               <Text style={styles.uploadedFileSize}>
-                                {uploadedVideoSize} • Siap Diputar In-Place
+                                {uploadedVideoSize} • Ready for In-Place Playback
                               </Text>
                             </View>
                           </View>
@@ -2153,7 +2153,7 @@ export default function SyllabusScreen() {
                               styles.previewLabel,
                               { color: isDark ? '#94A3B8' : '#64748B' },
                             ]}>
-                            Pratinjau Pemutar Video Langsung:
+                            Live In-Place Video Preview:
                           </Text>
                           <InlineVideoPlayer
                             videoUrl={newLessonVideoUrl}
@@ -2166,7 +2166,7 @@ export default function SyllabusScreen() {
                           style={styles.changeFileBtn}>
                           <Ionicons name="swap-horizontal" size={14} color="#2563EB" />
                           <Text style={styles.changeFileBtnText}>
-                            Ganti File Video Lain
+                            Choose Different Video File
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -2190,10 +2190,10 @@ export default function SyllabusScreen() {
                               styles.dropzoneTitle,
                               { color: isDark ? '#F8FAFC' : '#0F172A' },
                             ]}>
-                            Klik untuk Pilih & Unggah Video
+                            Click to Select & Upload Video
                           </Text>
                           <Text style={styles.dropzoneSub}>
-                            Mendukung file MP4, WebM, MOV (Maksimal 100MB)
+                            Supports MP4, WebM, MOV formats (Max 100MB)
                           </Text>
                           <View style={styles.dropzonePill}>
                             <Ionicons
@@ -2202,7 +2202,7 @@ export default function SyllabusScreen() {
                               color="#EF4444"
                             />
                             <Text style={styles.dropzonePillText}>
-                              Buka File Picker
+                              Open File Picker
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -2222,7 +2222,7 @@ export default function SyllabusScreen() {
                           ]}>
                           <Ionicons name="sparkles" size={13} color="#DC2626" />
                           <Text style={styles.sampleQuickBtnText}>
-                            Atau Gunakan File Video Sampel Demo (1-Klik)
+                            Or Use 1-Click Demo Sample Video
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -2236,10 +2236,10 @@ export default function SyllabusScreen() {
                         styles.inputLabel,
                         { color: isDark ? '#F8FAFC' : '#0F172A', marginTop: 4 },
                       ]}>
-                      Tautan URL Video (YouTube / MP4 Direct):
+                      Video URL Link (YouTube / Direct MP4):
                     </Text>
                     <TextInput
-                      placeholder="https://www.youtube.com/watch?v=... atau https://.../video.mp4"
+                      placeholder="https://www.youtube.com/watch?v=... or https://.../video.mp4"
                       placeholderTextColor="#94A3B8"
                       value={newLessonVideoUrl}
                       onChangeText={(val) => {
@@ -2264,7 +2264,7 @@ export default function SyllabusScreen() {
                           styles.presetTitle,
                           { color: isDark ? '#94A3B8' : '#64748B' },
                         ]}>
-                        Preset Cepat:
+                        Quick Presets:
                       </Text>
                       <TouchableOpacity
                         onPress={() =>
@@ -2303,7 +2303,7 @@ export default function SyllabusScreen() {
                             styles.previewLabel,
                             { color: isDark ? '#94A3B8' : '#64748B' },
                           ]}>
-                          Pratinjau Pemutar Video Langsung:
+                          Live In-Place Video Preview:
                         </Text>
                         <InlineVideoPlayer
                           videoUrl={newLessonVideoUrl}
