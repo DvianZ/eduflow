@@ -45,6 +45,7 @@ export function FeatureTourModal({
   const isModalVisible = propVisible !== undefined ? propVisible : storeIsOpen;
   const [isMinimized, setIsMinimized] = useState(false);
   const lastNavigatedStepRef = useRef<number>(-1);
+  const lastNavigatedTabRef = useRef<string>('');
 
   // Auto-close tour if session expires or user is unauthenticated
   useEffect(() => {
@@ -74,11 +75,12 @@ export function FeatureTourModal({
   const isLastStep = currentStepIndex === TOUR_STEPS.length - 1;
 
   // Dynamically navigate to the target screen, role, and scroll offset as the tour progresses.
-  // We debounce navigation by 120ms: rapid continuous clicks update the tour dock card INSTANTLY
+  // We debounce navigation by 100ms: rapid continuous clicks update the tour dock card INSTANTLY
   // with 0ms latency, while the underlying screen transition only executes cleanly for the active step.
   useEffect(() => {
     if (!isModalVisible || !isAuthenticated) {
       lastNavigatedStepRef.current = -1;
+      lastNavigatedTabRef.current = '';
       return;
     }
 
@@ -96,25 +98,9 @@ export function FeatureTourModal({
         switchRole(step.targetRole);
       }
 
-      // 2. Screen navigation
-      if (step.targetTab) {
-        const [baseRoute] = step.targetTab.split('?');
-        const isTargetTab =
-          baseRoute === '/' ||
-          baseRoute === '/syllabus' ||
-          baseRoute === '/grading' ||
-          baseRoute === '/profile';
-
-        // If target is inside (tabs) and a root stack screen (like /class-manager or /settings) is active,
-        // cleanly dismiss the stack screen back to tabs first so we never get stuck or pop to the wrong tab!
-        if (isTargetTab && router.canDismiss?.()) {
-          try {
-            router.dismissAll();
-          } catch {
-            // Ignore dismiss error
-          }
-        }
-
+      // 2. Screen navigation using router.replace (skips redundant calls if already on same tab)
+      if (step.targetTab && lastNavigatedTabRef.current !== step.targetTab) {
+        lastNavigatedTabRef.current = step.targetTab;
         try {
           router.replace(step.targetTab as any);
         } catch {
@@ -147,7 +133,7 @@ export function FeatureTourModal({
           }
         }
       }
-    }, 120);
+    }, 100);
 
     return () => clearTimeout(navTimer);
   }, [
@@ -178,13 +164,7 @@ export function FeatureTourModal({
     propOnClose?.();
     // Return to main dashboard with learner mode
     switchRole('learner');
-    if (router.canDismiss?.()) {
-      try {
-        router.dismissAll();
-      } catch {
-        // Ignore dismiss error
-      }
-    }
+    lastNavigatedTabRef.current = '/';
     try {
       router.replace('/' as any);
     } catch {
