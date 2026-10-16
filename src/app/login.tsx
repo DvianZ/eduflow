@@ -63,7 +63,7 @@ export default function LoginScreen() {
         });
         useElearningStore.getState().setHasSeenAppTour(false);
         useTourStore.getState().openTour(0);
-        router.replace('/(tabs)');
+        router.replace('/');
       }
     }, 400);
   };
@@ -93,7 +93,7 @@ export default function LoginScreen() {
         });
         useElearningStore.getState().setHasSeenAppTour(false);
         useTourStore.getState().openTour(0);
-        router.replace('/(tabs)');
+        router.replace('/');
       }
     }, 250);
   };

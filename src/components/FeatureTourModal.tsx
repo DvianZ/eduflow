@@ -28,7 +28,7 @@ export function FeatureTourModal({
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
-  const { setHasSeenAppTour, switchRole, currentRole } = useElearningStore();
+  const { setHasSeenAppTour, switchRole } = useElearningStore();
   const session = useAuthStore((s) => s.session);
   const isAuthenticated = !!session?.isAuthenticated;
 
@@ -73,34 +73,61 @@ export function FeatureTourModal({
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === TOUR_STEPS.length - 1;
 
-  // Dynamically navigate to the target screen, role, and scroll offset as the tour progresses
+  // Dynamically navigate to the target screen, role, and scroll offset as the tour progresses.
+  // We debounce navigation by 120ms: rapid continuous clicks update the tour dock card INSTANTLY
+  // with 0ms latency, while the underlying screen transition only executes cleanly for the active step.
   useEffect(() => {
     if (!isModalVisible || !isAuthenticated) {
       lastNavigatedStepRef.current = -1;
       return;
     }
 
-    if (lastNavigatedStepRef.current === currentStepIndex) {
-      return;
-    }
-    lastNavigatedStepRef.current = currentStepIndex;
-
     const step = TOUR_STEPS[currentStepIndex];
     if (!step) return;
 
-    // 1. Role switch if needed
-    if (step.targetRole && currentRole !== step.targetRole) {
-      switchRole(step.targetRole);
-    }
+    const navTimer = setTimeout(() => {
+      if (lastNavigatedStepRef.current === currentStepIndex) {
+        return;
+      }
+      lastNavigatedStepRef.current = currentStepIndex;
 
-    // 2. Screen navigation with router.replace to avoid duplicate stack pushes and back-popping
-    if (step.targetTab) {
-      router.replace(step.targetTab as any);
-    }
+      // 1. Role switch if needed
+      if (step.targetRole && useElearningStore.getState().currentRole !== step.targetRole) {
+        switchRole(step.targetRole);
+      }
 
-    // 3. Scroll offset if specified
-    if (step.scrollOffset !== undefined) {
-      const scrollTimer = setTimeout(() => {
+      // 2. Screen navigation
+      if (step.targetTab) {
+        const [baseRoute] = step.targetTab.split('?');
+        const isTargetTab =
+          baseRoute === '/' ||
+          baseRoute === '/syllabus' ||
+          baseRoute === '/grading' ||
+          baseRoute === '/profile';
+
+        // If target is inside (tabs) and a root stack screen (like /class-manager or /settings) is active,
+        // cleanly dismiss the stack screen back to tabs first so we never get stuck or pop to the wrong tab!
+        if (isTargetTab && router.canDismiss?.()) {
+          try {
+            router.dismissAll();
+          } catch {
+            // Ignore dismiss error
+          }
+        }
+
+        try {
+          router.replace(step.targetTab as any);
+        } catch {
+          try {
+            router.navigate(step.targetTab as any);
+          } catch {
+            // Ignore navigation error
+          }
+        }
+      }
+
+      // 3. Scroll offset if specified
+      if (step.scrollOffset !== undefined) {
         if (Platform.OS === 'web') {
           try {
             const scrollables = document.querySelectorAll<HTMLElement>(
@@ -119,14 +146,14 @@ export function FeatureTourModal({
             // Ignore DOM query issues on edge environments
           }
         }
-      }, 250);
-      return () => clearTimeout(scrollTimer);
-    }
+      }
+    }, 120);
+
+    return () => clearTimeout(navTimer);
   }, [
     isModalVisible,
     isAuthenticated,
     currentStepIndex,
-    currentRole,
     switchRole,
     router,
   ]);
@@ -140,9 +167,8 @@ export function FeatureTourModal({
   };
 
   const handlePrev = () => {
-    if (!isFirstStep) {
-      prevStep();
-    }
+    if (isFirstStep) return;
+    prevStep();
   };
 
   const handleFinish = () => {
@@ -152,7 +178,18 @@ export function FeatureTourModal({
     propOnClose?.();
     // Return to main dashboard with learner mode
     switchRole('learner');
-    router.replace('/(tabs)' as any);
+    if (router.canDismiss?.()) {
+      try {
+        router.dismissAll();
+      } catch {
+        // Ignore dismiss error
+      }
+    }
+    try {
+      router.replace('/' as any);
+    } catch {
+      router.navigate('/' as any);
+    }
   };
 
   if (!isModalVisible || !isAuthenticated) return null;
@@ -397,9 +434,9 @@ export function FeatureTourModal({
                   />
                   <Text
                     style={[
-                      styles.prevBtnText,
-                      { color: isFirstStep ? '#94A3B8' : isDark ? '#CBD5E1' : '#475569' },
-                    ]}>
+                    styles.prevBtnText,
+                    { color: isFirstStep ? '#94A3B8' : isDark ? '#CBD5E1' : '#475569' },
+                  ]}>
                     Back
                   </Text>
                 </TouchableOpacity>

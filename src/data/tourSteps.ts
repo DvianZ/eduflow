@@ -23,7 +23,7 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       'Welcome to EduFlow! On the Dashboard, learners view their Active Mission, class code (1-click copy), real-time curriculum progress, and enrolled cohorts.',
     tip: 'Demo Focus: Notice the 3D active mission card EDF-402 and live progress tracker.',
-    targetTab: '/(tabs)',
+    targetTab: '/',
     targetRole: 'learner',
   },
   {
@@ -36,7 +36,7 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       'Built-in demo utility: Test both sides of the platform instantly! Switch between Learner (Budi) and Instructor (Mr. Alex) with one tap in the top header.',
     tip: 'Demo Focus: The pill switcher in the top header makes two-sided client evaluation seamless.',
-    targetTab: '/(tabs)',
+    targetTab: '/',
     targetRole: 'learner',
   },
   {
@@ -49,7 +49,7 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       'The curriculum enforces sequential gatekeeper rules: Advanced lessons and project deliverables unlock only after finishing prerequisite materials and passing quizzes (≥80%).',
     tip: 'Demo Focus: Check Module 2 to see the lock gatekeeper protecting advanced assignments.',
-    targetTab: '/(tabs)/syllabus',
+    targetTab: '/syllabus',
     targetRole: 'learner',
   },
   {
@@ -62,7 +62,7 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       'Switched to Instructor mode: Mr. Alex can review project deliverables, assign composite scores (0–100), or request revisions with feedback that triggers instant student alerts.',
     tip: 'Demo Focus: The grading queue features revision workflows and gradebook CSV exports.',
-    targetTab: '/(tabs)/grading',
+    targetTab: '/grading',
     targetRole: 'teacher',
   },
   {
@@ -88,7 +88,7 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       'Learners can configure their official legal full name directly on this Profile screen to appear on official accredited graduation certificates and digital verification records.',
     tip: 'Demo Focus: Tap "Edit Legal Name" in the Official Certificate Name card on Profile.',
-    targetTab: '/(tabs)/profile?section=name',
+    targetTab: '/profile?section=name',
     targetRole: 'learner',
     scrollOffset: 0,
   },
@@ -102,7 +102,7 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       'The automated evaluator enforces the weighted formula: 30% curriculum progress + 30% quiz average + 40% project score. Graduated students can view credentials and print official PDF certificates!',
     tip: 'Demo Focus: Select Digital Entrepreneurship cohort, then tap "View Certificate" or "Print / Save PDF".',
-    targetTab: '/(tabs)/profile?section=evaluator',
+    targetTab: '/profile?section=evaluator',
     targetRole: 'learner',
     scrollOffset: 240,
   },

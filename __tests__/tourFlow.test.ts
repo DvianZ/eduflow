@@ -49,7 +49,7 @@ describe('EduFlow Guided Feature Tour Lifecycle Tests', () => {
 
     const step6 = TOUR_STEPS[5];
     expect(step6.id).toBe('profile-name');
-    expect(step6.targetTab).toBe('/(tabs)/profile?section=name');
+    expect(step6.targetTab).toBe('/profile?section=name');
     expect(step6.targetRole).toBe('learner');
   });
 
@@ -63,7 +63,7 @@ describe('EduFlow Guided Feature Tour Lifecycle Tests', () => {
     expect(useTourStore.getState().currentStepIndex).toBe(3);
     const step4 = TOUR_STEPS[3];
     expect(step4.id).toBe('grading');
-    expect(step4.targetTab).toBe('/(tabs)/grading');
+    expect(step4.targetTab).toBe('/grading');
     expect(step4.targetRole).toBe('teacher');
   });
 
@@ -75,5 +75,23 @@ describe('EduFlow Guided Feature Tour Lifecycle Tests', () => {
     useTourStore.getState().closeTour();
     expect(useTourStore.getState().isOpen).toBe(false);
     expect(useTourStore.getState().currentStepIndex).toBe(0);
+  });
+
+  test('Continuous next step clicking advances cleanly across all 10 steps', () => {
+    useAuthStore.getState().login('budi@eduflow.id', 'demo123');
+    useTourStore.getState().openTour(0);
+
+    for (let i = 0; i < TOUR_STEPS.length; i++) {
+      expect(useTourStore.getState().currentStepIndex).toBe(i);
+      const step = TOUR_STEPS[i];
+      expect(step).toBeDefined();
+      expect(step.title).toBeDefined();
+      expect(step.targetTab).toBeDefined();
+      expect(step.targetRole).toBeDefined();
+      useTourStore.getState().nextStep(TOUR_STEPS.length);
+    }
+
+    // After stepping past the last step, index stays capped at last step
+    expect(useTourStore.getState().currentStepIndex).toBe(TOUR_STEPS.length - 1);
   });
 });

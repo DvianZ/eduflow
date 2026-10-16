@@ -78,7 +78,7 @@ export default function RegisterScreen() {
         });
         useElearningStore.getState().setHasSeenAppTour(false);
         useTourStore.getState().openTour(0);
-        router.replace('/(tabs)');
+        router.replace('/');
       }
     }, 800);
   };
