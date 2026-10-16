@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -33,6 +33,11 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // The demo tour cannot run on the login screen
+  useEffect(() => {
+    useTourStore.getState().closeTour();
+  }, []);
 
   const handleLogin = () => {
     setError('');
@@ -319,36 +324,6 @@ export default function LoginScreen() {
               {t.auth.demoHint}
             </Text>
           </View>
-
-          {/* Client Testing Tour Showcase */}
-          <TouchableOpacity
-            style={[
-              styles.tourCard,
-              {
-                backgroundColor: isDark ? '#1E293B' : '#EFF6FF',
-                borderColor: isDark ? '#3B82F6' : '#93C5FD',
-              },
-            ]}
-            onPress={() => useTourStore.getState().openTour(0)}
-            activeOpacity={0.85}>
-            <View style={styles.tourCardLeft}>
-              <View style={styles.tourIconBadge}>
-                <Ionicons name="sparkles" size={20} color="#2563EB" />
-              </View>
-              <View style={styles.tourCardTexts}>
-                <View style={styles.tourPill}>
-                  <Text style={styles.tourPillText}>{t.auth.tourCardBadge}</Text>
-                </View>
-                <Text style={[styles.tourCardTitle, { color: textPrimary }]}>
-                  {t.auth.tourCardTitle}
-                </Text>
-                <Text style={[styles.tourCardDesc, { color: textSecondary }]}>
-                  {t.auth.tourCardDesc}
-                </Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#2563EB" />
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -551,56 +526,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     fontStyle: 'italic',
-  },
-  tourCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 14,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderBottomWidth: 4,
-    marginTop: 14,
-  },
-  tourCardLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  tourIconBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#DBEAFE',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tourCardTexts: {
-    flex: 1,
-  },
-  tourPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#2563EB',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-    marginBottom: 4,
-  },
-  tourPillText: {
-    color: '#FFFFFF',
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  tourCardTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  tourCardDesc: {
-    fontSize: 11,
-    lineHeight: 15,
   },
   topLangRow: {
     flexDirection: 'row',

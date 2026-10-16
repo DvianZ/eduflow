@@ -12,6 +12,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useTourStore } from '@/store/useTourStore';
 
 interface FeatureTourModalProps {
@@ -41,6 +42,9 @@ export function FeatureTourModal({
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { setHasSeenAppTour, switchRole } = useElearningStore();
+  const session = useAuthStore((s) => s.session);
+  const isAuthenticated = !!session?.isAuthenticated;
+
   const {
     isOpen: storeIsOpen,
     currentStepIndex,
@@ -53,6 +57,13 @@ export function FeatureTourModal({
 
   const isModalVisible = propVisible !== undefined ? propVisible : storeIsOpen;
   const [isMinimized, setIsMinimized] = useState(false);
+
+  // Auto-close tour if session expires or user is unauthenticated
+  useEffect(() => {
+    if (!isAuthenticated && storeIsOpen) {
+      closeTour();
+    }
+  }, [isAuthenticated, storeIsOpen, closeTour]);
 
   const tourSteps: TourStep[] = [
     {
@@ -198,7 +209,7 @@ export function FeatureTourModal({
 
   // Dynamically navigate to the target screen, role, and scroll offset as the tour progresses
   useEffect(() => {
-    if (isModalVisible && activeStep) {
+    if (isModalVisible && isAuthenticated && activeStep) {
       if (activeStep.targetRole) {
         switchRole(activeStep.targetRole);
       }
@@ -229,7 +240,7 @@ export function FeatureTourModal({
         return () => clearTimeout(scrollTimer);
       }
     }
-  }, [isModalVisible, currentStepIndex, activeStep, router, switchRole]);
+  }, [isModalVisible, isAuthenticated, currentStepIndex, activeStep, router, switchRole]);
 
   const handleNext = () => {
     if (isLastStep) {
@@ -255,7 +266,7 @@ export function FeatureTourModal({
     router.push('/(tabs)' as any);
   };
 
-  if (!isModalVisible) return null;
+  if (!isModalVisible || !isAuthenticated) return null;
 
   const cardMaxWidth = Math.min(windowWidth - 20, 500);
 

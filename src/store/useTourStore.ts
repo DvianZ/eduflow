@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useAuthStore } from './useAuthStore';
 
 interface TourStore {
   isOpen: boolean;
@@ -13,11 +14,18 @@ interface TourStore {
 export const useTourStore = create<TourStore>((set) => ({
   isOpen: false,
   currentStepIndex: 0,
-  openTour: (stepIndex = 0) =>
+  openTour: (stepIndex = 0) => {
+    // Demo tour can only be opened if user is logged in
+    const session = useAuthStore.getState().session;
+    if (!session?.isAuthenticated) {
+      return;
+    }
+
     set({
       isOpen: true,
       currentStepIndex: stepIndex,
-    }),
+    });
+  },
   closeTour: () =>
     set({
       isOpen: false,
