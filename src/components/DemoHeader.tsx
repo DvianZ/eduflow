@@ -26,6 +26,7 @@ export function DemoHeader() {
 
   const [showNotifications, setShowNotifications] = useState(false);
   const openTour = useTourStore((s) => s.openTour);
+  const isTourOpen = useTourStore((s) => s.isOpen);
 
   const {
     currentRole,
@@ -38,15 +39,15 @@ export function DemoHeader() {
   const { getCurrentUser } = useAuthStore();
   const authUser = getCurrentUser();
 
-  // Auto-show guided tour if user hasn't seen it yet
+  // Auto-show guided tour if user hasn't seen it yet and tour is not already running
   useEffect(() => {
-    if (!hasSeenAppTour) {
+    if (!hasSeenAppTour && !isTourOpen) {
       const timer = setTimeout(() => {
         openTour(0);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [hasSeenAppTour, openTour]);
+  }, [hasSeenAppTour, isTourOpen, openTour]);
 
   const userNotifications = notifications.filter(
     (n) => n.userId === currentUser.id
