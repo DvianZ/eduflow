@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useElearningStore } from '@/store/useElearningStore';
+import { useTourStore } from '@/store/useTourStore';
 import { useTranslation } from '@/i18n';
 import type { UserRole } from '@/types/elearning';
 
@@ -75,6 +76,8 @@ export default function RegisterScreen() {
           role: loginResult.user.role,
           avatarUrl: loginResult.user.avatarUrl,
         });
+        useElearningStore.getState().setHasSeenAppTour(false);
+        useTourStore.getState().openTour(0);
         router.replace('/(tabs)');
       }
     }, 800);

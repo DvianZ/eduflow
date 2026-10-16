@@ -906,6 +906,7 @@ export const useElearningStore = create<ElearningState>()(
       storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
+          state.hasSeenAppTour = false;
           state.batches = state.batches.map((b) => ({
             ...b,
             batchName: b.batchName.replace(/wadhwani/gi, 'Digital'),

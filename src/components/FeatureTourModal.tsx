@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  Modal,
   TouchableOpacity,
   StyleSheet,
   Platform,
   useWindowDimensions,
+  BackHandler,
 } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,24 +14,11 @@ import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTourStore } from '@/store/useTourStore';
+import { TOUR_STEPS } from '@/data/tourSteps';
 
 interface FeatureTourModalProps {
   visible?: boolean;
   onClose?: () => void;
-}
-
-interface TourStep {
-  id: string;
-  category: 'CORE FEATURE' | 'DEMO UTILITY';
-  isCore: boolean;
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  subtitle: string;
-  description: string;
-  tip: string;
-  targetTab?: string;
-  targetRole?: 'learner' | 'teacher';
-  scrollOffset?: number | 'bottom';
 }
 
 export function FeatureTourModal({
@@ -41,7 +28,7 @@ export function FeatureTourModal({
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
-  const { setHasSeenAppTour, switchRole } = useElearningStore();
+  const { setHasSeenAppTour, switchRole, currentRole } = useElearningStore();
   const session = useAuthStore((s) => s.session);
   const isAuthenticated = !!session?.isAuthenticated;
 
@@ -57,6 +44,7 @@ export function FeatureTourModal({
 
   const isModalVisible = propVisible !== undefined ? propVisible : storeIsOpen;
   const [isMinimized, setIsMinimized] = useState(false);
+  const lastNavigatedStepRef = useRef<number>(-1);
 
   // Auto-close tour if session expires or user is unauthenticated
   useEffect(() => {
@@ -65,188 +53,89 @@ export function FeatureTourModal({
     }
   }, [isAuthenticated, storeIsOpen, closeTour]);
 
-  const tourSteps: TourStep[] = [
-    {
-      id: 'dashboard',
-      category: 'CORE FEATURE',
-      isCore: true,
-      icon: 'compass',
-      title: '1. Dashboard & Cohort Mission',
-      subtitle: 'Time-Based Cohort Learning Hub',
-      description:
-        'Welcome to EduFlow! On the Dashboard, learners view their Active Mission, class code (1-click copy), real-time curriculum progress, and enrolled cohorts.',
-      tip: 'Demo Focus: Notice the 3D active mission card EDF-402 and live progress tracker.',
-      targetTab: '/(tabs)',
-      targetRole: 'learner',
-    },
-    {
-      id: 'role-switcher',
-      category: 'DEMO UTILITY',
-      isCore: false,
-      icon: 'swap-horizontal',
-      title: '2. Instant 1-Click Role Switcher',
-      subtitle: 'Learner ⇄ Instructor Toggle Without Re-login',
-      description:
-        'Built-in demo utility: Test both sides of the platform instantly! Switch between Learner (Budi) and Instructor (Mr. Alex) with one tap in the top header.',
-      tip: 'Demo Focus: The pill switcher in the top header makes two-sided client evaluation seamless.',
-      targetTab: '/(tabs)',
-      targetRole: 'learner',
-    },
-    {
-      id: 'gatekeeper',
-      category: 'CORE FEATURE',
-      isCore: true,
-      icon: 'layers',
-      title: '3. Curriculum & Prerequisite Gatekeeper',
-      subtitle: 'Automated Milestone & Lock Engine',
-      description:
-        'The curriculum enforces sequential gatekeeper rules: Advanced lessons and project deliverables unlock only after finishing prerequisite materials and passing quizzes (≥80%).',
-      tip: 'Demo Focus: Check Module 2 to see the lock gatekeeper protecting advanced assignments.',
-      targetTab: '/(tabs)/syllabus',
-      targetRole: 'learner',
-    },
-    {
-      id: 'grading',
-      category: 'CORE FEATURE',
-      isCore: true,
-      icon: 'clipboard',
-      title: '4. Project Review, Grading & Revisions',
-      subtitle: 'Instructor Evaluation Queue & Feedback',
-      description:
-        'Switched to Instructor mode: Mr. Alex can review project deliverables, assign composite scores (0–100), or request revisions with feedback that triggers instant student alerts.',
-      tip: 'Demo Focus: The grading queue features revision workflows and gradebook CSV exports.',
-      targetTab: '/(tabs)/grading',
-      targetRole: 'teacher',
-    },
-    {
-      id: 'class-manager',
-      category: 'CORE FEATURE',
-      isCore: true,
-      icon: 'people',
-      title: '5. Class & Student Management Panel',
-      subtitle: 'Cohort Creation & Roster Monitoring',
-      description:
-        'Instructor authority panel: Create new cohort batches, configure student seat limits, generate unique enrollment codes, and monitor learner graduation progress.',
-      tip: 'Demo Focus: Manage active cohort enrollment codes and track roster progress.',
-      targetTab: '/class-manager',
-      targetRole: 'teacher',
-    },
-    {
-      id: 'profile-name',
-      category: 'CORE FEATURE',
-      isCore: true,
-      icon: 'person-circle',
-      title: '6. Official Legal Name for Certificates',
-      subtitle: 'Exclusive Verified Name Management in Profile',
-      description:
-        'Learners can configure their official legal full name directly on this Profile screen to appear on official accredited graduation certificates and digital verification records.',
-      tip: 'Demo Focus: Tap "Edit Legal Name" in the Official Certificate Name card on Profile.',
-      targetTab: '/(tabs)/profile?section=name',
-      targetRole: 'learner',
-      scrollOffset: 0,
-    },
-    {
-      id: 'certificate',
-      category: 'CORE FEATURE',
-      isCore: true,
-      icon: 'ribbon',
-      title: '7. Graduation Evaluator & Certificate PDF',
-      subtitle: 'Weighted 30:30:40 Formula & Official PDF',
-      description:
-        'The automated evaluator enforces the weighted formula: 30% curriculum progress + 30% quiz average + 40% project score. Graduated students can view credentials and print official PDF certificates!',
-      tip: 'Demo Focus: Select Digital Entrepreneurship cohort, then tap "View Certificate" or "Print / Save PDF".',
-      targetTab: '/(tabs)/profile?section=evaluator',
-      targetRole: 'learner',
-      scrollOffset: 240,
-    },
-    {
-      id: 'settings-theme',
-      category: 'DEMO UTILITY',
-      isCore: false,
-      icon: 'color-palette',
-      title: '8. Theme & Tactile Personalization',
-      subtitle: 'Dark Mode, Light Mode & 3D Haptics',
-      description:
-        'In Settings, customize your experience: toggle between Light and Dark themes, enable 3D tactile vibration haptics on buttons, and audio milestone feedback.',
-      tip: 'Demo Focus: Toggle between Dark and Light mode to experience instant aesthetic adaptation.',
-      targetTab: '/settings?section=theme',
-      targetRole: 'learner',
-      scrollOffset: 190,
-    },
-    {
-      id: 'settings-export',
-      category: 'DEMO UTILITY',
-      isCore: false,
-      icon: 'download',
-      title: '9. Cohort Gradebook Export (CSV)',
-      subtitle: '1-Click Excel-Compatible Gradebook Sheet',
-      description:
-        'Export complete cohort performance data into UTF-8 BOM CSV for Excel, including quiz attempts, deliverable marks, and final graduation status.',
-      tip: 'Demo Focus: Tap "Download Gradebook CSV" to generate an export-ready spreadsheet.',
-      targetTab: '/settings?section=export',
-      targetRole: 'learner',
-      scrollOffset: 'bottom',
-    },
-    {
-      id: 'settings-reset',
-      category: 'DEMO UTILITY',
-      isCore: false,
-      icon: 'refresh',
-      title: '10. Reset Demo Data to Initial State',
-      subtitle: 'Safe Sandbox Re-simulation Any Time',
-      description:
-        'The ultimate testing tool: Evaluators can revert all mock data—quizzes, student submissions, revision requests, and certificates—back to default with 1 tap via a safe confirmation modal!',
-      tip: 'Demo Focus: Tap "Reset All Demo Testing Data" to reset state whenever needed.',
-      targetTab: '/settings?section=reset',
-      targetRole: 'learner',
-      scrollOffset: 'bottom',
-    },
-  ];
+  // Hardware back button support for Android
+  useEffect(() => {
+    if (!isModalVisible || !isAuthenticated) return;
 
-  const activeStep = tourSteps[currentStepIndex] || tourSteps[0];
+    const onBackPress = () => {
+      if (currentStepIndex > 0) {
+        prevStep();
+        return true;
+      }
+      return false;
+    };
+
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [isModalVisible, isAuthenticated, currentStepIndex, prevStep]);
+
+  const activeStep = TOUR_STEPS[currentStepIndex] || TOUR_STEPS[0];
   const isFirstStep = currentStepIndex === 0;
-  const isLastStep = currentStepIndex === tourSteps.length - 1;
+  const isLastStep = currentStepIndex === TOUR_STEPS.length - 1;
 
   // Dynamically navigate to the target screen, role, and scroll offset as the tour progresses
   useEffect(() => {
-    if (isModalVisible && isAuthenticated && activeStep) {
-      if (activeStep.targetRole) {
-        switchRole(activeStep.targetRole);
-      }
-      if (activeStep.targetTab) {
-        router.push(activeStep.targetTab as any);
-      }
-      if (activeStep.scrollOffset !== undefined) {
-        const scrollTimer = setTimeout(() => {
-          if (Platform.OS === 'web') {
-            try {
-              const scrollables = document.querySelectorAll<HTMLElement>(
-                'div[class*="r-overflowY"], div[scrollable="true"]'
-              );
-              scrollables.forEach((el) => {
-                if (el.scrollHeight > el.clientHeight && el.clientHeight > 200) {
-                  const targetY =
-                    activeStep.scrollOffset === 'bottom'
-                      ? el.scrollHeight
-                      : (activeStep.scrollOffset as number);
-                  el.scrollTo({ top: targetY, behavior: 'smooth' });
-                }
-              });
-            } catch {
-              // Ignore DOM query issues on edge environments
-            }
-          }
-        }, 220);
-        return () => clearTimeout(scrollTimer);
-      }
+    if (!isModalVisible || !isAuthenticated) {
+      lastNavigatedStepRef.current = -1;
+      return;
     }
-  }, [isModalVisible, isAuthenticated, currentStepIndex, activeStep, router, switchRole]);
+
+    if (lastNavigatedStepRef.current === currentStepIndex) {
+      return;
+    }
+    lastNavigatedStepRef.current = currentStepIndex;
+
+    const step = TOUR_STEPS[currentStepIndex];
+    if (!step) return;
+
+    // 1. Role switch if needed
+    if (step.targetRole && currentRole !== step.targetRole) {
+      switchRole(step.targetRole);
+    }
+
+    // 2. Screen navigation with router.replace to avoid duplicate stack pushes and back-popping
+    if (step.targetTab) {
+      router.replace(step.targetTab as any);
+    }
+
+    // 3. Scroll offset if specified
+    if (step.scrollOffset !== undefined) {
+      const scrollTimer = setTimeout(() => {
+        if (Platform.OS === 'web') {
+          try {
+            const scrollables = document.querySelectorAll<HTMLElement>(
+              'div[class*="r-overflowY"], div[scrollable="true"]'
+            );
+            scrollables.forEach((el) => {
+              if (el.scrollHeight > el.clientHeight && el.clientHeight > 200) {
+                const targetY =
+                  step.scrollOffset === 'bottom'
+                    ? el.scrollHeight
+                    : (step.scrollOffset as number);
+                el.scrollTo({ top: targetY, behavior: 'smooth' });
+              }
+            });
+          } catch {
+            // Ignore DOM query issues on edge environments
+          }
+        }
+      }, 250);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [
+    isModalVisible,
+    isAuthenticated,
+    currentStepIndex,
+    currentRole,
+    switchRole,
+    router,
+  ]);
 
   const handleNext = () => {
     if (isLastStep) {
       handleFinish();
     } else {
-      nextStep(tourSteps.length);
+      nextStep(TOUR_STEPS.length);
     }
   };
 
@@ -263,7 +152,7 @@ export function FeatureTourModal({
     propOnClose?.();
     // Return to main dashboard with learner mode
     switchRole('learner');
-    router.push('/(tabs)' as any);
+    router.replace('/(tabs)' as any);
   };
 
   if (!isModalVisible || !isAuthenticated) return null;
@@ -271,17 +160,13 @@ export function FeatureTourModal({
   const cardMaxWidth = Math.min(windowWidth - 20, 500);
 
   return (
-    <Modal
-      visible={isModalVisible}
-      animationType="fade"
-      transparent
-      onRequestClose={handleFinish}>
-      <View style={styles.modalRoot} pointerEvents="box-none">
-        {/* NON-BLOCKING FLOATING DOCK (NO BLUR, NO DIMMING, FULL SCREEN VISIBLE) */}
-        <View style={styles.dockOverlayContainer} pointerEvents="box-none">
+    <View style={styles.floatingContainer} pointerEvents="box-none">
+      {/* NON-BLOCKING FLOATING DOCK (NO BLUR, NO DIMMING, FULL SCREEN VISIBLE) */}
+      <View style={styles.dockOverlayContainer} pointerEvents="box-none">
           {/* MINIMIZED FLOATING PILL */}
           {isMinimized ? (
             <View
+              pointerEvents="auto"
               style={[
                 styles.minimizedPill,
                 {
@@ -297,7 +182,7 @@ export function FeatureTourModal({
                     styles.minimizedBadge,
                     { backgroundColor: activeStep.isCore ? '#2563EB' : '#D97706' },
                   ]}>
-                  <Ionicons name={activeStep.icon} size={13} color="#FFFFFF" />
+                  <Ionicons name={activeStep.icon as any} size={13} color="#FFFFFF" />
                 </View>
                 <Text
                   numberOfLines={1}
@@ -305,7 +190,7 @@ export function FeatureTourModal({
                     styles.minimizedText,
                     { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}>
-                  Tour ({currentStepIndex + 1}/{tourSteps.length}): {activeStep.title.replace(/^\d+\.\s*/, '')}
+                  Tour ({currentStepIndex + 1}/{TOUR_STEPS.length}): {activeStep.title.replace(/^\d+\.\s*/, '')}
                 </Text>
               </TouchableOpacity>
 
@@ -343,6 +228,7 @@ export function FeatureTourModal({
           ) : (
             /* EXPANDED INTERACTIVE TOUR DOCK */
             <View
+              pointerEvents="auto"
               style={[
                 styles.dockCard,
                 {
@@ -387,7 +273,7 @@ export function FeatureTourModal({
                         styles.stepProgressText,
                         { color: isDark ? '#CBD5E1' : '#475569' },
                       ]}>
-                      Step {currentStepIndex + 1} of {tourSteps.length}
+                      Step {currentStepIndex + 1} of {TOUR_STEPS.length}
                     </Text>
                   </View>
                 </View>
@@ -430,7 +316,7 @@ export function FeatureTourModal({
                     },
                   ]}>
                   <Ionicons
-                    name={activeStep.icon}
+                    name={activeStep.icon as any}
                     size={17}
                     color={activeStep.isCore ? '#2563EB' : '#D97706'}
                   />
@@ -520,7 +406,7 @@ export function FeatureTourModal({
 
                 {/* Progress Dots */}
                 <View style={styles.dotsRow}>
-                  {tourSteps.map((_, idx) => (
+                  {TOUR_STEPS.map((_, idx) => (
                     <TouchableOpacity
                       key={idx}
                       onPress={() => setStepIndex(idx)}
@@ -576,18 +462,24 @@ export function FeatureTourModal({
           )}
         </View>
       </View>
-    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  modalRoot: {
-    flex: 1,
-    position: 'relative',
-    backgroundColor: 'transparent',
+  floatingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 99999,
+    elevation: 99999,
   },
   dockOverlayContainer: {
-    flex: 1,
+    width: '100%',
+    height: '100%',
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingBottom: Platform.OS === 'ios' ? 24 : 14,
