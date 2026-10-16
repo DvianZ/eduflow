@@ -19,6 +19,7 @@ import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Batch } from '@/types/elearning';
+import { copyToClipboard } from '@/utils/clipboard';
 import { useTranslation } from '@/i18n';
 
 type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
@@ -72,13 +73,7 @@ export default function ClassManagerScreen() {
   );
 
   const handleCopyCode = async (code: string) => {
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(code);
-      }
-    } catch {
-      // fallback
-    }
+    await copyToClipboard(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2500);
   };

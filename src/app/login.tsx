@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useElearningStore } from '@/store/useElearningStore';
-import { FeatureTourModal } from '@/components/FeatureTourModal';
+import { useTourStore } from '@/store/useTourStore';
 import { useTranslation } from '@/i18n';
 
 export default function LoginScreen() {
@@ -33,7 +33,6 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showTour, setShowTour] = useState(false);
 
   const handleLogin = () => {
     setError('');
@@ -330,7 +329,7 @@ export default function LoginScreen() {
                 borderColor: isDark ? '#3B82F6' : '#93C5FD',
               },
             ]}
-            onPress={() => setShowTour(true)}
+            onPress={() => useTourStore.getState().openTour(0)}
             activeOpacity={0.85}>
             <View style={styles.tourCardLeft}>
               <View style={styles.tourIconBadge}>
@@ -352,11 +351,6 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
-
-      <FeatureTourModal
-        visible={showTour}
-        onClose={() => setShowTour(false)}
-      />
     </SafeAreaView>
   );
 }

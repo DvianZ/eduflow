@@ -6,6 +6,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useSettingsStore } from '@/store/useSettingsStore';
 
 import { AlertModal } from '@/components/AlertModal';
+import { FeatureTourModal } from '@/components/FeatureTourModal';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -47,6 +48,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <AlertModal />
+      <FeatureTourModal />
     </ThemeProvider>
   );
 }

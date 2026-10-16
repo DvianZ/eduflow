@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { NotificationModal } from '@/components/NotificationModal';
-import { FeatureTourModal } from '@/components/FeatureTourModal';
+import { useTourStore } from '@/store/useTourStore';
 import { useTranslation } from '@/i18n';
 
 export function DemoHeader() {
@@ -25,7 +25,7 @@ export function DemoHeader() {
   const isUltraCompact = screenWidth < 340;
 
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showFeatureTour, setShowFeatureTour] = useState(false);
+  const openTour = useTourStore((s) => s.openTour);
 
   const {
     currentRole,
@@ -42,11 +42,11 @@ export function DemoHeader() {
   useEffect(() => {
     if (!hasSeenAppTour) {
       const timer = setTimeout(() => {
-        setShowFeatureTour(true);
+        openTour(0);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [hasSeenAppTour]);
+  }, [hasSeenAppTour, openTour]);
 
   const userNotifications = notifications.filter(
     (n) => n.userId === currentUser.id
@@ -111,7 +111,7 @@ export function DemoHeader() {
 
           {/* Feature Tour Guide Button */}
           <TouchableOpacity
-            onPress={() => setShowFeatureTour(true)}
+            onPress={() => openTour(0)}
             style={[
               styles.iconBtn,
               isCompact && { width: isUltraCompact ? 24 : 26, height: isUltraCompact ? 24 : 26, borderRadius: 12 },
@@ -253,12 +253,6 @@ export function DemoHeader() {
           </Text>
         </View>
       )}
-
-      {/* In-App Guided Feature Tour Modal */}
-      <FeatureTourModal
-        visible={showFeatureTour}
-        onClose={() => setShowFeatureTour(false)}
-      />
 
       {/* Notification Center Modal */}
       <NotificationModal

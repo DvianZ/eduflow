@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router';
 import { DemoHeader } from '@/components/DemoHeader';
 import { useElearningStore } from '@/store/useElearningStore';
 import { calculateBatchEvaluation } from '@/utils/lockEngine';
+import { copyToClipboard } from '@/utils/clipboard';
 import { useTranslation } from '@/i18n';
 
 export default function DashboardScreen() {
@@ -80,13 +81,7 @@ export default function DashboardScreen() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const handleCopyCode = async (code: string) => {
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(code);
-      }
-    } catch {
-      // fallback
-    }
+    await copyToClipboard(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };

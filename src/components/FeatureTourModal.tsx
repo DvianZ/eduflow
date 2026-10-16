@@ -12,10 +12,11 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useElearningStore } from '@/store/useElearningStore';
+import { useTourStore } from '@/store/useTourStore';
 
 interface FeatureTourModalProps {
-  visible: boolean;
-  onClose: () => void;
+  visible?: boolean;
+  onClose?: () => void;
 }
 
 interface TourStep {
@@ -32,14 +33,25 @@ interface TourStep {
   scrollOffset?: number | 'bottom';
 }
 
-export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
+export function FeatureTourModal({
+  visible: propVisible,
+  onClose: propOnClose,
+}: FeatureTourModalProps = {}) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const { setHasSeenAppTour, switchRole } = useElearningStore();
+  const {
+    isOpen: storeIsOpen,
+    currentStepIndex,
+    closeTour,
+    nextStep,
+    prevStep,
+    setStepIndex,
+  } = useTourStore();
   const { width: windowWidth } = useWindowDimensions();
 
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const isModalVisible = propVisible !== undefined ? propVisible : storeIsOpen;
   const [isMinimized, setIsMinimized] = useState(false);
 
   const tourSteps: TourStep[] = [
@@ -186,7 +198,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
 
   // Dynamically navigate to the target screen, role, and scroll offset as the tour progresses
   useEffect(() => {
-    if (visible && activeStep) {
+    if (isModalVisible && activeStep) {
       if (activeStep.targetRole) {
         switchRole(activeStep.targetRole);
       }
@@ -217,39 +229,39 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
         return () => clearTimeout(scrollTimer);
       }
     }
-  }, [visible, currentStepIndex, activeStep, router, switchRole]);
+  }, [isModalVisible, currentStepIndex, activeStep, router, switchRole]);
 
   const handleNext = () => {
     if (isLastStep) {
       handleFinish();
     } else {
-      setCurrentStepIndex((prev) => prev + 1);
+      nextStep(tourSteps.length);
     }
   };
 
   const handlePrev = () => {
     if (!isFirstStep) {
-      setCurrentStepIndex((prev) => prev - 1);
+      prevStep();
     }
   };
 
   const handleFinish = () => {
     setHasSeenAppTour(true);
-    setCurrentStepIndex(0);
+    closeTour();
     setIsMinimized(false);
-    onClose();
+    propOnClose?.();
     // Return to main dashboard with learner mode
     switchRole('learner');
     router.push('/(tabs)' as any);
   };
 
-  if (!visible) return null;
+  if (!isModalVisible) return null;
 
   const cardMaxWidth = Math.min(windowWidth - 20, 500);
 
   return (
     <Modal
-      visible={visible}
+      visible={isModalVisible}
       animationType="fade"
       transparent
       onRequestClose={handleFinish}>
@@ -500,7 +512,7 @@ export function FeatureTourModal({ visible, onClose }: FeatureTourModalProps) {
                   {tourSteps.map((_, idx) => (
                     <TouchableOpacity
                       key={idx}
-                      onPress={() => setCurrentStepIndex(idx)}
+                      onPress={() => setStepIndex(idx)}
                       style={[
                         styles.dotItem,
                         idx === currentStepIndex

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import { useTranslation } from '@/i18n';
 import { useSettingsStore, AppTheme } from '@/store/useSettingsStore';
 import { useElearningStore } from '@/store/useElearningStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { FeatureTourModal } from '@/components/FeatureTourModal';
+import { useTourStore } from '@/store/useTourStore';
 import {
   buildGradebookRows,
   formatGradebookCSV,
@@ -60,8 +60,6 @@ export default function SettingsScreen() {
     quizAttempts,
   } = useElearningStore();
   const registeredUsers = useAuthStore((state) => state.registeredUsers);
-
-  const [showTourModal, setShowTourModal] = useState(false);
 
   const { section } = useGlobalSearchParams<{ section?: string }>();
   const scrollRef = useRef<ScrollView>(null);
@@ -515,7 +513,7 @@ export default function SettingsScreen() {
           <View style={[styles.bentoCard, { backgroundColor: cardBg, borderColor }]}>
             {/* Replay Tour */}
             <TouchableOpacity
-              onPress={() => setShowTourModal(true)}
+              onPress={() => useTourStore.getState().openTour(0)}
               style={styles.actionRow}
               activeOpacity={0.8}>
               <View style={styles.actionLeft}>
@@ -639,12 +637,6 @@ export default function SettingsScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-
-      {/* Guided Tour Modal */}
-      <FeatureTourModal
-        visible={showTourModal}
-        onClose={() => setShowTourModal(false)}
-      />
     </SafeAreaView>
   );
 }

@@ -1,5 +1,6 @@
 import { Batch, Course, BatchEnrollment, AssignmentSubmission, SubmissionGrade, QuizAttempt, Module, Lesson, Quiz } from '@/types/elearning';
 import { AuthUser } from '@/types/auth';
+import { copyToClipboard } from '@/utils/clipboard';
 
 export interface GradebookRow {
   no: number;
@@ -266,13 +267,5 @@ export function downloadCSVFile(csvContent: string, filename: string): boolean {
  * Menyalin konten CSV ke clipboard
  */
 export async function copyCSVToClipboard(csvContent: string): Promise<boolean> {
-  try {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      await navigator.clipboard.writeText(csvContent);
-      return true;
-    }
-  } catch (err) {
-    console.error('Clipboard copy error:', err);
-  }
-  return false;
+  return await copyToClipboard(csvContent);
 }

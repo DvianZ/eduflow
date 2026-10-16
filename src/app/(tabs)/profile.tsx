@@ -20,6 +20,7 @@ import { calculateBatchEvaluation } from '@/utils/lockEngine';
 import { useTranslation } from '@/i18n';
 import { triggerMilestoneFeedback } from '@/utils/feedback';
 import { getCertificatePdfFilename, printCertificatePDF } from '@/utils/certificatePdf';
+import { copyToClipboard } from '@/utils/clipboard';
 import { DEMO_USERS } from '@/data/mockData';
 
 export default function ProfileScreen() {
@@ -282,7 +283,14 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            <View style={styles.certNameValueBox}>
+            <View
+              style={[
+                styles.certNameValueBox,
+                {
+                  backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                  borderColor: isDark ? '#334155' : '#E2E8F0',
+                },
+              ]}>
               <Text
                 style={[
                   styles.certNameValueText,
@@ -297,17 +305,40 @@ export default function ProfileScreen() {
                   );
                   setShowCertNameModal(true);
                 }}
-                style={styles.editCertNameBtn}>
-                <Ionicons name="create-outline" size={15} color="#2563EB" />
-                <Text style={styles.editCertNameBtnText}>
+                style={[
+                  styles.editCertNameBtn,
+                  isDark && {
+                    backgroundColor: '#1E293B',
+                    borderColor: '#3B82F6',
+                    borderBottomColor: '#1D4ED8',
+                  },
+                ]}>
+                <Ionicons
+                  name="create-outline"
+                  size={15}
+                  color={isDark ? '#60A5FA' : '#2563EB'}
+                />
+                <Text
+                  style={[
+                    styles.editCertNameBtnText,
+                    isDark && { color: '#93C5FD' },
+                  ]}>
                   Edit Legal Name
                 </Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.certNameNoticeRow}>
-              <Ionicons name="information-circle-outline" size={14} color="#64748B" />
-              <Text style={styles.certNameNoticeText}>
+              <Ionicons
+                name="information-circle-outline"
+                size={14}
+                color={isDark ? '#94A3B8' : '#64748B'}
+              />
+              <Text
+                style={[
+                  styles.certNameNoticeText,
+                  { color: isDark ? '#94A3B8' : '#64748B' },
+                ]}>
                 Ensure name matches your government-issued ID. Name cannot be altered once credential is officially issued.
               </Text>
             </View>
@@ -636,10 +667,11 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    onPress={() => {
+                    onPress={async () => {
+                      await copyToClipboard(existingCert.certificateNumber);
                       Alert.alert(
                         'Credential Copied',
-                        `Certificate ID: ${existingCert.certificateNumber}\nClass: ${existingCert.batchName}\nRecipient: ${existingCert.studentName}\n\nID copied for your professional portfolio verification.`
+                        `Certificate ID: ${existingCert.certificateNumber}\nClass: ${existingCert.batchName}\nRecipient: ${existingCert.studentName}\n\nID copied to clipboard for your portfolio verification.`
                       );
                     }}
                     style={[
@@ -914,8 +946,21 @@ export default function ProfileScreen() {
             <View style={styles.promptBtnRow}>
               <TouchableOpacity
                 onPress={() => setShowCertNameModal(false)}
-                style={styles.promptCancelBtn}>
-                <Text style={styles.promptCancelText}>Cancel</Text>
+                style={[
+                  styles.promptCancelBtn,
+                  isDark && {
+                    backgroundColor: '#0F172A',
+                    borderColor: '#334155',
+                    borderBottomColor: '#1E293B',
+                  },
+                ]}>
+                <Text
+                  style={[
+                    styles.promptCancelText,
+                    isDark && { color: '#94A3B8' },
+                  ]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity

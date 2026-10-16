@@ -22,6 +22,7 @@ import {
   isAssignmentUnlocked,
 } from '@/utils/lockEngine';
 import { Lesson, Quiz, Assignment } from '@/types/elearning';
+import { copyToClipboard } from '@/utils/clipboard';
 import { useTranslation } from '@/i18n';
 import { triggerMilestoneFeedback } from '@/utils/feedback';
 import { InlineVideoPlayer } from '@/components/InlineVideoPlayer';
@@ -127,13 +128,7 @@ export default function SyllabusScreen() {
   const currentModuleQuiz = quizzes.find((q) => q.moduleId === selectedLesson?.moduleId);
 
   const handleCopyCodeSnippet = async (text: string, index: number) => {
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-      }
-    } catch {
-      // fallback
-    }
+    await copyToClipboard(text);
     setCopiedSnippetIndex(index);
     setTimeout(() => setCopiedSnippetIndex(null), 2000);
   };
