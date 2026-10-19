@@ -45,7 +45,6 @@ export function detectAlertType(
     combined.includes('passed') ||
     combined.includes('published') ||
     combined.includes('active') ||
-    combined.includes('🎉') ||
     combined.includes('✓')
   ) {
     return 'success';

@@ -91,10 +91,10 @@ export default function RegisterScreen() {
     }
   };
 
-  const bg = isDark ? '#090D16' : '#F0F4FF';
+  const bg = isDark ? '#0F172A' : '#F8FAFC';
   const cardBg = isDark ? '#1E293B' : '#FFFFFF';
   const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
-  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const textSecondary = isDark ? '#94A3B8' : '#475569';
   const inputBg = isDark ? '#0F172A' : '#F1F5F9';
   const inputBorder = isDark ? '#334155' : '#CBD5E1';
 

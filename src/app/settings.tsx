@@ -135,10 +135,10 @@ export default function SettingsScreen() {
     );
   };
 
-  const bg = isDark ? '#090D16' : '#F4F6FA';
+  const bg = isDark ? '#0F172A' : '#F8FAFC';
   const cardBg = isDark ? '#1E293B' : '#FFFFFF';
   const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
-  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const textSecondary = isDark ? '#94A3B8' : '#475569';
   const borderColor = isDark ? '#334155' : '#E2E8F0';
   const sectionTitleColor = isDark ? '#93C5FD' : '#2563EB';
 
@@ -204,7 +204,7 @@ export default function SettingsScreen() {
                 },
               ]}>
               <View style={styles.langOptionLeft}>
-                <Text style={styles.flagEmoji}>🇺🇸</Text>
+                <Text style={[styles.flagEmoji, { fontWeight: '800', fontSize: 16, color: textPrimary }]}>US</Text>
                 <View style={{ flex: 1 }}>
                   <View style={styles.langBadgeRow}>
                     <Text style={[styles.langName, { color: textPrimary }]}>

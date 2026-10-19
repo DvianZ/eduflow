@@ -471,7 +471,7 @@ export function FeatureTourModal({
                     },
                   ]}>
                   <Text style={styles.nextBtnText}>
-                    {isLastStep ? 'Finish Tour 🎉' : 'Next Step ➔'}
+                    {isLastStep ? 'Finish Tour' : 'Next Step ➔'}
                   </Text>
                 </TouchableOpacity>
               </View>

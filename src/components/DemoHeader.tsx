@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   useWindowDimensions,
+  Image,
 } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
@@ -74,14 +75,14 @@ export function DemoHeader() {
       {/* Brand & Streak Row */}
       <View style={styles.topRow}>
         <View style={[styles.brandContainer, isCompact && { gap: 5, marginRight: 2 }]}>
-          <View
+          <Image
+            source={require('../../assets/images/app-logo.png')}
             style={[
               styles.logoIcon,
               isCompact && { width: isUltraCompact ? 26 : 28, height: isUltraCompact ? 26 : 28, borderRadius: 6 },
-              { backgroundColor: isTeacher ? '#8B5CF6' : '#2563EB' },
-            ]}>
-            <Ionicons name="school" size={isUltraCompact ? 13 : 15} color="#FFFFFF" />
-          </View>
+            ]}
+            resizeMode="contain"
+          />
           <View style={styles.brandTextWrapper}>
             <Text
               style={[
@@ -106,7 +107,7 @@ export function DemoHeader() {
               { backgroundColor: isDark ? '#1E293B' : '#FEF3C7' },
             ]}>
             <Text style={[styles.streakText, isCompact && { fontSize: 10 }]}>
-              {isUltraCompact ? `${userStreak.currentStreak}d` : `🔥 ${userStreak.currentStreak}d`}
+              {`${userStreak.currentStreak}d`}
             </Text>
           </View>
 
@@ -123,7 +124,7 @@ export function DemoHeader() {
               },
             ]}
             accessibilityLabel={t.header.guideBtn}>
-            <Ionicons name="sparkles" size={isUltraCompact ? 12 : 14} color="#2563EB" />
+            <Ionicons name="sparkles" size={isUltraCompact ? 12 : 14} color={isDark ? '#3B82F6' : '#2563EB'} />
           </TouchableOpacity>
 
           {/* In-App Notification Bell */}
@@ -140,7 +141,7 @@ export function DemoHeader() {
               name={unreadCount > 0 ? 'notifications' : 'notifications-outline'}
               size={isUltraCompact ? 13 : 15}
               color={
-                unreadCount > 0 ? '#8B5CF6' : isDark ? '#94A3B8' : '#64748B'
+                unreadCount > 0 ? (isDark ? '#8B5CF6' : '#7C3AED') : isDark ? '#94A3B8' : '#64748B'
               }
             />
             {unreadCount > 0 && (
@@ -183,7 +184,7 @@ export function DemoHeader() {
             style={[
               styles.rolePill,
               isCompact && { paddingVertical: 5, paddingHorizontal: 3, gap: 3 },
-              !isTeacher && styles.activePillLearner,
+              !isTeacher && { backgroundColor: isDark ? '#3B82F6' : '#2563EB' },
             ]}>
             <Ionicons
               name="person"
@@ -206,7 +207,7 @@ export function DemoHeader() {
             style={[
               styles.rolePill,
               isCompact && { paddingVertical: 5, paddingHorizontal: 3, gap: 3 },
-              isTeacher && styles.activePillTeacher,
+              isTeacher && { backgroundColor: isDark ? '#8B5CF6' : '#7C3AED' },
             ]}>
             <Ionicons
               name="school"

@@ -344,7 +344,7 @@ export const INITIAL_ANNOUNCEMENTS: BatchAnnouncement[] = [
     batchId: 'batch-edf-402',
     authorId: 'user-alex',
     authorName: 'Alex Kurniawan, M.Sc.',
-    title: '📢 Welcome to Batch 04 - Mobile Cohort Program!',
+    title: 'Welcome to Batch 04 - Mobile Cohort Program!',
     message: 'Welcome to all cohort participants! Please begin working through Module 1 sequentially. Remember to complete your Module Evaluation Quiz prior to submitting the Capstone Deliverable in Module 2.',
     createdAt: '2026-10-12T08:00:00Z',
   },
@@ -353,7 +353,7 @@ export const INITIAL_ANNOUNCEMENTS: BatchAnnouncement[] = [
     batchId: 'batch-wdf-101',
     authorId: 'user-hendra',
     authorName: 'Dr. Hendra Wijaya, Ph.D.',
-    title: '🎓 Official Graduation Announcement - Entrepreneurship Batch 01',
+    title: 'Official Graduation Announcement - Entrepreneurship Batch 01',
     message: 'Congratulations to all accredited graduates! Verified digital credentials have been issued and are available in your Graduation Profile.',
     createdAt: '2026-09-15T10:00:00Z',
   },
@@ -416,7 +416,7 @@ export const INITIAL_NOTIFICATIONS: InAppNotification[] = [
   {
     id: 'notif-1',
     userId: 'user-budi',
-    title: '📢 New Cohort Announcement in Batch 04',
+    title: 'New Cohort Announcement in Batch 04',
     message: 'Alex Kurniawan posted an announcement: Welcome to Batch 04 - Mobile Cohort Program!',
     type: 'announcement',
     isRead: false,
@@ -430,7 +430,7 @@ export const INITIAL_NOTIFICATIONS: InAppNotification[] = [
   {
     id: 'notif-2',
     userId: 'user-budi',
-    title: '🎉 Graduation Certificate Issued!',
+    title: 'Graduation Certificate Issued!',
     message: 'Congratulations! Your accredited certificate for Entrepreneurship & Digital Venture Creation has been officially published.',
     type: 'grade',
     isRead: true,
@@ -444,7 +444,7 @@ export const INITIAL_NOTIFICATIONS: InAppNotification[] = [
   {
     id: 'notif-3',
     userId: 'user-budi',
-    title: '🔥 3-Day Learning Streak Active',
+    title: '3-Day Learning Streak Active',
     message: 'Excellent momentum! Maintain your daily learning habit to earn bonus XP.',
     type: 'system',
     isRead: false,
@@ -453,7 +453,7 @@ export const INITIAL_NOTIFICATIONS: InAppNotification[] = [
   {
     id: 'notif-4',
     userId: 'user-alex',
-    title: '👋 New Learner Enrolled',
+    title: 'New Learner Enrolled',
     message: 'Budi Santoso has enrolled in React Native & Expo Mobile Developer - Batch 04.',
     type: 'enrollment',
     isRead: false,
@@ -466,7 +466,7 @@ export const INITIAL_NOTIFICATIONS: InAppNotification[] = [
   {
     id: 'notif-5',
     userId: 'user-alex',
-    title: '💡 Deliverable Ready for Evaluation',
+    title: 'Deliverable Ready for Evaluation',
     message: 'A new capstone submission has been queued and awaits your review in the Gradebook.',
     type: 'system',
     isRead: false,

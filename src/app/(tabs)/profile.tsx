@@ -112,7 +112,7 @@ export default function ProfileScreen() {
     authUpdateCertName(currentUser.id, certNameInput.trim());
     setShowCertNameModal(false);
     Alert.alert(
-      'Official Name Saved! 🎉',
+      'Official Name Saved!',
       'This legal name will appear on all your verified digital credentials.'
     );
   };
@@ -168,7 +168,7 @@ export default function ProfileScreen() {
       setSelectedCertId(cert.id);
       setShowCertificateModal(true);
       Alert.alert(
-        '🎉 Congratulations! Official Credential Issued',
+        'Congratulations! Official Credential Issued',
         `Credential ID: ${cert.certificateNumber}\nProgram: ${cert.courseTitle}\nFinal Score: ${cert.finalScore}/100\n+200 XP earned!\n\nYou can now view and print your official certificate.`
       );
     }
@@ -193,7 +193,7 @@ export default function ProfileScreen() {
       edges={['top']}
       style={[
         styles.safeArea,
-        { backgroundColor: isDark ? '#0B0F19' : '#F4F6FA' },
+        { backgroundColor: isDark ? '#0F172A' : '#F8FAFC' },
       ]}>
       <DemoHeader />
 
@@ -247,8 +247,8 @@ export default function ProfileScreen() {
                   },
                 ]}>
                 {isTeacher
-                  ? '👨‍🏫 Certified Cohort Instructor'
-                  : '👨‍🎓 Active Cohort Learner'}
+                  ? 'Certified Cohort Instructor'
+                  : 'Active Cohort Learner'}
               </Text>
             </View>
           </View>
@@ -390,7 +390,7 @@ export default function ProfileScreen() {
                         {
                           backgroundColor: isSelected ? '#8B5CF6' : isDark ? '#0F172A' : '#F1F5F9',
                           borderColor: isSelected ? '#7C3AED' : isDark ? '#334155' : '#E2E8F0',
-                          borderBottomColor: isSelected ? '#6D28D9' : isDark ? '#0B0F19' : '#CBD5E1',
+                          borderBottomColor: isSelected ? '#6D28D9' : isDark ? '#0F172A' : '#CBD5E1',
                         },
                       ]}>
                       <Text
@@ -412,7 +412,7 @@ export default function ProfileScreen() {
                 {
                   backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
                   borderColor: isDark ? '#334155' : '#E2E8F0',
-                  borderBottomColor: isDark ? '#0B0F19' : '#CBD5E1',
+                  borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
                 },
               ]}>
               <Text
@@ -420,7 +420,7 @@ export default function ProfileScreen() {
                   styles.monitorTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                👥 Student Monitoring ({activeBatch.classCode}):
+                Student Monitoring ({activeBatch.classCode}):
               </Text>
 
               {batchEnrollments.length === 0 ? (
@@ -506,7 +506,7 @@ export default function ProfileScreen() {
                   styles.evalTitle,
                   { color: isDark ? '#F8FAFC' : '#0F172A' },
                 ]}>
-                🎓 Graduation Evaluator & Certificate Claim
+                Graduation Evaluator & Certificate Claim
               </Text>
               <Text
                 style={[
@@ -537,7 +537,7 @@ export default function ProfileScreen() {
                         {
                           backgroundColor: isSelected ? '#2563EB' : isDark ? '#0F172A' : '#F1F5F9',
                           borderColor: isSelected ? '#1D4ED8' : isDark ? '#334155' : '#E2E8F0',
-                          borderBottomColor: isSelected ? '#1E40AF' : isDark ? '#0B0F19' : '#CBD5E1',
+                          borderBottomColor: isSelected ? '#1E40AF' : isDark ? '#0F172A' : '#CBD5E1',
                         },
                       ]}>
                       <Text
@@ -574,7 +574,7 @@ export default function ProfileScreen() {
                         styles.showcaseTitle,
                         { color: isDark ? '#A7F3D0' : '#065F46' },
                       ]}>
-                      Cohort Officially Certified! 🎓
+                      Cohort Officially Certified!
                     </Text>
                     <Text
                       style={[
@@ -679,7 +679,7 @@ export default function ProfileScreen() {
                       {
                         backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
                         borderColor: isDark ? '#334155' : '#E2E8F0',
-                        borderBottomColor: isDark ? '#0B0F19' : '#CBD5E1',
+                        borderBottomColor: isDark ? '#0F172A' : '#CBD5E1',
                       },
                     ]}>
                     <Ionicons

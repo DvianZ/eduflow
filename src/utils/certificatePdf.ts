@@ -109,7 +109,7 @@ export function buildCertificateHTML(cert: Certificate): string {
       margin-bottom: 16px;
       text-decoration: underline;
       text-underline-offset: 6px;
-      text-decoration-color: #FBBF24;
+      text-decoration-color: #F59E0B;
     }
     .cert-desc {
       font-size: 13px;
@@ -187,7 +187,9 @@ export function buildCertificateHTML(cert: Certificate): string {
 <body>
   <div class="cert-frame">
     <div class="cert-inner">
-      <div class="cert-badge">🎓</div>
+      <div class="cert-badge">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-top: 12px;"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      </div>
       <div class="cert-title">Certificate of Completion</div>
       <div class="cert-number">CREDENTIAL #${cert.certificateNumber}</div>
       <div class="cert-lead">This is to officially certify that</div>

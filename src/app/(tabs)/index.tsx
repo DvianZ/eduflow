@@ -159,10 +159,10 @@ export default function DashboardScreen() {
   };
 
   // Gamified & Tactile 3D Color Tokens
-  const pageBg = isDark ? '#0B0F19' : '#F4F6FA';
+  const pageBg = isDark ? '#0F172A' : '#F8FAFC';
   const cardBg = isDark ? '#1E293B' : '#FFFFFF';
-  const textPrimary = isDark ? '#F8FAFC' : '#1E293B';
-  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
+  const textSecondary = isDark ? '#94A3B8' : '#475569';
   const inputBg = isDark ? '#0F172A' : '#F8FAFC';
 
   return (
@@ -184,13 +184,7 @@ export default function DashboardScreen() {
               {/* Status Pill */}
               <View style={[styles.heroBadgePill, isCompact && { paddingHorizontal: 8, paddingVertical: 4 }]}>
                 <Ionicons
-                  name={
-                    activeBatch.status === 'completed'
-                      ? 'trophy'
-                      : activeBatch.id === 'batch-edf-402'
-                      ? 'flash'
-                      : 'school'
-                  }
+                  name={activeBatch.status === 'completed' ? 'trophy' : 'school'}
                   size={13}
                   color="#FBBF24"
                 />

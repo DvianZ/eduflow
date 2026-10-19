@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -98,10 +99,10 @@ export default function LoginScreen() {
     }, 250);
   };
 
-  const bg = isDark ? '#090D16' : '#F0F4FF';
+  const bg = isDark ? '#0F172A' : '#F8FAFC';
   const cardBg = isDark ? '#1E293B' : '#FFFFFF';
   const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
-  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const textSecondary = isDark ? '#94A3B8' : '#475569';
   const inputBg = isDark ? '#0F172A' : '#F1F5F9';
   const inputBorder = isDark ? '#334155' : '#CBD5E1';
 
@@ -117,9 +118,11 @@ export default function LoginScreen() {
           {/* Brand */}
           <View style={styles.brandSection}>
             <View style={styles.logoContainer}>
-              <View style={styles.logoGradient}>
-                <Ionicons name="school" size={32} color="#FFFFFF" />
-              </View>
+              <Image
+                source={require('../../assets/images/app-logo.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
             </View>
             <Text style={[styles.brandTitle, { color: textPrimary }]}>
               EduFlow <Text style={styles.cohortTag}>{t.header.cohortTag}</Text>
@@ -371,18 +374,10 @@ const styles = StyleSheet.create({
   logoContainer: {
     marginBottom: 12,
   },
-  logoGradient: {
-    width: 64,
-    height: 64,
+  logoImage: {
+    width: 76,
+    height: 76,
     borderRadius: 20,
-    backgroundColor: '#2563EB',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#2563EB',
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
   },
   brandTitle: {
     fontSize: 28,

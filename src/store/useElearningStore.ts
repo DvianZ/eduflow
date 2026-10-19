@@ -317,7 +317,7 @@ export const useElearningStore = create<ElearningState>()(
           const teacherNotif: InAppNotification = {
             id: `notif-sub-${Date.now()}`,
             userId: batch.instructorId,
-            title: '📥 Pengumpulan Tugas Baru',
+            title: 'New Assignment Submission',
             message: `${currentUser.fullName} telah mengumpulkan tugas proyek di kelas ${batch.batchName}.`,
             type: 'system',
             isRead: false,
@@ -387,8 +387,8 @@ export const useElearningStore = create<ElearningState>()(
           id: `notif-grade-${Date.now()}`,
           userId: submission.userId,
           title: requestRevision
-            ? '⚠️ Project Revision Requested'
-            : `🎉 Project Evaluated: Score ${score}/100`,
+            ? 'Project Revision Requested'
+            : `Project Evaluated: Score ${score}/100`,
           message: requestRevision
             ? `${currentUser.fullName} requested a revision on "${assignment?.title || 'Project Assignment'}". Remarks: "${feedbackNotes || 'Please review instructor notes.'}"`
             : `${currentUser.fullName} evaluated "${assignment?.title || 'Project Assignment'}". Remarks: "${feedbackNotes || 'Excellent work!'}"`,
@@ -439,7 +439,7 @@ export const useElearningStore = create<ElearningState>()(
         const newNotifs: InAppNotification[] = enrolledStudents.map((enr, idx) => ({
           id: `notif-ann-${Date.now()}-${idx}`,
           userId: enr.userId,
-          title: `📢 New Announcement: ${batch?.batchName || 'Cohort'}`,
+          title: `New Announcement: ${batch?.batchName || 'Cohort'}`,
           message: `${currentUser.fullName}: "${title}"`,
           type: 'announcement',
           isRead: false,
@@ -830,7 +830,7 @@ export const useElearningStore = create<ElearningState>()(
         const teacherNotif: InAppNotification = {
           id: `notif-join-${Date.now()}`,
           userId: batch.instructorId,
-          title: '👋 New Student Enrolled',
+          title: 'New Student Enrolled',
           message: `A new student has enrolled in cohort ${batch.batchName}.`,
           type: 'enrollment',
           isRead: false,

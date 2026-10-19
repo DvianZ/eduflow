@@ -596,7 +596,7 @@ export default function SyllabusScreen() {
       edges={['top']}
       style={[
         styles.safeArea,
-        { backgroundColor: isDark ? '#0B0F19' : '#F4F6FA' },
+        { backgroundColor: isDark ? '#0F172A' : '#F8FAFC' },
       ]}>
       <DemoHeader />
 
@@ -609,7 +609,7 @@ export default function SyllabusScreen() {
               styles.screenTitle,
               { color: isDark ? '#F8FAFC' : '#0F172A' },
             ]}>
-            📚 {t.syllabus.headerTitle}
+            {t.syllabus.headerTitle}
           </Text>
           <Text style={styles.screenSubtitle}>
             {isTeacher
@@ -1227,11 +1227,11 @@ export default function SyllabusScreen() {
                             Project Assignment • Max {assignment.maxScore} Pts
                           </Text>
                           <Text style={styles.dueDateLabel}>
-                            ⏰ Deadline: {assignment.dueDate}
+                            Deadline: {assignment.dueDate}
                           </Text>
                           {!unlocked && !isTeacher && (
                             <Text style={styles.lockHintText}>
-                              🔒 Locked (Complete Module 1 lessons & quiz first)
+                              Locked (Complete Module 1 lessons & quiz first)
                             </Text>
                           )}
                         </View>
@@ -1695,7 +1695,7 @@ export default function SyllabusScreen() {
                       styles.instructionsTitle,
                       { color: isDark ? '#93C5FD' : '#1D4ED8' },
                     ]}>
-                    📋 Instructor Assignment Guidelines:
+                    Instructor Assignment Guidelines:
                   </Text>
                   <Text
                     style={[
@@ -1705,7 +1705,7 @@ export default function SyllabusScreen() {
                     {selectedAssignment.instructions}
                   </Text>
                   <Text style={styles.modalDueDateBadge}>
-                    ⏰ Due Date: {selectedAssignment.dueDate}
+                    Due Date: {selectedAssignment.dueDate}
                   </Text>
                 </View>
 
@@ -2271,7 +2271,7 @@ export default function SyllabusScreen() {
                           styles.presetChip,
                           { backgroundColor: isDark ? '#0F172A' : '#EFF6FF' },
                         ]}>
-                        <Text style={styles.presetChipText}>🎬 Sample MP4</Text>
+                        <Text style={styles.presetChipText}>Sample MP4</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() =>
@@ -2285,7 +2285,7 @@ export default function SyllabusScreen() {
                         ]}>
                         <Text
                           style={[styles.presetChipText, { color: '#DC2626' }]}>
-                          🔴 YouTube
+                          YouTube
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -2555,7 +2555,7 @@ export default function SyllabusScreen() {
                 styles.promptTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              ⏰ Set Assignment Deadline
+              Set Assignment Deadline
             </Text>
             <Text style={styles.promptSubtitle}>
               {targetAssignmentToEdit?.title}
@@ -2614,7 +2614,7 @@ export default function SyllabusScreen() {
                 styles.promptTitle,
                 { color: isDark ? '#F8FAFC' : '#0F172A' },
               ]}>
-              📁 Add New Module
+              Add New Module
             </Text>
 
             <Text style={styles.promptSubtitle}>

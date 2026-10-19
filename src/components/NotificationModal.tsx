@@ -105,39 +105,39 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
       case 'grade':
         return {
           icon: 'trophy',
-          color: '#10B981',
+          color: isDark ? '#10B981' : '#059669',
           bg: isDark ? 'rgba(16, 185, 129, 0.2)' : '#ECFDF5',
         };
       case 'revision':
         return {
           icon: 'alert-circle',
-          color: '#F59E0B',
+          color: isDark ? '#F59E0B' : '#D97706',
           bg: isDark ? 'rgba(245, 158, 11, 0.2)' : '#FFFBEB',
         };
       case 'announcement':
         return {
           icon: 'megaphone',
-          color: '#8B5CF6',
+          color: isDark ? '#8B5CF6' : '#7C3AED',
           bg: isDark ? 'rgba(139, 92, 246, 0.2)' : '#F5F3FF',
         };
       case 'enrollment':
         return {
           icon: 'people',
-          color: '#2563EB',
+          color: isDark ? '#3B82F6' : '#2563EB',
           bg: isDark ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
         };
       case 'deadline':
         return {
           icon: 'time',
-          color: '#EF4444',
+          color: isDark ? '#EF4444' : '#DC2626',
           bg: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEF2F2',
         };
       case 'system':
       default:
         return {
           icon: 'notifications',
-          color: '#6366F1',
-          bg: isDark ? 'rgba(99, 102, 241, 0.2)' : '#EEF2FF',
+          color: isDark ? '#0EA5E9' : '#0284C7',
+          bg: isDark ? 'rgba(14, 165, 233, 0.2)' : '#F0F9FF',
         };
     }
   };
@@ -382,7 +382,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
 
                       <View style={styles.notifFooter}>
                         <Text style={styles.notifTime}>
-                          ⏱️ {formatRelativeTime(notif.createdAt)}
+                          {formatRelativeTime(notif.createdAt)}
                         </Text>
                         {notif.linkRoute && (
                           <View style={styles.actionPrompt}>

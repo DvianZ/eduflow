@@ -184,10 +184,10 @@ export default function ClassManagerScreen() {
     }
   };
 
-  const bg = isDark ? '#090D16' : '#F8FAFC';
+  const bg = isDark ? '#0F172A' : '#F8FAFC';
   const cardBg = isDark ? '#1E293B' : '#FFFFFF';
   const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
-  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const textSecondary = isDark ? '#94A3B8' : '#475569';
   const inputBg = isDark ? '#0F172A' : '#F1F5F9';
   const inputBorder = isDark ? '#334155' : '#CBD5E1';
 
@@ -294,7 +294,7 @@ export default function ClassManagerScreen() {
                   <View style={styles.successBannerHeader}>
                     <Ionicons name="sparkles" size={20} color="#10B981" />
                     <Text style={styles.successBannerTitle}>
-                      Class Created Successfully! 🎉
+                      Class Created Successfully!
                     </Text>
                   </View>
                   <Text style={[styles.successBannerText, { color: isDark ? '#D1FAE5' : '#065F46' }]}>
@@ -992,7 +992,7 @@ export default function ClassManagerScreen() {
                           fontWeight: editStatus === 'active' ? '700' : '500',
                         },
                       ]}>
-                      🟢 Active
+                      Active
                     </Text>
                   </TouchableOpacity>
 
@@ -1033,7 +1033,7 @@ export default function ClassManagerScreen() {
                           fontWeight: editStatus === 'upcoming' ? '700' : '500',
                         },
                       ]}>
-                      🟡 Upcoming
+                      Upcoming
                     </Text>
                   </TouchableOpacity>
 
@@ -1074,7 +1074,7 @@ export default function ClassManagerScreen() {
                           fontWeight: editStatus === 'completed' ? '700' : '500',
                         },
                       ]}>
-                      🔴 Completed (Closed)
+                      Completed (Closed)
                     </Text>
                   </TouchableOpacity>
                 </View>

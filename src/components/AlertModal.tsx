@@ -61,7 +61,7 @@ export function AlertModal() {
       case 'success':
         return {
           iconName: 'checkmark-circle',
-          accentColor: '#10B981',
+          accentColor: isDark ? '#10B981' : '#059669',
           bgColor: isDark ? 'rgba(16, 185, 129, 0.16)' : '#ECFDF5',
           borderColor: isDark ? 'rgba(16, 185, 129, 0.35)' : '#A7F3D0',
           tagLabel: 'SUCCESS',
@@ -69,7 +69,7 @@ export function AlertModal() {
       case 'error':
         return {
           iconName: 'alert-circle',
-          accentColor: '#EF4444',
+          accentColor: isDark ? '#EF4444' : '#DC2626',
           bgColor: isDark ? 'rgba(239, 68, 68, 0.16)' : '#FEF2F2',
           borderColor: isDark ? 'rgba(239, 68, 68, 0.35)' : '#FECACA',
           tagLabel: 'ERROR',
@@ -77,7 +77,7 @@ export function AlertModal() {
       case 'warning':
         return {
           iconName: 'warning',
-          accentColor: '#F59E0B',
+          accentColor: isDark ? '#F59E0B' : '#D97706',
           bgColor: isDark ? 'rgba(245, 158, 11, 0.16)' : '#FFFBEB',
           borderColor: isDark ? 'rgba(245, 158, 11, 0.35)' : '#FDE68A',
           tagLabel: 'ATTENTION',
@@ -85,18 +85,18 @@ export function AlertModal() {
       case 'confirm':
         return {
           iconName: 'help-circle',
-          accentColor: '#6366F1',
-          bgColor: isDark ? 'rgba(99, 102, 241, 0.16)' : '#EEF2FF',
-          borderColor: isDark ? 'rgba(99, 102, 241, 0.35)' : '#C7D2FE',
+          accentColor: isDark ? '#14B8A6' : '#0D9488',
+          bgColor: isDark ? 'rgba(20, 184, 166, 0.16)' : '#F0FDFA',
+          borderColor: isDark ? 'rgba(20, 184, 166, 0.35)' : '#99F6E4',
           tagLabel: 'CONFIRMATION',
         };
       case 'info':
       default:
         return {
           iconName: 'information-circle',
-          accentColor: '#2563EB',
-          bgColor: isDark ? 'rgba(37, 99, 235, 0.16)' : '#EFF6FF',
-          borderColor: isDark ? 'rgba(37, 99, 235, 0.35)' : '#BFDBFE',
+          accentColor: isDark ? '#0EA5E9' : '#0284C7',
+          bgColor: isDark ? 'rgba(14, 165, 233, 0.16)' : '#F0F9FF',
+          borderColor: isDark ? 'rgba(14, 165, 233, 0.35)' : '#BAE6FD',
           tagLabel: 'NOTICE',
         };
     }
@@ -108,7 +108,7 @@ export function AlertModal() {
   const modalBg = isDark ? '#1E293B' : '#FFFFFF';
   const modalBorder = isDark ? '#334155' : '#E2E8F0';
   const titleColor = isDark ? '#F8FAFC' : '#0F172A';
-  const msgColor = isDark ? '#94A3B8' : '#64748B';
+  const msgColor = isDark ? '#94A3B8' : '#475569';
 
   const isTwoButtons = buttons.length === 2;
 

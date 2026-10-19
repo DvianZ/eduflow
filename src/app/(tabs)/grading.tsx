@@ -174,7 +174,7 @@ export default function GradingScreen() {
       edges={['top']}
       style={[
         styles.safeArea,
-        { backgroundColor: isDark ? '#0B0F19' : '#F4F6FA' },
+        { backgroundColor: isDark ? '#0F172A' : '#F8FAFC' },
       ]}>
       <DemoHeader />
 

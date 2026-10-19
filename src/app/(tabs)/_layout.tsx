@@ -33,8 +33,15 @@ export default function TabsLayout() {
     }
   }, [session?.isAuthenticated, router]);
 
-  const activeColor = currentRole === 'teacher' ? '#8B5CF6' : '#007AFF';
-  const inactiveColor = isDark ? '#8E8E93' : '#8E8E93';
+  const activeColor =
+    currentRole === 'teacher'
+      ? isDark
+        ? '#8B5CF6'
+        : '#7C3AED'
+      : isDark
+      ? '#3B82F6'
+      : '#2563EB';
+  const inactiveColor = '#64748B';
 
   return (
     <Tabs
@@ -44,7 +51,7 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: inactiveColor,
         tabBarStyle: {
           backgroundColor: isDark
-            ? 'rgba(28, 28, 30, 0.85)'
+            ? 'rgba(15, 23, 42, 0.85)'
             : 'rgba(255, 255, 255, 0.85)',
           borderTopColor: isDark
             ? 'rgba(255, 255, 255, 0.08)'
